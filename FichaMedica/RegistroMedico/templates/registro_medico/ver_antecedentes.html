@@ -1,0 +1,166 @@
+
+{% extends 'core/base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block content %}
+
+
+    <style>
+        body{
+            margin: 0;
+        }
+        main {
+            margin-top: 0 !important; /* Elimina el margen superior del main */
+            padding-top: 0 !important; /* Elimina el padding superior si existe */
+          }
+        .container {
+            max-width: 1200px;
+            padding:40px;
+         
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .card {
+            background-color: #fff;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .card h3 {
+            margin-top: 0;
+            font-size: 1.2em;
+            color: #0056b3;
+        }
+        .card p {
+            margin: 5px 0;
+        }
+        .card span {
+            font-weight: bold;
+        }
+        .btn2 {
+            display: inline-block;
+            width: 48%;
+            text-align: center;
+            padding: 10px;
+            background-color: #0056b3;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        .btn:hover {
+            background-color: #004494;
+        }
+        .btn.btn-success {
+            background-color: #28a745;
+        }
+        .btn.btn-success:hover {
+            background-color: #218838;
+        }
+        @media (max-width: 600px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+
+
+    <main class="px-3" style="position: relative; min-height: 100vh; width: 100%; margin: 0; padding: 0;">
+        <style>
+          main::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('{% static "core/img/medico_home.jpg" %}') no-repeat center center;
+            background-size: cover;
+            opacity: 0.4; /* Controla la transparencia de la imagen */
+            z-index: -1; /* Coloca la imagen detrás del contenido */
+          }
+        </style>
+        <div style="position: relative; z-index: 1; ">
+                <div class="container"  style="margin-top: 100px;">
+                    <h2>Antecedentes Médicos</h2>
+
+                    <div class="grid">
+                        <div class="card">
+                            <h3>Operaciones y Medicación</h3>
+                            <p><span>¿Fue operado?</span> {{ antecedente.fue_operado|yesno:"Sí,No" }}</p>
+                            <p><span>¿Toma medicación?</span> {{ antecedente.toma_medicacion|yesno:"Sí,No" }}</p>
+                            <p><span>¿Estuvo internado?</span> {{ antecedente.estuvo_internado|yesno:"Sí,No" }}</p>
+                        </div>
+
+                        <div class="card">
+                            <h3>Condiciones Crónicas</h3>
+                            <p><span>¿Es diabético?</span> {{ antecedente.es_diabetico|yesno:"Sí,No" }}</p>
+                            <p><span>¿Es asmático?</span> {{ antecedente.es_amatico|yesno:"Sí,No" }}</p>
+                            <p><span>¿Es alérgico?</span> {{ antecedente.es_alergico|yesno:"Sí,No" }}</p>
+                            <p><span>Observaciones de alergias:</span> {{ antecedente.alerg_observ }}</p>
+                        </div>
+
+                        <div class="card">
+                            <h3>Dolores y Fracturas</h3>
+                            <p><span>¿Dolores articulares?</span> {{ antecedente.dolores_articulares|yesno:"Sí,No" }}</p>
+                            <p><span>¿Dolor de cintura?</span> {{ antecedente.dolor_cintira|yesno:"Sí,No" }}</p>
+                            <p><span>¿Fracturas?</span> {{ antecedente.fracturas|yesno:"Sí,No" }}</p>
+                        </div>
+
+                        <div class="card">
+                            <h3>Problemas Respiratorios</h3>
+                            <p><span>¿Falta de aire?</span> {{ antecedente.falta_aire|yesno:"Sí,No" }}</p>
+                            <p><span>¿Dolor en el pecho?</span> {{ antecedente.dolor_pecho|yesno:"Sí,No" }}</p>
+                            <p><span>¿Traumatismos de cráneo?</span> {{ antecedente.tramatismos_craneo|yesno:"Sí,No" }}</p>
+                        </div>
+
+                        <div class="card">
+                            <h3>Antecedentes Familiares</h3>
+                            <p><span>¿Muerte súbita familiar?</span> {{ antecedente.muerte_subita_familiar|yesno:"Sí,No" }}</p>
+                            <p><span>¿Enfermedades cardíacas familiares?</span> {{ antecedente.enfermedad_cardiaca_familiar|yesno:"Sí,No" }}</p>
+                            <p><span>¿Soplo cardíaco?</span> {{ antecedente.soplo_cardiaco|yesno:"Sí,No" }}</p>
+                        </div>
+
+                        <div class="card">
+                            <h3>Otros Antecedentes</h3>
+                            <p><span>¿Epilepsia?</span> {{ antecedente.antecedente_epilepsia|yesno:"Sí,No" }}</p>
+                            <p><span>¿Consumo de cocaína o anabólicos?</span> {{ antecedente.consumo_cocaina_anabolicos|yesno:"Sí,No" }}</p>
+                            <p><span>Observaciones:</span> {{ antecedente.cca_observaciones }}</p>
+                        </div>
+                    </div>
+
+                        <!-- Contenedor de los botones -->
+                    <div class="d-flex justify-content-center mt-4">
+                        <a href="{% url 'menu_jugador' %}" class="btn btn-primary me-2">Volver al Menú del Jugador</a>
+                        <!-- Agregamos 'me-2' para separar los botones -->
+                        {% if not ficha_medica.consentimiento_persona %}
+                        <a href="{% url 'registroMedico:modificar_antecedente' antecedente.idantecedente_enfermedades %}" class="btn btn-success">
+                            Modificar Antecedente
+                        </a>
+                        {% endif %}
+                    </div>
+                        
+
+
+                </div>
+
+          
+        </div>
+    </main>
+
+{% endblock %}

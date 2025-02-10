@@ -1,0 +1,95 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Seleccionar Torneo, Categoría y Equipo{% endblock %}
+
+{% block content %}
+<div class="container text-center mt-5">
+    <h3>Seleccione el torneo, la categoría y el equipo</h3>
+    
+    <!-- Formulario principal -->
+    <form id="seleccion-form" method="post">
+        {% csrf_token %}
+
+        <!-- Selección de Torneo -->
+        <div class="mb-4">
+            <h5>Seleccione el torneo</h5>
+            <select id="torneo-select" name="torneo" class="form-select" required onchange="fetchCategorias(this.value)">
+                <option value="">-- Seleccione un torneo --</option>
+                {% for torneo in torneos %}
+                    <option value="{{ torneo.id }}">{{ torneo.nombre }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Selección de Categoría (se llena dinámicamente) -->
+        <div class="mb-4" id="categoria-section" style="display: none;">
+            <h5>Seleccione la categoría</h5>
+            <select id="categoria-select" name="categoria" class="form-select" required onchange="fetchEquipos(this.value)">
+                <option value="">-- Seleccione una categoría --</option>
+            </select>
+        </div>
+
+        <!-- Selección de Equipo (se llena dinámicamente) -->
+        <div class="mb-4" id="equipo-section" style="display: none;">
+            <h5>Seleccione el equipo</h5>
+            <select id="equipo-select" name="equipo" class="form-select" required>
+                <option value="">-- Seleccione un equipo --</option>
+            </select>
+        </div>
+
+        <!-- Botón para enviar el formulario -->
+        <div id="submit-section" style="display: none;">
+            <button type="submit" class="btn btn-success btn-lg mt-3">Guardar</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    // Función para cargar categorías basadas en el torneo seleccionado
+    function fetchCategorias(torneoId) {
+        if (torneoId) {
+            fetch(`/fetch_categorias/${torneoId}/`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Error al cargar categorías');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const categoriaSelect = document.getElementById('categoria-select');
+                    categoriaSelect.innerHTML = '<option value="">-- Seleccione una categoría --</option>'; // Limpiar opciones anteriores
+    
+                    data.categorias.forEach(categoria => {
+                        categoriaSelect.innerHTML += `<option value="${categoria.id}">${categoria.nombre}</option>`;
+                    });
+    
+                    document.getElementById('categoria-section').style.display = 'block'; // Mostrar la sección de categorías
+                })
+                .catch(error => {
+                    console.error('Error en la solicitud:', error);
+                });
+        }
+    }
+
+    // Función para cargar equipos basados en la categoría seleccionada
+    function fetchEquipos(categoriaId) {
+        if (categoriaId) {
+            fetch(`/fetch_equipos/${categoriaId}/`)
+            .then(response => response.json())
+            .then(data => {
+                const equipoSelect = document.getElementById('equipo-select');
+                equipoSelect.innerHTML = '<option value="">-- Seleccione un equipo --</option>'; // Limpiar opciones anteriores
+
+                data.equipos.forEach(equipo => {
+                    equipoSelect.innerHTML += `<option value="${equipo.id}">${equipo.nombre}</option>`;
+                });
+
+                document.getElementById('equipo-section').style.display = 'block'; // Mostrar la sección de equipos
+                document.getElementById('submit-section').style.display = 'block'; // Mostrar el botón de guardar
+            });
+        }
+    }
+</script>
+{% endblock %}
+

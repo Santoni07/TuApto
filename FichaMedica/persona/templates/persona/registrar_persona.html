@@ -1,0 +1,97 @@
+{% extends 'core/base.html' %}
+
+{% load static %}
+{% load widget_tweaks %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <h1 class="is-size-3 text-center mt-3">Bienvenido/a, <strong>{{ profile.nombre }} {{ profile.apellido }}</strong> vamos a completar tu registro</h1>
+
+            <div class="registration-form bg-light p-4 rounded shadow-sm">
+                <form method="post" id="registroForm">
+                    {% csrf_token %}
+                    
+                    <!-- Formulario de Persona -->
+                    <div class="form-group mt-3">
+                        {{ form_persona.direccion.label_tag }}
+                        {% render_field form_persona.direccion class+="form-control mt-2" required="required" %}
+                    </div>
+                    <div class="form-group mt-3">
+                        {{ form_persona.telefono.label_tag }}
+                        {% render_field form_persona.telefono class+="form-control mt-2" required="required" %}
+                    </div>
+                    <div class="form-group mt-3">
+                        {{ form_persona.telefono_alternativo.label_tag }}
+                        {% render_field form_persona.telefono_alternativo class+="form-control mt-2" %}
+                    </div>
+
+                    <!-- Formulario de Jugador -->
+                    <div class="form-group mt-3">
+                        {{ form_jugador.grupo_sanguineo.label_tag }}
+                        {% render_field form_jugador.grupo_sanguineo class+="form-control mt-2" required="required" %}
+                    </div>
+                    <div class="form-group mt-3">
+                        {{ form_jugador.cobertura_medica.label_tag }}
+                        {% render_field form_jugador.cobertura_medica class+="form-control mt-2" %}
+                    </div>
+                    <div class="form-group mt-3">
+                        {{ form_jugador.numero_afiliado.label_tag }}
+                        {% render_field form_jugador.numero_afiliado class+="form-control mt-2" %}
+                    </div>
+
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-primary btn-block">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Registro Exitoso -->
+<div class="modal fade" id="registroExitosoModal" tabindex="-1" aria-labelledby="registroExitosoModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="registroExitosoModalLabel">Registro Exitoso</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        ¡Tu registro se ha completado exitosamente!
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Incluye Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // Validación de campos requeridos antes de enviar el formulario
+    document.getElementById('registroForm').addEventListener('submit', function(event) {
+        const direccion = document.getElementById('{{ form_persona.direccion.id_for_label }}').value.trim();
+        const telefono = document.getElementById('{{ form_persona.telefono.id_for_label }}').value.trim();
+        const grupoSanguineo = document.getElementById('{{ form_jugador.grupo_sanguineo.id_for_label }}').value.trim();
+    
+        if (!direccion || !telefono || !grupoSanguineo) {
+            event.preventDefault();
+            alert('Por favor, complete los campos obligatorios: Dirección, Teléfono y Grupo Sanguíneo.');
+        }
+    });
+
+    // Mostrar el modal si la página fue cargada con el parámetro 'success'
+    document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('success')) {
+            var registroExitosoModal = new bootstrap.Modal(document.getElementById('registroExitosoModal'));
+            registroExitosoModal.show();
+        }
+    });
+</script>
+
+{% endblock %}

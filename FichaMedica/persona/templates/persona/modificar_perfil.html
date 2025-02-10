@@ -1,0 +1,92 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Modificar Perfil</h2>
+
+    <form method="POST" class="needs-validation" novalidate>
+        {% csrf_token %}
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3>Datos Personales</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="id_telefono">Teléfono</label>
+                        {{ form_persona.telefono }}  
+                        {% if form_persona.telefono.errors %}
+                            <div class="text-danger">
+                                {{ form_persona.telefono.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="id_telefono_alternativo">Teléfono Alternativo</label>
+                        {{ form_persona.telefono_alternativo }}  
+                        {% if form_persona.telefono_alternativo.errors %}
+                            <div class="text-danger">
+                                {{ form_persona.telefono_alternativo.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 mb-3">
+                        <label for="id_direccion">Dirección</label>
+                        {{ form_persona.direccion }}  
+                        {% if form_persona.direccion.errors %}
+                            <div class="text-danger">
+                                {{ form_persona.direccion.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3>Datos del Jugador</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="id_cobertura_medica">Cobertura Médica</label>
+                        {% if form_jugador.cobertura_medica.value %}
+                            {{ form_jugador.cobertura_medica }}
+                        {% else %}
+                            <input type="text" class="form-control" value="No Posee" readonly>
+                        {% endif %}
+                        {% if form_jugador.cobertura_medica.errors %}
+                            <div class="text-danger">
+                                {{ form_jugador.cobertura_medica.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="id_numero_afiliado">Número de Afiliado</label>
+                        {% if form_jugador.numero_afiliado.value %}
+                            {{ form_jugador.numero_afiliado }}
+                        {% else %}
+                            <input type="text" class="form-control" value="No Posee" readonly>
+                        {% endif %}
+                        {% if form_jugador.numero_afiliado.errors %}
+                            <div class="text-danger">
+                                {{ form_jugador.numero_afiliado.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+
+        <div class="d-flex justify-content-between">
+            <a href="{% url 'menu_jugador' %}" class="btn btn-secondary">Cancelar</a>
+            <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

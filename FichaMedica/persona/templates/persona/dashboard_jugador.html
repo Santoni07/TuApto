@@ -1,0 +1,188 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Salud - Aptos Físicos{% endblock %}
+
+{% block content %}
+<style>
+  body {
+      background-image: url("{% static 'img/background.jpg' %}");
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center;
+      height: 100vh;
+      margin: 0;
+      position: relative;
+      font-family: 'Arial', sans-serif;
+  }
+
+  body::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(255, 255, 255, 0.8);
+      z-index: -1;
+  }
+
+  .form-wrapper {
+      max-width: 800px;
+      margin: 50px auto;
+      background-color: #fff;
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  }
+
+  .form-wrapper h1 {
+      font-size: 2rem;
+      color: #343a40;
+      margin-bottom: 40px;
+  }
+
+  .info-card {
+      background-color: #f8f9fa;
+      border: 1px solid #dee2e6;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 20px;
+      text-align: left;
+      transition: transform 0.3s, box-shadow 0.3s;
+  }
+
+  .info-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  }
+
+  .info-card h3 {
+      font-size: 1.5rem;
+      color: #495057;
+      margin-bottom: 10px;
+  }
+
+  .info-card p {
+      font-size: 1rem;
+      color: #6c757d;
+      margin: 0;
+  }
+
+  .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+  }
+
+  .welcome-message {
+      text-align: center;
+      margin-bottom: 40px;
+  }
+
+  .welcome-message h1 {
+      font-size: 2.5rem;
+      color: #007bff;
+      font-weight: bold;
+  }
+
+  .welcome-message h2 {
+      padding: 20px;
+      font-size: 1.5rem;
+      color: #6c757d;
+  }
+
+  @media (max-width: 768px) {
+      .info-grid {
+          grid-template-columns: 1fr;
+      }
+  }
+</style>
+
+<main class="main">
+  <div class="welcome-message">
+    <h1>Bienvenido/a, {{ profile.nombre }} {{ profile.apellido }}</h1>
+    <h2>Información del perfil</h2>
+  </div>
+
+  <div class="form-wrapper">
+    <div class="info-grid">
+      <!-- Información personal -->
+      <div class="info-card">
+        <h3>Datos Personales</h3>
+        <p><strong>Nombre:</strong> {{ profile.nombre }}</p>
+        <p><strong>Apellido:</strong> {{ profile.apellido }}</p>
+        <p><strong>DNI:</strong> {{ profile.dni }}</p>
+        <p><strong>Fecha de Nacimiento:</strong> {{ profile.fecha_nacimiento }}</p>
+      </div>
+
+      <!-- Información de contacto -->
+      <div class="info-card">
+        <h3>Contacto</h3>
+        <p><strong>Email:</strong> {{ profile.email }}</p>
+        <p><strong>Teléfono:</strong> {{ persona.telefono }}</p>
+        <p><strong>Teléfono Alternativo:</strong> {{ persona.telefono_alternativo }}</p>
+        <p><strong>Dirección:</strong> {{ persona.direccion }}</p>
+      </div>
+
+      <!-- Información de salud -->
+      <div class="info-card">
+        <h3>Información de Salud</h3>
+        <p><strong>Grupo Sanguíneo:</strong> {{ jugador.grupo_sanguineo }}</p>
+        <p><strong>Obra Social:</strong> {{ jugador.cobertura_medica }}</p>
+        <p><strong>Número de Afiliado:</strong> {{ jugador.numero_afiliado }}</p>
+      </div>
+
+      <!-- Información del torneo -->
+      <div class="info-card">
+        <h3>Torneo</h3>
+        <p><strong>Nombre del Torneo:</strong> {{ jugador.jugadorcategoriaequipo_set.all.0.categoria_equipo.categoria.torneo.nombre }}</p>
+        <p><strong>Categoría:</strong> {{ jugador.jugadorcategoriaequipo_set.all.0.categoria_equipo.categoria.nombre }}</p>
+        <p><strong>Equipo:</strong> {{ jugador.jugadorcategoriaequipo_set.all.0.categoria_equipo.equipo.nombre }}</p>
+      </div>
+
+      <!-- Información de antecedentes de enfermedades -->
+      <div class="info-card">
+        <h3>Antecedentes de Enfermedades</h3>
+        {% if antecedentes %}
+            <ul>
+                {% for antecedente in antecedentes %}
+                    <li>
+                        <strong>Fue Operado:</strong> {{ antecedente.fue_operado|yesno:"Sí,No" }}<br>
+                        <strong>Toma Medicación:</strong> {{ antecedente.toma_medicacion|yesno:"Sí,No" }}<br>
+                        <strong>Estuvo Internado:</strong> {{ antecedente.estuvo_internado|yesno:"Sí,No" }}<br>
+                        <strong>Sufre Hormigueos:</strong> {{ antecedente.sufre_hormigueos|yesno:"Sí,No" }}<br>
+                        <strong>Es Diabético:</strong> {{ antecedente.es_diabetico|yesno:"Sí,No" }}<br>
+                        <strong>Es Asmático:</strong> {{ antecedente.es_amatico|yesno:"Sí,No" }}<br>
+                        <strong>Es Alérgico:</strong> {{ antecedente.es_alergico|yesno:"Sí,No" }}<br>
+                        <strong>Observaciones de Alergia:</strong> {{ antecedente.alerg_observ }}<br>
+                        <strong>Antecedente de Epilepsia:</strong> {{ antecedente.antecedente_epilepsia|yesno:"Sí,No" }}<br>
+                        <strong>Desviación de Columna:</strong> {{ antecedente.desviacion_columna|yesno:"Sí,No" }}<br>
+                        <strong>Dolor de Cintura:</strong> {{ antecedente.dolor_cintira|yesno:"Sí,No" }}<br>
+                        <strong>Fracturas:</strong> {{ antecedente.fracturas|yesno:"Sí,No" }}<br>
+                        <strong>Dolores Articulares:</strong> {{ antecedente.dolores_articulares|yesno:"Sí,No" }}<br>
+                        <strong>Falta de Aire:</strong> {{ antecedente.falta_aire|yesno:"Sí,No" }}<br>
+                        <strong>Traumatismos Cráneo:</strong> {{ antecedente.tramatismos_craneo|yesno:"Sí,No" }}<br>
+                        <strong>Dolor en el Pecho:</strong> {{ antecedente.dolor_pecho|yesno:"Sí,No" }}<br>
+                        <strong>Pérdida de Conocimiento:</strong> {{ antecedente.perdida_conocimiento|yesno:"Sí,No" }}<br>
+                        <strong>Presión Arterial:</strong> {{ antecedente.presion_arterial|yesno:"Sí,No" }}<br>
+                        <strong>Muerte Súbita Familiar:</strong> {{ antecedente.muerte_subita_familiar|yesno:"Sí,No" }}<br>
+                        <strong>Enfermedad Cardíaca Familiar:</strong> {{ antecedente.enfermedad_cardiaca_familiar|yesno:"Sí,No" }}<br>
+                        <strong>Soplo Cardíaco:</strong> {{ antecedente.soplo_cardiaco|yesno:"Sí,No" }}<br>
+                        <strong>Abstenerse de Competencia:</strong> {{ antecedente.abstenerce_competencia|yesno:"Sí,No" }}<br>
+                        <strong>Antecedentes Coronarios Familiares:</strong> {{ antecedente.antecedentes_coronarios_familiares|yesno:"Sí,No" }}<br>
+                        <strong>Fumar, Hipertensión, Diabetes:</strong> {{ antecedente.fumar_hipertension_diabetes|yesno:"Sí,No" }}<br>
+                        <strong>Observación FHD:</strong> {{ antecedente.fhd_observacion }}<br>
+                        <strong>Consumo de Cocaína/Anabólicos:</strong> {{ antecedente.consumo_cocaina_anabolicos|yesno:"Sí,No" }}<br>
+                        <strong>Otra Información:</strong> {{ antecedente.otra_informacion }}<br>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No hay antecedentes registrados.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</main>
+{% endblock %}

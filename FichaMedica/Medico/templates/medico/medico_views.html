@@ -1,0 +1,402 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+   
+    .card-body{
+        background-color: #f0f0f0;
+    }
+</style>
+
+
+    <section id="content">
+        <header class="d-flex align-items-center ms-4 me-4 mt-4 mb-4">
+            <a href="#" class="logo d-flex align-items-center me-auto">
+                <img src="{% static 'core/img/milogo.jpg' %}" alt="Logo" style="width: 80px;" class="logo_header">
+                <h1 class="sitename ms-2">TU APTO</h1>
+            </a>
+        </header>
+
+        {% for torneo in jugador_info.categorias_equipo %}
+        <div class="row align-items-center mb-2">
+            <!-- Columna central para la descripción -->
+            <div class="col-md-9 d-flex justify-content-center flex-column text-center">
+                <h4>{{ torneo.descripcion }}</h4>
+                <div>
+                    <p><strong>{{ torneo.direccion }}</strong></p>
+                    <p>Tel: <strong>{{ torneo.telefono }}</strong></p>
+                </div>
+            </div>
+    
+            <!-- Columna derecha para el logo -->
+            <div class="col-md-3 text-center">
+                {% if torneo.imagen %}
+                    <img src="{{ torneo.imagen }}" class="img-fluid" style="width: 300px;">
+                {% else %}
+                    <p>No hay logo disponible</p>
+                {% endif %}
+            </div>
+        </div>
+        <hr>
+    {% endfor %}
+    
+    
+
+
+        <div class="container mt-5">
+            <h1 class="text-center mb-4">Ficha Médica</h1>
+
+            <!-- Información Personal -->
+            <div class="card mb-4">
+                <div class="card-header ">
+                    <h2 >1 - INFORMACIÓN PERSONAL</h2>
+                </div>
+                <div class="card-body" >
+                    <div class="row" >
+                        <div class="col-md-6 text-center">
+                            <p>Nombre: <strong>{{ jugador_info.nombre }}</strong></p>
+                            <p>Apellido: <strong>{{ jugador_info.apellido }}</strong></p>
+                            <p>Edad: <strong>{{ jugador_info.edad }}</strong></p>
+                            <p>DNI: <strong>{{ jugador_info.dni }}</strong></p>
+                            <p>Dirección: <strong>{{ jugador_info.direccion }}</strong></p>
+                        </div>
+                        <div class="col-md-6 text-center">
+                            
+                            <p>Teléfono: <strong>{{ jugador_info.telefono }}</strong></p>
+                            <p>Grupo Sanguíneo: <strong>{{ jugador_info.grupo_sanguineo }}</strong></p>
+                            <p>Cobertura Médica: <strong>{{ jugador_info.cobertura_medica }}</strong></p>
+                            <p>Número de Afiliado: <strong>{{ jugador_info.numero_afiliado }}</strong></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+                            <!-- Equipos y Categorías -->
+                    <div class="card mb-4">
+                        <div class="card-header text-center">
+                            <h2>Equipos y Categorías</h2>
+                        </div>
+                        <div class="card-body">
+                            {% for categoria in jugador_info.categorias_equipo %}
+                                <div class="row text-center">
+                                    <div class="col-md-4">
+                                        <p>Torneo: <strong>{{ categoria.torneo }}</strong></p>
+                                    </div>
+                                    
+                                    <div class="col-md-4">
+                                        <p>Categoría: <strong>{{ categoria.nombre_categoria }}</strong></p>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <p>Equipo: <strong>{{ categoria.nombre_equipo }}</strong></p>
+                                    </div>
+                                </div>
+                            
+                            {% endfor %}
+                        </div>
+                    </div>
+
+            <!-- Antecedentes -->
+            <div class="card mb-4">
+                <div class="card-header text-center">
+                    <h2>Antecedentes Médicos</h2>
+                </div>
+                <div class="card-body">
+                    {% for antecedente in jugador_info.antecedentes %}
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p>¿Fue operado en los últimos 4 meses? <strong>{{ antecedente.fue_operado|yesno:"Sí,No" }}</strong></p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p>¿Toma regularmente alguna medicación? <strong>{{ antecedente.toma_medicacion|yesno:"Sí,No" }}</strong></p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p>¿Estuvo internado en el último año? <strong>{{ antecedente.estuvo_internado|yesno:"Sí,No" }}</strong></p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p>¿Sufre de hormigueos en las manos? <strong>{{ antecedente.sufre_hormigueos|yesno:"Sí,No" }}</strong></p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p>¿Es diabético? <strong>{{ antecedente.es_diabetico|yesno:"Sí,No" }}</strong></p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p>¿Es asmático? <strong>{{ antecedente.es_asmatico|yesno:"Sí,No" }}</strong></p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p>¿Es alérgico? <strong>{{ antecedente.es_alergico|yesno:"Sí,No" }}</strong></p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p>Observaciones de alergias: <strong>{{ antecedente.alerg_observ }}</strong></p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p>¿Tiene antecedentes de epilepsia o convulsiones? <strong>{{ antecedente.antecedente_epilepsia|yesno:"Sí,No" }}</strong></p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p>¿Tiene desviación de columna? <strong>{{ antecedente.desviacion_columna|yesno:"Sí,No" }}</strong></p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p>¿Tiene dolor de cintura después de realizar ejercicios físicos? <strong>{{ antecedente.dolor_cintura|yesno:"Sí,No" }}</strong></p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p>¿Ha tenido fracturas, luxaciones o lesiones ligamentarias en los últimos 4 meses? <strong>{{ antecedente.fracturas|yesno:"Sí,No" }}</strong></p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p>¿Tiene dolores articulares? <strong>{{ antecedente.dolores_articulares|yesno:"Sí,No" }}</strong></p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p>¿Alguna vez experimentó falta de aire excesiva mientras realizaba ejercicios físicos? <strong>{{ antecedente.falta_aire|yesno:"Sí,No" }}</strong></p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p>¿Ha tenido traumatismos de cráneo con pérdida de conocimiento en los últimos 4 meses? <strong>{{ antecedente.traumatismos_craneo|yesno:"Sí,No" }}</strong></p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p>¿Alguna vez sintió dolor en el pecho mientras realizaba ejercicios físicos o después? <strong>{{ antecedente.dolor_pecho|yesno:"Sí,No" }}</strong></p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p>¿Alguna vez perdió el conocimiento durante ejercicios físicos o después? <strong>{{ antecedente.perdida_conocimiento|yesno:"Sí,No" }}</strong></p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p>¿Le han detectado alguna vez presión arterial alta? <strong>{{ antecedente.presion_arterial|yesno:"Sí,No" }}</strong></p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p>¿Algún familiar ha sufrido muerte súbita antes de los 45 años? <strong>{{ antecedente.muerte_subita_familiar|yesno:"Sí,No" }}</strong></p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p>¿Familiar directo con antecedentes de enfermedad cardíaca, Síndrome de Marfán? <strong>{{ antecedente.enfermedad_cardiaca_familiar|yesno:"Sí,No" }}</strong></p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p>¿Le han detectado alguna vez un soplo cardíaco? <strong>{{ antecedente.soplo_cardiaco|yesno:"Sí,No" }}</strong></p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p>¿Algún médico le ha recomendado abstenerse de competir? <strong>{{ antecedente.abstenerce_competencia|yesno:"Sí,No" }}</strong></p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p>¿Familiares menores de 65 años con antecedentes coronarios? <strong>{{ antecedente.antecedentes_coronarios_familiares|yesno:"Sí,No" }}</strong></p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p>¿Fuma, tiene hipertensión, diabetes o colesterol alto? <strong>{{ antecedente.fumar_hipertension_diabetes|yesno:"Sí,No" }}</strong></p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p>¿Consumo de cocaína o anabólicos? <strong>{{ antecedente.consumo_cocaina_anabolicos|yesno:"Sí,No" }}</strong></p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p>Observaciones: <strong>{{ antecedente.cca_observaciones }}</strong></p>
+                                </div>
+                            </div>
+                            <hr>
+                    {% endfor %}
+
+                </div>
+            </div>
+
+            <!-- Formularios Médicos -->
+            <div class="card mb-4">
+                <div class="card-header text-center">
+                    <h2>Formularios Médicos</h2>
+                </div>
+                <div class="card-body">
+                    
+                    <!-- Electro Basal -->
+                    <div class="col-12 mb-3">
+                        <h3>Electro Basal</h3>
+                        <div class="row">
+                            <!-- Columna Izquierda -->
+                            <div class="col-md-6">
+                                <p><strong>Ritmo:</strong> {{ jugador_info.electro_basal_form.ritmo.value }}</p>
+                                <p><strong>PQ:</strong> {{ jugador_info.electro_basal_form.PQ.value }}</p>
+                                <p><strong>Frecuencia:</strong> {{ jugador_info.electro_basal_form.frecuencia.value }}</p>
+                            
+                            </div>
+                    
+                            <!-- Columna Derecha -->
+                            <div class="col-md-6">
+                                <p><strong>Arritmias:</strong> {{ jugador_info.electro_basal_form.arritmias.value.value }}</p>
+                                <p><strong>Eje QRS:</strong> {{ jugador_info.electro_basal_form.ejeQRS.value }}</p>
+                                <p><strong>Trazado Normal:</strong> {{ jugador_info.electro_basal_form.trazadoNormal.value|yesno:"Sí,No" }}</p>
+                                <p><strong>Observaciones:</strong> {{ jugador_info.electro_basal_form.observaciones.value }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                <!-- Electro Esfuerzo -->
+                        <div class="col-12 mb-3">
+                            <h3>Electro Esfuerzo</h3>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Observaciones :</strong> {{ jugador_info.electro_esfuerzo_form.observaciones.value }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+                        <!-- Cardiovascular -->
+                        <div class="col-12 mb-3">
+                            <h3 >Cardiovascular</h3>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Auscultacion :</strong> {{ jugador_info.cardiovascular_form.auscultacion.value }}</p>
+                                    <p><strong>Soplos :</strong> {{ jugador_info.cardiovascular_form.soplos.value }}</p>
+                                    <p><strong>R1 :</strong> {{ jugador_info.cardiovascular_form.R1.value }}</p>
+                                    <p><strong>Tension arterial :</strong> {{ jugador_info.cardiovascular_form.tension_arterial.value }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    
+                                    <p><strong>R2 :</strong> {{ jugador_info.cardiovascular_form.R2.value }}</p>
+                                    <p><strong>Observaciones :</strong> {{ jugador_info.cardiovascular_form.observaciones.value }}</p>
+                                    <p><strong>Ruidos agregados :</strong> {{ jugador_info.cardiovascular_form.ruidos_agregados.value }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+                        <!-- Oftalmológico -->
+                        <div class="col-12 mb-3">
+                            <h3>Oftalmológico</h3>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Od :</strong> {{ jugador_info.oftalmologico_form.od.value }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Oi :</strong> {{ jugador_info.oftalmologico_form.oi.value }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+                        <!-- Laboratorio -->
+                        <div class="col-12 mb-3">
+                            <h3>Laboratorio</h3>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Citologico :</strong> {{ jugador_info.laboratorio_form.citologico.value }}</p>
+                                    <p><strong>Orina :</strong> {{ jugador_info.laboratorio_form.orina.value }}</p>
+                                    <p><strong>Colesterol :</strong> {{ jugador_info.laboratorio_form.colesterol.value }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Uremia :</strong> {{ jugador_info.laboratorio_form.uremia.value }}</p>
+                                    <p><strong>Glucemia :</strong> {{ jugador_info.laboratorio_form.glucemia.value }}</p>
+                                    <p><strong>Otros :</strong> {{ jugador_info.laboratorio_form.otros.value }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+                        <!-- Torax -->
+                        <div class="col-12 mb-3">
+                            <h3>Torax</h3>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    
+                                    <p><strong>Observaciones:</strong> {{ jugador_info.torax_form.observaciones.value }}</p>
+                                   
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr>
+                        <!-- Otros examenes cinicos -->
+                        <div class="col-12 mb-3">
+                            <h3>Otros examenes Clinicos</h3>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Respiratorio:</strong> {{ jugador_info.otros_examenes_form.respiratorio_observaciones.value }}</p>
+                                    <p><strong>Renal:</strong> {{ jugador_info.otros_examenes_form.renal_observaciones.value }}</p>
+                                    <p><strong>Digestivo:</strong> {{ jugador_info.otros_examenes_form.digestivo_observaciones.value }}</p>
+                                    <p><strong>Osteoarticular:</strong> {{ jugador_info.otros_examenes_form.osteoarticular_observaciones.value }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    
+                
+                    
+                </div>
+            </div>
+            <!-- Firma del Apto -->
+                <div class="card mt-4 mb-4 shadow-sm">
+                    <div class="p-4">
+                        <p class="text-justify">
+                            Habiendo tomado conocimiento de los "Antecedentes de Enfermedad" consignados en el anverso, realizados los estudios citados precedentemente y efectuada la evaluación clínico/médica correspondiente, el Sr. 
+                            <strong>{{ jugador_info.nombre }} {{ jugador_info.apellido }}</strong>, 
+                        </p>
+                        <p class="text-justify">
+                            D.N.I. Nro. <strong>{{ jugador_info.dni }}</strong>, declaro que queda 
+                            <strong>{{ registro_medico.estado }}</strong> su apto médico para la práctica deportiva.
+                        </p>
+
+                        
+                            <!-- Columna para la fecha -->
+                            <div>
+                                <p class="text-justify">
+                                    Fecha: <strong>{{ registro_medico.fecha_de_llenado|date:"d/m/Y" }}</strong>
+                                    <br>
+                                    Fecha Vencimiento: <strong>{{ registro_medico.fecha_caducidad|date:"d/m/Y" }}</strong>
+                                </p>
+                            </div>
+
+                            <div class="row mt-4 d-flex justify-content-center">
+                                <!-- Columna para la firma del médico -->
+                                <div class="col-md-6 text-center">
+                                    <p>
+                                        <strong>{{ registro_medico.medico }}</strong><br>
+                                        Matrícula: <strong>{{ registro_medico.medico.matricula }}</strong>
+                                    </p>
+                                    {% if registro_medico.medico.firma %}
+                                        <img src="{{ registro_medico.medico.firma }}" alt="Firma del médico" class="img-fluid" style="max-width: 150px;">
+                                    {% else %}
+                                        <p>No se ha proporcionado una firma.</p>
+                                    {% endif %}
+                                    <p><em>Firma y sello del Médico</em></p>
+                                </div>
+                            </div>
+                            
+
+                        <hr class="mt-4">
+
+                        <!-- Nota final -->
+                        <p class="text-center text-muted">
+                            <small>Esta certificación tiene validez por el año en curso a partir de la fecha de emisión y es válida sin enmiendas solo en original.</small>
+                        </p>
+                    </div>
+                </div>
+
+                
+
+        </div>
+    </section>
+    <div class="mt-4 text-center d-flex justify-content-center">
+        
+           <!-- Botón Volver -->
+           
+           {% if rol_usuario == "medico" %}
+            <a href="{% url 'medico_home' %}" class="btn btn-secondary me-3">Volver</a>
+            {% elif rol_usuario == "jugador" %}
+            <a href="{% url 'menu_jugador' %}" class="btn btn-secondary me-3">Volver</a>
+            {% endif %}
+            
+        <!-- Botón Descargar -->
+        <form method="get" action="{% url 'ficha_medica' jugador_info.id %}">
+            <input type="hidden" name="descargar_pdf" value="true">
+            <button type="submit" class="btn btn-primary">Descargar</button>
+        </form>
+    </div>
+{% endblock %}

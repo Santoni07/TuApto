@@ -1,0 +1,403 @@
+{% extends 'core/base.html' %} {% load static %} {% block title %}Salud - Aptos
+Físicos{% endblock %} 
+
+{% block content %}
+<style>
+  /* Estilos para los botones del carrusel */
+  .black-controls {
+    background-color: white !important; /* Fondo negro */
+    border: none; /* Sin bordes */
+    opacity: 0.4; /* Transparencia opcional */
+  }
+
+  .black-controls:hover {
+    opacity: 1; /* Sin transparencia */
+  }
+
+  /* Iconos dentro de los botones */
+  .black-controls .carousel-control-prev-icon,
+  .black-controls .carousel-control-next-icon {
+    filter: invert(1); /* Cambia el color del ícono a blanco */
+  }
+  /* Contenedor principal */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  /* Sección Hero */
+  .hero-section {
+    background-color: #0288d1; /* Color de fondo del Hero */
+    color: white;
+    padding: 40px 0;
+    text-align: center;
+  }
+
+  /* Contenedor principal */
+  .options-section {
+    background-color: #f4f4f4;
+    padding: 0px;
+  }
+
+  .options-container {
+    display: flex; /* Flexbox para alinear los bloques horizontalmente */
+    max-width: 100%; /* Ocupa todo el ancho */
+  }
+
+  /* Estilo de los bloques */
+  .option {
+    font-family: Nunito !important;
+    flex: 1; /* Todos los bloques tienen el mismo tamaño */
+    text-align: center; /* Centrar texto */
+    padding: 60px 20px; /* Espaciado interno */
+    color: rgb(248, 249, 249); /* Texto oscuro para contraste */
+    font-size: 1.5rem; /* Tamaño del texto más grande */
+    font-weight: bold;
+    transition: transform 0.5s ease, box-shadow 0.5s ease; /* Animación suave */
+    cursor: pointer; /* Cambiar cursor al pasar por encima */
+  }
+
+  /* Efecto de zoom al pasar el ratón */
+  .option:hover {
+    transform: scale(1.3); /* Efecto de zoom */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Sombra visible */
+  }
+
+  /* Quitar espacio entre bloques */
+  .options-container .option + .option {
+    margin-left: 0;
+  }
+
+  /* Diseño responsivo */
+  @media (max-width: 768px) {
+    .options-container {
+      flex-direction: column; /* Los bloques se apilan uno debajo del otro */
+    }
+
+    .option {
+      flex: 1 1 100%; /* Cada bloque ocupa el 100% del ancho */
+      padding: 40px 10px; /* Reducir el padding en pantallas medianas */
+    }
+  }
+
+  @media (max-width: 480px) {
+    .option {
+      padding: 20px 10px; /* Padding aún más reducido en pantallas pequeñas */
+    }
+  }
+</style>
+<!-- Hero Section -->
+<section id="hero" class="hero section dark-background">
+  <!-- Menú en la sección Hero -->
+  <nav class="hero-menu">
+    <ul
+      style="
+        display: flex;
+        justify-content: center;
+        list-style: none;
+        margin: 0;
+        padding: 20px 0;
+        background: rgba(0, 0, 0, 0.5);
+      "
+    >
+      <li style="margin: 0 15px">
+        <a
+          href="#conocenos"
+          style="text-decoration: none; color: black; font-weight: bold"
+          >Conócenos</a
+        >
+      </li>
+      <li style="margin: 0 15px">
+        <a
+          href="#centros-medicos"
+          style="text-decoration: none; color: white; font-weight: bold"
+          >Centros Médicos</a
+        >
+      </li>
+      <li style="margin: 0 15px">
+        <a
+          href="#general"
+          style="text-decoration: none; color: white; font-weight: bold"
+          >General</a
+        >
+      </li>
+    </ul>
+  </nav>
+  <!-- Fin del menú -->
+
+  <img
+    src="{% static 'core/img/medico_home.jpg' %}"
+    alt="Medico Home"
+    class="hero-img"
+  />
+
+  <div class="container text-center">
+    <div class="row justify-content-start">
+      <div class="col-lg-8 col-md-8 col-sm-10 text-lg-start text-md-center">
+        <h2>Aptos Físicos Online</h2>
+        <p>
+          Gestiona de manera sencilla y rápida tus exámenes médicos para torneos
+          de fútbol. Los jugadores pueden cargar sus datos y antecedentes, y los
+          médicos realizarán la aprobación del apto físico de forma online.
+        </p>
+        <a href="" class="btn-get-started">Regístrate</a>
+        <a href="{% url 'login' %}" class="btn-get-started">Inicia Sesión</a>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- End Hero Section -->
+<section id="options" class="options-section">
+  <div class="options-container">
+    <div class="option" style="background-color: #006994">
+        <a href="#quienes-somos" style="color: white; text-decoration: none; display: block;">Quienes Somos</a>
+    </div>
+    <div class="option" style="background-color: #0093c4">
+        <a href="#quiero-ser-prestador" style="color: white; text-decoration: none; display: block;">Quiero ser Prestador</a>
+    </div>
+    <div class="option" style="background-color: #00c4f6">
+      <a href="{% url 'salud_bienestar' %}" style="color: white; text-decoration: none; display: block;">Salud y Bienestar</a>
+    </div>
+    <div class="option" style="background-color: #00d7f6">
+      <a href="{% url 'novedades' %}" style="color: white; text-decoration: none; display: block;">Novedades</a>
+    </div>
+    <div class="option" style="background-color:rgb(126, 219, 243)">
+      <a href="#footer" style="color: white; text-decoration: none; display: block;">Contacto</a>
+    </div>
+  </div>
+
+</section>
+{% endblock %}
+
+{% block publicidad %}
+        <!-- Publicidades Section -->
+        <section
+          id="publicidades"
+          class="publicidades section light-background"
+          style="padding:40px; margin: 0"
+        >
+          <div class="container-fluid" style="padding: 0">
+            <div class="row g-0">
+              <!-- Columna izquierda: Imagen con leyenda -->
+              <div class="col-md-6 position-relative">
+                <div class="content-container" style="padding-top: 20px">
+                  <!-- Título -->
+                  <h2 style="font-family: Nunito Sans; color: #00a2d3; font-weight: bold; text-align: center; margin-bottom: 40px;">
+                    Evaluación Médica Deportiva
+                  </h2>
+
+                  <!-- Descripción -->
+                  <p
+                    style="font-family: Nunito Sans; font-size: 1.2rem; line-height: 1.8; text-align: center; color: #333; padding: 0 20px;"
+                  >
+                    Los profesionales realizaran las pruebas de esfuerzo y diagnósticos
+                    médicos especializados para asegurar la aptitud física de los
+                    jugadores, contribuyendo a su salud y rendimiento en el deporte.
+                  </p>
+
+                  <!-- Imagen -->
+                  <div
+                    class="image-container"
+                    style="margin-top: 20px; text-align: center"
+                  >
+                    <img
+                      src="{% static 'core/img/medicina-del-deporte.jpg' %}"
+                      alt="imagen de deporte"
+                      class="img-fluid"
+                      style="
+                        max-width: 100%;
+                        height: 30%;
+                        border-radius: 8px;
+                        margin-top: 0px;
+                      "
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Columna derecha: Carrusel -->
+              <div class="col-md-6">
+                <!-- Ajuste del margen superior -->
+                <div
+                  id="publicidadesCarousel"
+                  class="carousel slide h-100 rounded"
+                  data-bs-ride="carousel"
+                  style="padding: 20px; background-color: white"
+                >
+                  <!-- Contenido del carrusel -->
+                  <div class="carousel-inner" style="margin-top: 50px">
+                    {% for publicidad in publicidades %}
+                    <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                      <div class="text-center">
+                        <img
+                          src="{{ publicidad.imagen.url }}"
+                          alt="{{ publicidad.titulo }}"
+                          class="publicidad-img rounded img-fluid"
+                          style="max-width: 30%; height: auto; margin: 0 auto"
+                        />
+                        <h3 style="margin-top: 15px; font-size: 1.5rem; color: #007bff">
+                          {{ publicidad.titulo }}
+                        </h3>
+                        <p style="color: #555">{{ publicidad.descripcion }}</p>
+                        {% if publicidad.url %}
+                        <a href="{{ publicidad.url }}" class="btn btn-primary mt-3"
+                          >Ver más</a
+                        >
+                        {% endif %}
+                      </div>
+                    </div>
+                    {% endfor %}
+                  </div>
+
+                  <!-- Controles de navegación -->
+                  <button
+                    class="carousel-control-prev"
+                    type="button"
+                    data-bs-target="#publicidadesCarousel"
+                    data-bs-slide="prev"
+                  >
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Anterior</span>
+                  </button>
+                  <button
+                    class="carousel-control-next"
+                    type="button"
+                    data-bs-target="#publicidadesCarousel"
+                    data-bs-slide="next"
+                  >
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Siguiente</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+{% endblock %} 
+{% block landingPage %}
+
+
+<!-- Sección Quiénes Somos -->
+<section id="quienes-somos" class="container-fluid py-5" style="background-color: #f9f9f9;">
+  <div class="row align-items-center">
+      <!-- Columna de Texto -->
+      <div class="col-lg-6 text-center text-lg-start mb-4 mb-lg-0">
+          <h2 class="text-primary font-weight-bold" style="font-family: Nunito Sans; color: #00a2d3; text-align: center;">Quienes Somos</h2>
+          <p class="lead text-dark" style="font-family: Nunito Sans; font-size: 1.2rem; line-height: 1.8; text-align: center; color: #333; padding: 0 20px;">
+              TU APTO es una empresa dedicada a poner a tu alcance una plataforma que te otorga accesibilidad permanente a tu apto y estudios médicos. Practicidad a la hora de completar tus fichas médicas, veracidad y seriedad, ya que los médicos registrados y habilitados para el uso del sistema lo hacen a través de la firma de un contrato legalizado de firma digital, dándole al médico seguridad en el uso de su identidad y matrícula por plagio y a los deportistas la confianza que quien hace el apto realmente es quien firma.
+              <br><br>
+              De esta manera otorgamos: <br>
+              • Al médico, seguridad, legalidad y protección de datos e identidad. <br>
+              • Al deportista ser dueño de su apto, para utilizarlo según su vigencia y antes necesidades futuras. <br>
+              • Al ente organizador acceso rápido al chequeo médico, estado, legalidad, simplicidad, archivo y control de los aptos médicos.
+          </p>
+      </div>
+
+      <!-- Columna de Imagen -->
+      <div class="col-lg-6">
+          <img src="{% static 'core/img/quienes_somos.jpg' %}" alt="Quienes Somos" class="img-fluid rounded" style="width: 100%; height: auto; object-fit: cover;">
+      </div>
+  </div>
+</section>
+
+<!-- Sección Quiero Ser Prestador -->
+<section id="quiero-ser-prestador" class="container-fluid py-5" style="background-color: #f9f9f9;">
+  <div class="row align-items-center">
+      <!-- Columna de Texto -->
+      <div class="col-lg-6 text-center text-lg-start mb-4 mb-lg-0">
+          <h2 class="text-primary font-weight-bold" style="font-family: Nunito Sans; color: #00a2d3; text-align: center; margin-bottom: 20px;">Quiero ser Prestador</h2>
+          <p class="lead text-dark" style="font-family: Nunito Sans; font-size: 1.2rem; text-align: center; color: #333; margin-bottom: 20px;">
+              Únete a nuestra red de prestadores médicos y forma parte de un proyecto innovador que está transformando la forma en que se gestionan los aptos médicos deportivos.
+              <br><br>
+              Como prestador, tendrás acceso a herramientas digitales diseñadas para simplificar y optimizar tu trabajo. Podrás realizar evaluaciones médicas de manera eficiente y almacenar toda la información en un sistema centralizado, accesible desde cualquier dispositivo.
+              <br><br>
+              Además, te ofrecemos la posibilidad de ampliar tu red de pacientes al trabajar directamente con clubes deportivos, torneos y jugadores. Nuestra plataforma conecta a prestadores médicos con organizaciones deportivas, facilitando la coordinación y asegurando que los jugadores cumplan con los requisitos médicos necesarios.
+              <br><br>
+              ¡Sé parte del cambio y ayúdanos a revolucionar el mundo de los aptos médicos deportivos!
+          </p>
+      </div>
+
+      <!-- Columna de Formulario -->
+      <div class="col-lg-6">
+          <form action="#" method="POST" class="bg-white p-4 rounded shadow-sm">
+              <h3 class="text-primary text-center mb-4" style="font-family: Nunito Sans; color: #00a2d3;">¿Quieres ser Prestador?</h3>
+              <p class="text-center mb-4" style="font-family: Nunito Sans; font-size: 1rem; color: #333;">Rellena el siguiente formulario para contactarnos y formar parte de nuestra red de prestadores médicos. Nos pondremos en contacto contigo lo antes posible.</p>
+
+              <!-- Nombre -->
+              <div class="mb-3">
+                  <label for="name" class="form-label" style="font-weight: bold; color: #333;">Nombre completo:</label>
+                  <input type="text" id="name" name="name" class="form-control" required>
+              </div>
+
+              <!-- Correo electrónico -->
+              <div class="mb-3">
+                  <label for="email" class="form-label" style="font-weight: bold; color: #333;">Correo electrónico:</label>
+                  <input type="email" id="email" name="email" class="form-control" required>
+              </div>
+
+              <!-- Mensaje -->
+              <div class="mb-3">
+                  <label for="message" class="form-label" style="font-weight: bold; color: #333;">Mensaje:</label>
+                  <textarea id="message" name="message" rows="4" class="form-control" required></textarea>
+              </div>
+
+              <!-- Botón de envío -->
+              <div class="text-center">
+                  <button type="submit" class="btn btn-primary w-100" style="background-color: #00a2d3; color: white; border: none; padding: 10px 20px; border-radius: 4px; font-size: 1rem; cursor: pointer;">Enviar Consulta</button>
+              </div>
+          </form>
+      </div>
+  </div>
+</section>
+
+
+
+{% endblock %} 
+{% block footer %}
+<footer id="footer" style="display: flex; flex-wrap: wrap; justify-content: space-between; padding: 20px; background-color: #d9e6f2; color:#2c3e50;">
+    <!-- Sección Izquierda: Logo -->
+    <div style="flex: 1; display: flex; align-items: center; justify-content: center; margin-right: 20px;">
+        <img src="{% static 'core/img/tuapto.png' %}" alt="Logo TU APTO" style="height: 40px; margin-right: 10px;">
+        <p style="margin: 0; text-align: center;">TU APTO</p>
+    </div>
+
+    <!-- Sección Central: Información -->
+    <div style="flex: 1; border-left: 2px solid #fff; padding-left: 20px; display: flex; flex-direction: column; justify-content: center;">
+        <p style="margin: 5px 0;">© TU APTO 2025 - Todos los derechos reservados</p>
+        <p style="margin: 5px 0;">Av. Cornelio Savedra 343 - CP5008 - Córdoba</p>
+        <p style="margin: 5px 0;">Email: CentroMedicoDR.GR@gmail.com / Tel: 3513817760</p>
+    </div>
+
+    <!-- Sección Derecha: Formulario -->
+    <div style="flex: 1; padding: 8px; background-color: #fff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); max-width: 400px; margin: 0 auto;">
+      <h4 style="color: #00a2d3; text-align: center; margin-bottom: 6px; font-size: 1rem;">Contáctanos</h4>
+      <form action="#" method="POST" style="display: flex; flex-direction: column; gap: 4px;">
+          <input type="text" name="nombre" placeholder="Tu nombre" required 
+              style="padding: 6px; font-size: 0.9rem; border: 1px solid #ddd; border-radius: 4px;">
+          <input type="email" name="email" placeholder="Tu correo" required 
+              style="padding: 6px; font-size: 0.9rem; border: 1px solid #ddd; border-radius: 4px;">
+          <textarea name="mensaje" placeholder="Tu mensaje" rows="2" required 
+              style="padding: 6px; font-size: 0.9rem; border: 1px solid #ddd; border-radius: 4px; resize: none;"></textarea>
+          <button type="submit" 
+              style="background-color: #00a2d3; color: white; border: none; padding: 6px; border-radius: 4px; font-size: 0.9rem; cursor: pointer;">
+              Enviar
+          </button>
+      </form>
+  </div>
+  
+  
+</footer>
+<script>
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+
+        document.querySelector(this.getAttribute('href')).scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'  // Asegura que la sección inicie desde la parte superior de la ventana
+        });
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,99 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Salud - Selección de Torneo, Categoría y Equipo{% endblock %}
+
+{% block content %}
+<div class="container text-center mt-5">
+    <h3 class="mb-4">Seleccione el torneo, la categoría y el equipo</h3>
+
+    <form id="seleccion-form" method="post">
+        {% csrf_token %}
+
+        <!-- Selección de torneo -->
+        <div class="mb-4" id="torneo-section">
+            <h5 class="mb-3">Seleccione el torneo</h5>
+            <div class="d-flex justify-content-center flex-wrap" id="logosTorneos">
+                {% for torneo in torneos %}
+                    <div class="mx-3 mb-4 logo-torneo text-center">
+                        <input type="radio" id="torneo_{{ torneo.id }}" name="torneo" value="{{ torneo.id }}" class="d-none" required>
+                        <label for="torneo_{{ torneo.id }}" class="p-2" style="cursor: pointer;" onclick="seleccionarTorneo({{ torneo.id }})">
+                            <img src="{{ torneo.imagen.url|default:'https://via.placeholder.com/150' }}" alt="{{ torneo.nombre }}" 
+                                 class="logo img-fluid" 
+                                 style="width: 150px; border-radius: 15px; border: 3px solid #ddd; transition: transform 0.3s ease;">
+                            <div class="mt-2 font-weight-bold">{{ torneo.nombre }}</div>
+                        </label>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Selección de categoría (se oculta hasta que se confirme el torneo) -->
+        <div class="mb-4" id="categoria-section" style="display: none;">
+            <h5 class="mb-3">Seleccione la categoría</h5>
+            <select id="categoria-select" name="categoria" class="form-select" required onchange="mostrarEquipo()">
+                <option value="">-- Seleccione una categoría --</option>
+                {% for categoria in categorias %}
+                    <option value="{{ categoria.id }}">{{ categoria.nombre }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Selección de equipo (se oculta hasta que se confirme la categoría) -->
+        <div class="mb-4" id="equipo-section" style="display: none;">
+            <h5 class="mb-3">Seleccione el equipo</h5>
+            <select id="equipo-select" name="equipo" class="form-select" required>
+                <option value="">-- Seleccione un equipo --</option>
+                {% for equipo in equipos %}
+                    <option value="{{ equipo.id }}">{{ equipo.nombre }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Botón para enviar el formulario (se oculta hasta que se confirme el equipo) -->
+        <div id="submit-section" style="display: none;">
+            <button type="submit" class="btn btn-success btn-lg mt-3">Guardar</button>
+        </div>
+    </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    function seleccionarTorneo(torneoId) {
+        // Ocultar los logos de torneos
+        const logosTorneos = document.getElementById('logosTorneos');
+        
+        // Ocultar todos los logos
+        const allLogos = logosTorneos.querySelectorAll('.logo-torneo');
+        allLogos.forEach(logo => {
+            logo.style.display = 'none';
+        });
+
+        // Marcar el torneo seleccionado
+        const selectedTorneo = document.getElementById('torneo_' + torneoId);
+        selectedTorneo.checked = true;
+
+        // Mostrar solo el logo seleccionado
+        const selectedLogo = selectedTorneo.closest('.logo-torneo');
+        selectedLogo.style.display = 'block';
+
+        // Mostrar la sección de categorías
+        document.getElementById('categoria-section').style.display = 'block';
+    }
+
+    function mostrarEquipo() {
+        const categoriaSelect = document.getElementById('categoria-select');
+        if (categoriaSelect.value) {
+            // Mostrar la sección de equipos
+            document.getElementById('equipo-section').style.display = 'block';
+        }
+    }
+
+    document.getElementById('equipo-select').addEventListener('change', function() {
+        if (this.value) {
+            // Mostrar el botón de enviar si se ha seleccionado un equipo
+            document.getElementById('submit-section').style.display = 'block';
+        }
+    });
+</script>
+{% endblock %}

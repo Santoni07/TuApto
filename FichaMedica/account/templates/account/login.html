@@ -1,0 +1,162 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Iniciar sesión{% endblock %}
+
+{% block content %}
+<style>
+    .errorlist { 
+        color: red;
+    }
+
+    .login-container {
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .login-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+       
+    }
+
+    .login-header {
+        background-color: #007bff;
+        color: white;
+        border-top-left-radius: 15px;
+        border-top-right-radius: 15px;
+    }
+
+    .login-header h3 {
+        margin: 0;
+        padding: 15px 0;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    .form-group {
+        margin-bottom: 1rem;
+        position: relative;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 10px;
+        border-radius: 5px;
+        border: 1px solid #ced4da;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        border: none;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+    }
+
+    .toggle-password {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        cursor: pointer;
+    }
+
+    @media (max-width: 768px) {
+        .login-container {
+            padding: 15px;
+        }
+    }
+
+    @media (min-width: 992px) {
+        .card-body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .form-group {
+            width: 70%;
+        }
+    }
+</style>
+
+<body>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-5 col-sm-8">
+                <div class="login-container">
+                    <div class="card login-card">
+                        <div class="card-header text-center login-header">
+                            <h3>Iniciar sesión</h3>
+                        </div>
+                        <div class="card-body">
+                            {% if messages %}
+                                <div class="alert alert-danger" role="alert">
+                                    {% for message in messages %}
+                                        {{ message }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <form method="POST">
+                                {% csrf_token %}
+                                {% for field in form %}
+                                    <div class="form-group">
+                                        {{ field.label_tag }}
+                                        <div class="position-relative">
+                                            {{ field }}
+                                            {% if field.name == 'password' %}
+                                                <button type="button" class="toggle-password" onclick="togglePasswordVisibility()">
+                                                    <i id="toggle-icon" class="fas fa-eye"></i>
+                                                </button>
+                                            {% endif %}
+                                            {% if field.errors %}
+                                                <div class="errorlist">
+                                                    {{ field.errors }}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-primary btn-block">Acceder</button>
+                                </div>
+                            </form>
+                            <div class="mt-3 text-center">
+                                <p>¿Olvidaste tu contraseña? <a href="{% url 'password_reset' %}">Recupérala aquí</a></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script>
+        function togglePasswordVisibility() {
+            const passwordField = document.getElementById("id_password");
+            const toggleIcon = document.getElementById("toggle-icon");
+
+            if (passwordField.type === "password") {
+                passwordField.type = "text";
+                toggleIcon.classList.remove("fa-eye");
+                toggleIcon.classList.add("fa-eye-slash");
+            } else {
+                passwordField.type = "password";
+                toggleIcon.classList.remove("fa-eye-slash");
+                toggleIcon.classList.add("fa-eye");
+            }
+        }
+    </script>
+</body>
+{% endblock %}
