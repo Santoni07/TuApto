@@ -62,7 +62,7 @@
                   background-color: #00c4f6;
             
                 ">
-                {% if ficha_medica.antecedenteenfermedades %}
+                {% if jugador.antecedentes %}
                   <li style="margin-bottom: 5px;">
                     <a href="{% url 'registroMedico:ver_antecedente' jugador.id %}" style="color: white; text-decoration: none; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);">
                       Ver Antecedentes
@@ -78,7 +78,7 @@
                   <!-- Condicional para Consentimientos -->
                   {% if ficha_medica %}
                     <li>
-                      <a href="{% url 'registroMedico:consentimiento' ficha_medica.idfichaMedica %}" style="color: white; text-decoration: none; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);">
+                      <a href="{% url 'registroMedico:consentimiento' ficha_medica.id %}" style="color: white; text-decoration: none; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);">
                         Consentimientos
                       </a>
                     </li>
@@ -109,12 +109,12 @@
                 ">
                   {% if ficha_medica %}
                     <li style="margin-bottom: 5px;">
-                      <a href="{% url 'registroMedico:cargar_estudio' ficha_medica.idfichaMedica %}" style="color: white; text-decoration: none; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);">
+                      <a href="{% url 'registroMedico:cargar_estudio' ficha_medica.id %}" style="color: white; text-decoration: none; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);">
                         Cargar Estudios
                       </a>
                     </li>
                     <li>
-                      <a href="{% url 'registroMedico:ver_estudios' ficha_medica.idfichaMedica %}" style="color: white; text-decoration: none; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);">
+                      <a href="{% url 'registroMedico:ver_estudios' ficha_medica.id %}" style="color: white; text-decoration: none; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);">
                         Ver Estudios
                       </a>
                     </li>
@@ -163,7 +163,7 @@
                       <strong>- Fecha de Caducidad:</strong> {{ ficha_medica.fecha_caducidad }}
                       {% for categoria_equipo in jugador_info.categorias_equipo %}
                       
-                      <strong>- Torneo:</strong> {{ categoria_equipo.torneo }}
+                      <strong>- Torneo:</strong> {{ categoria_equipo.torneo.nombre }}
                   
                          
                     {% endfor %}
@@ -199,7 +199,177 @@
                 }
               </style>
         <div style="position: relative; z-index: 1;">
-                  
+                          
+                        <!-- Tabla Apto -->  
+                        <div class="container  p-3 bg-white shadow rounded" id="aptoTable" style="position: relative; top: 50px" >
+                          <h1 class="text-center text-primary fw-bold" style="margin-top:40px">Lista de Torneos Inscriptos</h1>
+                        
+                          {% if jugador_info.categorias_equipo %}
+                            <!-- Tabla para dispositivos medianos y grandes -->
+                            <div class="table-responsive d-none d-md-block">
+                              <table class="table table-bordered table-hover align-middle">
+                                <thead class="text-white bg-info">
+                                  <tr class="text-center">
+                                    <th>Torneo</th>
+                                    <th>Categoría</th>
+                                    <th>Equipo</th>
+                                    <th>Consentimiento</th>
+                                    <th>Antecedentes</th>
+                                    <th>Apto Médico</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {% for categoria_equipo in jugador_info.categorias_equipo %}
+                                    <tr class="text-center">
+                                      <td class="fw-bold">{{ categoria_equipo.torneo.nombre }}</td>
+                                      <td>{{ categoria_equipo.nombre_categoria }}</td>
+                                      <td>{{ categoria_equipo.nombre_equipo }}</td>
+                                      <td class="{% if ficha_medica.consentimiento_persona %}text-success{% else %}text-danger{% endif %}">
+                                        {% if ficha_medica.consentimiento_persona %}Sí{% else %}No{% endif %}
+                                      </td>
+                                      <td>
+                                        {% if jugador.antecedentes %}
+                                          <a href="{% url 'registroMedico:ver_antecedente' jugador.id %}" class="btn btn-success btn-sm">Ver</a>
+                                        {% else %}
+                                          <a href="{% url 'registroMedico:cargar_antecedente' jugador.id %}" class="btn btn-warning btn-sm">Cargar</a>
+                                        {% endif %}
+                                      </td>
+                                      <td class="fw-bold {% if ficha_medica.estado == 'APROBADA' %}text-success{% else %}text-danger{% endif %}">
+                                        {% if ficha_medica.estado == "APROBADA" %}
+                                          <a href="{% url 'ficha_medica' jugador.id %}" class="btn btn-success btn-sm">Ver</a>
+                                        {% else %}
+                                          <span>{{ ficha_medica.estado }}</span>
+                                        {% endif %}
+                                      </td>
+                                    </tr>
+                                  {% endfor %}
+                                </tbody>
+                              </table>
+                            </div>
+                        
+                            <!-- Tarjetas verticales para dispositivos pequeños -->
+                            <div class="d-block d-md-none">
+                              {% for categoria_equipo in jugador_info.categorias_equipo %}
+                                <div class="card border-info shadow-sm mb-3">
+                                  <div class="card-header bg-info text-white fw-bold">
+                                    {{ categoria_equipo.torneo.nombre }}
+                                  </div>
+                                  <div class="card-body">
+                                    <p><strong>Categoría:</strong> {{ categoria_equipo.nombre_categoria }}</p>
+                                    <p><strong>Equipo:</strong> {{ categoria_equipo.nombre_equipo }}</p>
+                                    <p><strong>Consentimiento:</strong> 
+                                      <span class="{% if ficha_medica.consentimiento_persona %}text-success{% else %}text-danger{% endif %}">
+                                        {% if ficha_medica.consentimiento_persona %}Sí{% else %}No{% endif %}
+                                      </span>
+                                    </p>
+                                    <p><strong>Antecedentes:</strong>
+                                      {% if jugador.antecedentes %}
+                                        <a href="{% url 'registroMedico:ver_antecedente' jugador.id %}" class="btn btn-success btn-sm">Ver</a>
+                                      {% else %}
+                                        <a href="{% url 'registroMedico:cargar_antecedente' jugador.id %}" class="btn btn-warning btn-sm">Cargar</a>
+                                      {% endif %}
+                                    </p>
+                                    <p><strong>Apto Médico:</strong> 
+                                      <span class="fw-bold {% if ficha_medica.estado == 'APROBADA' %}text-success{% else %}text-danger{% endif %}">
+                                        {{ ficha_medica.estado }}
+                                      </span>
+                                    </p>
+                                  </div>
+                                </div>
+                              {% endfor %}
+                            </div>
+                          {% else %}
+                            <p class="text-center text-muted">No hay torneos inscriptos.</p>
+                          {% endif %}
+                        </div>
+                        
+                      
+                        
+                      <!-- DATOS -->
+            <div class="container p-3 bg-white shadow rounded" id="datosPersonales" style="position: relative; top: 50px">
+              <h1 class="text-center text-primary fw-bold">Datos Personales</h1>
+
+              {% if profile %}
+                <div class="card border-info shadow-sm">
+                  <div class="card-header bg-info text-white fw-bold text-center">
+                    Información Personal
+                  </div>
+                  <div class="card-body">
+                    <!-- Tabla para pantallas grandes -->
+                    <div class="table-responsive d-none d-md-block">
+                      <table class="table table-bordered">
+                        <tbody>
+                          <tr>
+                            <th class="bg-light text-nowrap text-center">Nombre</th>
+                            <td class="text-center">{{ profile.nombre }}</td>
+                          </tr>
+                          <tr>
+                            <th class="bg-light text-nowrap text-center">Apellido</th>
+                            <td class="text-center">{{ profile.apellido }}</td>
+                          </tr>
+                          <tr>
+                            <th class="bg-light text-nowrap text-center">DNI</th>
+                            <td class="text-center">{{ profile.dni }}</td>
+                          </tr>
+                          <tr>
+                            <th class="bg-light text-nowrap text-center">Fecha de Nacimiento</th>
+                            <td class="text-center">{{ profile.fecha_nacimiento }}</td>
+                          </tr>
+                          <tr>
+                            <th class="bg-light text-nowrap text-center">Email</th>
+                            <td class="text-center">{{ profile.email }}</td>
+                          </tr>
+                          <tr>
+                            <th class="bg-light text-nowrap text-center">Teléfono</th>
+                            <td class="text-center">{{ persona.telefono }}</td>
+                          </tr>
+                          <tr>
+                            <th class="bg-light text-nowrap text-center">Teléfono Alternativo</th>
+                            <td class="text-center">{{ persona.telefono_alternativo }}</td>
+                          </tr>
+                          <tr>
+                            <th class="bg-light text-nowrap text-center">Dirección</th>
+                            <td class="text-center">{{ persona.direccion }}</td>
+                          </tr>
+                          <tr>
+                            <th class="bg-light text-nowrap text-center">Obra Social</th>
+                            <td class="text-center">{{ persona.jugador.cobertura_medica }}</td>
+                          </tr>
+                          <tr>
+                            <th class="bg-light text-nowrap text-center">Número de Afiliado</th>
+                            <td class="text-center">{{ persona.jugador.numero_afiliado }}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <!-- Tarjetas individuales para dispositivos pequeños -->
+                    <div class="d-block d-md-none">
+                      <div class="card border-info shadow-sm mb-3">
+                        <div class="card-body">
+                          <p class="fw-bold text-primary"><span class="text-dark">Nombre:</span> {{ profile.nombre }}</p>
+                          <p class="fw-bold text-primary"><span class="text-dark">Apellido:</span> {{ profile.apellido }}</p>
+                          <p class="fw-bold text-primary"><span class="text-dark">DNI:</span> {{ profile.dni }}</p>
+                          <p class="fw-bold text-primary"><span class="text-dark">Fecha de Nacimiento:</span> {{ profile.fecha_nacimiento }}</p>
+                          <p class="fw-bold text-primary"><span class="text-dark">Email:</span> {{ profile.email }}</p>
+                          <p class="fw-bold text-primary"><span class="text-dark">Teléfono:</span> {{ persona.telefono }}</p>
+                          <p class="fw-bold text-primary"><span class="text-dark">Teléfono Alternativo:</span> {{ persona.telefono_alternativo }}</p>
+                          <p class="fw-bold text-primary"><span class="text-dark">Dirección:</span> {{ persona.direccion }}</p>
+                          <p class="fw-bold text-primary"><span class="text-dark">Obra Social:</span> {{ persona.jugador.cobertura_medica }}</p>
+                          <p class="fw-bold text-primary"><span class="text-dark">Número de Afiliado:</span> {{ persona.jugador.numero_afiliado }}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="text-center mt-4">
+                      <a href="{% url 'modificar_perfil' %}" class="btn btn-success btn-lg">Modificar</a>
+                    </div>
+                  </div>
+                </div>
+              {% else %}
+                <p class="text-center text-muted">No tienes datos personales cargados.</p>
+              {% endif %}
+            </div>
 
                    <!-- Mensaje de Bienvenida  -->
                       <div class="container-welcome d-flex justify-content-start" id="welcome" style="margin-top: 0px;">
@@ -223,7 +393,7 @@
                             <span class="fs-5" style="font-family: 'Nunito Sans', sans-serif;">
                               {% if ficha_medica.antecedenteenfermedades %}
                               <strong>Recuerda:</strong> Carga tu consentimiento.
-                              <a href="{% url 'registroMedico:consentimiento' ficha_medica.idfichaMedica %}" 
+                              <a href="{% url 'registroMedico:consentimiento' ficha_medica.id %}" 
                               class="btn btn-primary btn-lg" 
                               style="font-family: 'Nunito Sans', sans-serif; font-weight: 600;">Cargar</a>
                               {% else %}
@@ -250,205 +420,48 @@
         <div class="container p-3 bg-white shadow rounded" id="torneoSeleccionado" style="position: relative; top: 50px">
           <h1 class="text-center text-primary fw-bold">Torneo Seleccionado</h1>
         
-          {% for categoria_equipo in jugador_info.categorias_equipo %}
-            <div class="card border-info shadow-sm">
+        {% for categoria_equipo in jugador_info.categorias_equipo %}
+          <div class="card border-info shadow-sm">
               <div class="card-header bg-info text-white fw-bold text-center">
-                {{ categoria_equipo.torneo }}
+                  {{ categoria_equipo.torneo.nombre }}
               </div>
               <div class="card-body text-center">
-                <h2 class="text-info">{{ categoria_equipo.torneo }}</h2>
-        
-                <!-- Logo del torneo -->
-                <img id="logoTorneo" src="{% static 'core/img/ucfal.png' %}" alt="Logo del torneo" class="img-fluid my-3" style="max-width: 150px;">
-        
-                <!-- Mapa de Google Maps embebido -->
-                <div class="mt-4">
-                  <h5 class="text-info">Ubicación del Torneo</h5>
-                  <div class="responsive-map border rounded shadow-sm overflow-hidden" style="max-width: 100%; height: 400px; margin: auto;">
-                    <iframe
-                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d4820.030071378765!2d-64.19140032407297!3d-31.323751378199383!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94329a2946526775%3A0x990a4ccfbc13a275!2sUni%C3%B3n%20Cordobesa%20de%20F%C3%BAtbol%20Amateur!5e0!3m2!1ses!2sar!4v1729720527705!5m2!1ses!2sar"
-                      allowfullscreen=""
-                      loading="lazy"
-                      referrerpolicy="no-referrer-when-downgrade"
-                      class="w-100 h-100 border-0">
-                    </iframe>
+                
+
+                  <!-- Logo del torneo -->
+                  {% if categoria_equipo.torneo.imagen %}
+                  <img id="logoTorneo" src="{{ categoria_equipo.torneo.imagen }}" alt="Logo del torneo" class="img-fluid my-3" style="max-width: 150px;">
+                  {% else %}
+                      <p>No disponible</p>
+                  {% endif %}
+                  <!-- Tabla con información del torneo -->
+                  <div class="table-responsive">
+                      <table class="table table-bordered">
+                          <tbody>
+                              <tr>
+                                  <th scope="row" class="bg-light">Nombre del Torneo</th>
+                                  <td>{{ categoria_equipo.torneo.nombre }}</td>
+                              </tr>
+                              <tr>
+                                <th scope="row" class="bg-light">Descripcion</th>
+                                <td>{{ categoria_equipo.torneo.descripcion }}</td>
+                            </tr>
+                              <tr>
+                                  <th scope="row" class="bg-light">Dirección</th>
+                                  <td>{{ categoria_equipo.torneo.direccion }}</td>
+                              </tr>
+                              <tr>
+                                  <th scope="row" class="bg-light">Teléfono</th>
+                                  <td>{{ categoria_equipo.torneo.telefono }}</td>
+                              </tr>
+                          </tbody>
+                      </table>
                   </div>
-                </div>
-              </div>
-            </div>
-          {% endfor %}
-        </div>
-        
-            <!-- Tabla Apto -->  
-            <div class="container  p-3 bg-white shadow rounded" id="aptoTable" style="position: relative; top: 50px" >
-              <h1 class="text-center text-primary fw-bold" style="margin-top:40px">Lista de Torneos Inscriptos</h1>
-            
-              {% if jugador_info.categorias_equipo %}
-                <!-- Tabla para dispositivos medianos y grandes -->
-                <div class="table-responsive d-none d-md-block">
-                  <table class="table table-bordered table-hover align-middle">
-                    <thead class="text-white bg-info">
-                      <tr class="text-center">
-                        <th>Torneo</th>
-                        <th>Categoría</th>
-                        <th>Equipo</th>
-                        <th>Consentimiento</th>
-                        <th>Antecedentes</th>
-                        <th>Apto Médico</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {% for categoria_equipo in jugador_info.categorias_equipo %}
-                        <tr class="text-center">
-                          <td class="fw-bold">{{ categoria_equipo.torneo }}</td>
-                          <td>{{ categoria_equipo.nombre_categoria }}</td>
-                          <td>{{ categoria_equipo.nombre_equipo }}</td>
-                          <td class="{% if ficha_medica.consentimiento_persona %}text-success{% else %}text-danger{% endif %}">
-                            {% if ficha_medica.consentimiento_persona %}Sí{% else %}No{% endif %}
-                          </td>
-                          <td>
-                            {% if ficha_medica.antecedenteenfermedades %}
-                              <a href="{% url 'registroMedico:ver_antecedente' jugador.id %}" class="btn btn-success btn-sm">Ver</a>
-                            {% else %}
-                              <a href="{% url 'registroMedico:cargar_antecedente' jugador.id %}" class="btn btn-warning btn-sm">Cargar</a>
-                            {% endif %}
-                          </td>
-                          <td class="fw-bold {% if ficha_medica.estado == 'APROBADA' %}text-success{% else %}text-danger{% endif %}">
-                            {% if ficha_medica.estado == "APROBADA" %}
-                              <a href="{% url 'ficha_medica' jugador.id %}" class="btn btn-success btn-sm">Ver</a>
-                            {% else %}
-                              <span>{{ ficha_medica.estado }}</span>
-                            {% endif %}
-                          </td>
-                        </tr>
-                      {% endfor %}
-                    </tbody>
-                  </table>
-                </div>
-            
-                <!-- Tarjetas verticales para dispositivos pequeños -->
-                <div class="d-block d-md-none">
-                  {% for categoria_equipo in jugador_info.categorias_equipo %}
-                    <div class="card border-info shadow-sm mb-3">
-                      <div class="card-header bg-info text-white fw-bold">
-                        {{ categoria_equipo.torneo }}
-                      </div>
-                      <div class="card-body">
-                        <p><strong>Categoría:</strong> {{ categoria_equipo.nombre_categoria }}</p>
-                        <p><strong>Equipo:</strong> {{ categoria_equipo.nombre_equipo }}</p>
-                        <p><strong>Consentimiento:</strong> 
-                          <span class="{% if ficha_medica.consentimiento_persona %}text-success{% else %}text-danger{% endif %}">
-                            {% if ficha_medica.consentimiento_persona %}Sí{% else %}No{% endif %}
-                          </span>
-                        </p>
-                        <p><strong>Antecedentes:</strong>
-                          {% if ficha_medica.antecedenteenfermedades %}
-                            <a href="{% url 'registroMedico:ver_antecedente' jugador.id %}" class="btn btn-success btn-sm">Ver</a>
-                          {% else %}
-                            <a href="{% url 'registroMedico:cargar_antecedente' jugador.id %}" class="btn btn-warning btn-sm">Cargar</a>
-                          {% endif %}
-                        </p>
-                        <p><strong>Apto Médico:</strong> 
-                          <span class="fw-bold {% if ficha_medica.estado == 'APROBADA' %}text-success{% else %}text-danger{% endif %}">
-                            {{ ficha_medica.estado }}
-                          </span>
-                        </p>
-                      </div>
-                    </div>
-                  {% endfor %}
-                </div>
-              {% else %}
-                <p class="text-center text-muted">No hay torneos inscriptos.</p>
-              {% endif %}
-            </div>
-            
-          
-            
-          <!-- DATOS -->
-<div class="container p-3 bg-white shadow rounded" id="datosPersonales" style="position: relative; top: 50px">
-  <h1 class="text-center text-primary fw-bold">Datos Personales</h1>
-
-  {% if profile %}
-    <div class="card border-info shadow-sm">
-      <div class="card-header bg-info text-white fw-bold text-center">
-        Información Personal
-      </div>
-      <div class="card-body">
-        <!-- Tabla para pantallas grandes -->
-        <div class="table-responsive d-none d-md-block">
-          <table class="table table-bordered">
-            <tbody>
-              <tr>
-                <th class="bg-light text-nowrap text-center">Nombre</th>
-                <td class="text-center">{{ profile.nombre }}</td>
-              </tr>
-              <tr>
-                <th class="bg-light text-nowrap text-center">Apellido</th>
-                <td class="text-center">{{ profile.apellido }}</td>
-              </tr>
-              <tr>
-                <th class="bg-light text-nowrap text-center">DNI</th>
-                <td class="text-center">{{ profile.dni }}</td>
-              </tr>
-              <tr>
-                <th class="bg-light text-nowrap text-center">Fecha de Nacimiento</th>
-                <td class="text-center">{{ profile.fecha_nacimiento }}</td>
-              </tr>
-              <tr>
-                <th class="bg-light text-nowrap text-center">Email</th>
-                <td class="text-center">{{ profile.email }}</td>
-              </tr>
-              <tr>
-                <th class="bg-light text-nowrap text-center">Teléfono</th>
-                <td class="text-center">{{ persona.telefono }}</td>
-              </tr>
-              <tr>
-                <th class="bg-light text-nowrap text-center">Teléfono Alternativo</th>
-                <td class="text-center">{{ persona.telefono_alternativo }}</td>
-              </tr>
-              <tr>
-                <th class="bg-light text-nowrap text-center">Dirección</th>
-                <td class="text-center">{{ persona.direccion }}</td>
-              </tr>
-              <tr>
-                <th class="bg-light text-nowrap text-center">Obra Social</th>
-                <td class="text-center">{{ persona.jugador.cobertura_medica }}</td>
-              </tr>
-              <tr>
-                <th class="bg-light text-nowrap text-center">Número de Afiliado</th>
-                <td class="text-center">{{ persona.jugador.numero_afiliado }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <!-- Tarjetas individuales para dispositivos pequeños -->
-        <div class="d-block d-md-none">
-          <div class="card border-info shadow-sm mb-3">
-            <div class="card-body">
-              <p class="fw-bold text-primary"><span class="text-dark">Nombre:</span> {{ profile.nombre }}</p>
-              <p class="fw-bold text-primary"><span class="text-dark">Apellido:</span> {{ profile.apellido }}</p>
-              <p class="fw-bold text-primary"><span class="text-dark">DNI:</span> {{ profile.dni }}</p>
-              <p class="fw-bold text-primary"><span class="text-dark">Fecha de Nacimiento:</span> {{ profile.fecha_nacimiento }}</p>
-              <p class="fw-bold text-primary"><span class="text-dark">Email:</span> {{ profile.email }}</p>
-              <p class="fw-bold text-primary"><span class="text-dark">Teléfono:</span> {{ persona.telefono }}</p>
-              <p class="fw-bold text-primary"><span class="text-dark">Teléfono Alternativo:</span> {{ persona.telefono_alternativo }}</p>
-              <p class="fw-bold text-primary"><span class="text-dark">Dirección:</span> {{ persona.direccion }}</p>
-              <p class="fw-bold text-primary"><span class="text-dark">Obra Social:</span> {{ persona.jugador.cobertura_medica }}</p>
-              <p class="fw-bold text-primary"><span class="text-dark">Número de Afiliado:</span> {{ persona.jugador.numero_afiliado }}</p>
-            </div>
           </div>
+              <br>
+        {% endfor %}
         </div>
 
-        <div class="text-center mt-4">
-          <a href="{% url 'modificar_perfil' %}" class="btn btn-success btn-lg">Modificar</a>
-        </div>
-      </div>
-    </div>
-  {% else %}
-    <p class="text-center text-muted">No tienes datos personales cargados.</p>
-  {% endif %}
-</div>
 
             
       </main>
@@ -457,97 +470,97 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 <script>
   document.addEventListener("DOMContentLoaded", function () {
-    const sections = ["aptoTable", "datosPersonales", "torneoSeleccionado"];
-    const welcomeSection = document.getElementById("welcome");
-    const submenus = {
-        "datomedico": "submenuDatosMedicos",
-        "estudios": "submenuEstudios",
-        "notificaciones": "submenuNotificaciones"
-    };
+      const sections = ["aptoTable", "datosPersonales", "torneoSeleccionado"];
+      const welcomeSection = document.getElementById("welcome");
+      const submenus = {
+          "datomedico": "submenuDatosMedicos",
+          "estudios": "submenuEstudios",
+          "notificaciones": "submenuNotificaciones"
+      };
 
-    // ✅ Función para ocultar todas las secciones excepto welcome
-    function hideAllSections() {
-        sections.forEach(sectionId => {
-            const section = document.getElementById(sectionId);
-            if (section) section.classList.add("d-none");
-        });
-    }
+      // ✅ Función para ocultar todas las secciones excepto welcome
+      function hideAllSections() {
+          sections.forEach(sectionId => {
+              const section = document.getElementById(sectionId);
+              if (section) section.classList.add("d-none");
+          });
+      }
 
-    // ✅ Función para cerrar los submenús
-    function closeAllSubmenus() {
-        Object.values(submenus).forEach(submenuId => {
-            const submenu = document.getElementById(submenuId);
-            if (submenu) submenu.style.display = "none";
-        });
-    }
+      // ✅ Función para cerrar los submenús
+      function closeAllSubmenus() {
+          Object.values(submenus).forEach(submenuId => {
+              const submenu = document.getElementById(submenuId);
+              if (submenu) submenu.style.display = "none";
+          });
+      }
 
-    // ✅ Función para manejar clics en el menú principal
-    function handleMenuClick(event) {
+      // ✅ Función para manejar clics en el menú principal
+      function handleMenuClick(event) {
         event.preventDefault();
         const targetId = this.getAttribute("id");
-
+    
         console.log("🔹 Click en:", targetId);
-
+    
         // Cerrar todos los submenús al hacer clic en cualquier opción del menú
         closeAllSubmenus();
-
-        // Si es "Datos Médicos" o "Estudios", mostrar el submenú y mantener el welcome
+    
+        // Si es "Datos Médicos", "Estudios" o "Notificaciones", solo mostrar welcome y detener ejecución
         if (submenus[targetId]) {
             const submenu = document.getElementById(submenus[targetId]);
-            if (submenu) submenu.style.display = (submenu.style.display === "block") ? "none" : "block";
-            welcomeSection.classList.remove("d-none"); // Mantener visible el welcome
-            return; // No ocultamos welcome en esta opción
+            if (submenu) {
+                submenu.style.display = (submenu.style.display === "block") ? "none" : "block";
+            }
+            
+            hideAllSections(); // Asegura que todo lo demás se oculta
+            welcomeSection.classList.remove("d-none"); // Mantener welcome visible
+            return; // Termina la ejecución aquí
         }
-
-        // Ocultar welcome al seleccionar secciones principales
+    
+        // Ocultar todas las secciones y el welcome
         hideAllSections();
         welcomeSection.classList.add("d-none");
-
+    
         // Mostrar la sección correspondiente
-        const selectedSection = document.getElementById(targetId === "consultarApto" ? "aptoTable" :
+        const selectedSection = document.getElementById(
+            targetId === "consultarApto" ? "aptoTable" :
             targetId === "datospersonales" ? "datosPersonales" :
-                targetId === "vertorneo" ? "torneoSeleccionado" : null);
-
+            targetId === "vertorneo" ? "torneoSeleccionado" : null
+        );
+    
         if (selectedSection) {
             selectedSection.classList.remove("d-none");
             console.log("✅ Mostrando sección:", targetId);
-            console.log("📌 Verificando la existencia de aptoTable...");
-        const parent = document.getElementById("aptoTable").parentElement;
-            console.log("📌 Padre de aptoTable:", parent);
-            console.log("Display del padre:", window.getComputedStyle(parent).display);
-            console.log("Height del padre:", window.getComputedStyle(parent).height);
-            console.log("Overflow del padre:", window.getComputedStyle(parent).overflow);
-            
         } else {
             console.warn("⚠ Sección no encontrada:", targetId);
         }
     }
+    
 
-    // ✅ Asignar eventos a las opciones del menú principal
-    document.querySelectorAll('[data-menu="link"]').forEach(link => {
-        link.addEventListener("click", handleMenuClick);
-    });
+      // ✅ Asignar eventos a las opciones del menú principal
+      document.querySelectorAll('[data-menu="link"]').forEach(link => {
+          link.addEventListener("click", handleMenuClick);
+      });
 
-    // ✅ Asignar eventos a las opciones dentro de los submenús
-    document.querySelectorAll("#submenuDatosMedicos a, #submenuEstudios a, #submenuNotificaciones a").forEach(subLink => {
-        subLink.addEventListener("click", function () {
-            hideAllSections();
-            welcomeSection.classList.add("d-none"); // Ocultar welcome al seleccionar una opción dentro del submenú
-            closeAllSubmenus(); // Cerrar el submenú
-        });
-    });
+      // ✅ Asignar eventos a las opciones dentro de los submenús
+      document.querySelectorAll("#submenuDatosMedicos a, #submenuEstudios a, #submenuNotificaciones a").forEach(subLink => {
+          subLink.addEventListener("click", function () {
+              hideAllSections();
+              welcomeSection.classList.add("d-none"); // Ocultar welcome al seleccionar una opción dentro del submenú
+              closeAllSubmenus(); // Cerrar el submenú
+          });
+      });
 
-    // ✅ Cerrar submenús si se hace clic fuera del menú
-    document.addEventListener("click", function (event) {
-        if (!event.target.closest(".nav-item")) {
-            closeAllSubmenus();
-        }
-    });
+      // ✅ Cerrar submenús si se hace clic fuera del menú
+      document.addEventListener("click", function (event) {
+          if (!event.target.closest(".nav-item")) {
+              closeAllSubmenus();
+          }
+      });
 
-    // ✅ Mostrar welcome al cargar la página
-    hideAllSections();
-    welcomeSection.classList.remove("d-none");
-});
+      // ✅ Mostrar welcome al cargar la página
+      hideAllSections();
+      welcomeSection.classList.remove("d-none");
+  });
 
   
 </script>

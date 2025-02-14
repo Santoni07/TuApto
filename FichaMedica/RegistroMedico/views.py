@@ -35,7 +35,7 @@ class CargarAntecedenteView(FormView):
             torneo=torneo,
             defaults={
                 'estado': 'PROCESO',
-                'fecha_caducidad': datetime.now() + timedelta(days=365)
+                
             }
         )
 
@@ -47,7 +47,7 @@ class CargarAntecedenteView(FormView):
     def form_valid(self, form):
         jugador_id = self.kwargs.get('jugador_id')
         jugador = get_object_or_404(Jugador, id=jugador_id)
-
+        print(f"Jugador encontrado: {jugador}")  # Depuración
         # Obtener el torneo asociado al jugador
         jugador_categoria_equipo = JugadorCategoriaEquipo.objects.filter(jugador=jugador).first()
         torneo = jugador_categoria_equipo.categoria_equipo.categoria.torneo
@@ -58,51 +58,60 @@ class CargarAntecedenteView(FormView):
             torneo=torneo,
             defaults={
                 'estado': 'PROCESO',
-                'fecha_caducidad': datetime.now() + timedelta(days=365)
+                'fecha_caducidad': datetime.now().date() + timedelta(days=365)  # Asegurar que sea un objeto de fecha
             }
         )
-
-        # Guardar el antecedente asociado a la ficha médica
-        antecedente = form.save(commit=False)
-        antecedente.idfichaMedica = ficha_medica
-        antecedente.save()
+        
+        print(f"Ficha médica {'creada' if created else 'encontrada'}: {ficha_medica}")  # Depuración
+            # Guardar el antecedente asociado al jugador en lugar de la ficha médica
+        
+        if form.is_valid():
+            print("✅ Formulario válido.")
+            antecedente = form.save(commit=False)
+            antecedente.jugador = jugador
+            antecedente.save()
+            print(f"✅ Antecedente guardado correctamente: {antecedente}")
+        else:
+            print("❌ Error en el formulario:", form.errors)
+            return self.form_invalid(form)
+      
 
         return super().form_valid(form)
 
 class VerAntecedenteView(DetailView):
-    model = AntecedenteEnfermedades  # Ahora la vista se basa en AntecedenteEnfermedades
+    model = AntecedenteEnfermedades
     template_name = 'registro_medico/ver_antecedentes.html'
-    context_object_name = 'antecedente'  # Se utiliza 'antecedente' para el objeto en la plantilla
+    context_object_name = 'antecedente'
 
     def get_object(self, queryset=None):
-        jugador_id = self.kwargs.get('jugador_id')  # Obtener el ID del jugador desde la URL
-        jugador = get_object_or_404(Jugador, id=jugador_id)  # Obtener el objeto jugador
-        print(jugador)
-        # Obtener el torneo asociado al jugador
-        jugador_categoria_equipo = JugadorCategoriaEquipo.objects.filter(jugador=jugador).first()
-        torneo = jugador_categoria_equipo.categoria_equipo.categoria.torneo
+        jugador_id = self.kwargs.get('jugador_id')
+        jugador = get_object_or_404(Jugador, id=jugador_id)
+        print(f"Jugador encontrado: {jugador}")
 
-        # Obtener la ficha médica asociada al jugador y torneo
-        ficha_medica = RegistroMedico.objects.filter(jugador=jugador, torneo=torneo).first()
+        # Buscar la ficha médica asociada al jugador
+        ficha_medica = RegistroMedico.objects.filter(jugador=jugador).first()
+        print(f"Ficha médica encontrada: {ficha_medica}")
 
-        # Ahora obtener el antecedente usando la ficha médica
-        antecedente = get_object_or_404(AntecedenteEnfermedades, idfichaMedica=ficha_medica)
-        print(antecedente)
+        # Obtener el antecedente basado en el jugador (en lugar de ficha médica)
+        antecedente = get_object_or_404(AntecedenteEnfermedades, jugador=jugador)
+        print(f"Antecedente encontrado: {antecedente}")
+
         return antecedente
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        antecedente = self.object  # Obtén el antecedente actual
-        profile = self.request.user.profile
-        context['profile'] = profile  # Pasar el perfil al contexto
-        # Acceso a la ficha médica a través de la relación
-        ficha_medica = antecedente.idfichaMedica  
-        context['ficha_medica'] = ficha_medica  # Añade la ficha médica al contexto
+        antecedente = self.object  
+        
+        # Obtener la ficha médica asociada al jugador
+        ficha_medica = RegistroMedico.objects.filter(jugador=antecedente.jugador).first()
+        context['ficha_medica'] = ficha_medica
+
+        # Pasar el perfil del usuario actual
+        if hasattr(self.request.user, 'profile'):
+            context['profile'] = self.request.user.profile
 
         return context
-
-
-
+    
 class ModificarAntecedenteView(UpdateView):
     model = AntecedenteEnfermedades
     template_name = 'registro_medico/modificar_antecedentes.html'
@@ -187,14 +196,14 @@ class CargarEstudioView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         # Obtener la ficha médica a partir de la URL o sesión
-        ficha_medica = RegistroMedico.objects.get(idfichaMedica=self.kwargs['ficha_id'])
+        ficha_medica = RegistroMedico.objects.get(id=self.kwargs['ficha_id'])
 
         form.instance.ficha_medica = ficha_medica  # Asocia el estudio a la ficha médica
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['ficha_medica'] = get_object_or_404(RegistroMedico, idfichaMedica=self.kwargs['ficha_id'])
+        context['ficha_medica'] = get_object_or_404(RegistroMedico, id=self.kwargs['ficha_id'])
         return context
 
     def get_success_url(self):
@@ -209,14 +218,14 @@ class EstudiosMedicoListView(ListView):
     # Filtrar los estudios por ficha médica
     def get_queryset(self):
         ficha_medica_id = self.kwargs.get('ficha_medica_id')
-        return EstudiosMedico.objects.filter(ficha_medica__idfichaMedica=ficha_medica_id)
+        return EstudiosMedico.objects.filter(ficha_medica__id=ficha_medica_id)
 
 class EliminarEstudioView(DeleteView):
     model= EstudiosMedico
     template_name = 'registro_medico/eliminar_estudio_confirm.html'
     context_object_name = 'estudio' 
     def get_success_url(self):
-       ficha_medica_id = self.object.ficha_medica.idfichaMedica
+       ficha_medica_id = self.object.ficha_medica.id
        return reverse_lazy('registroMedico:ver_estudios', kwargs={'ficha_medica_id': ficha_medica_id})
 
 class EliminarEstudioMedicoView(DeleteView):

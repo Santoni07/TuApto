@@ -357,7 +357,7 @@ class MedicoHomeView(LoginRequiredMixin, ListView):
                 ]
 
                 # Obtener antecedentes médicos del jugador
-                antecedentes = AntecedenteEnfermedades.objects.filter(idfichaMedica=registro_medico)
+                antecedentes = AntecedenteEnfermedades.objects.filter(jugador=jugador)
                 jugador_info['antecedentes'] = [
                     {
                         'fue_operado': ant.fue_operado,
@@ -365,23 +365,23 @@ class MedicoHomeView(LoginRequiredMixin, ListView):
                         'estuvo_internado': ant.estuvo_internado,
                         'sufre_hormigueos': ant.sufre_hormigueos,
                         'es_diabetico': ant.es_diabetico,
-                        'es_asmatico': ant.es_amatico,
+                        'es_asmatico': ant.es_asmatico,
                         'es_alergico': ant.es_alergico,
                         'alerg_observ': ant.alerg_observ,
                         'antecedente_epilepsia': ant.antecedente_epilepsia,
                         'desviacion_columna': ant.desviacion_columna,
-                        'dolor_cintura': ant.dolor_cintira,
+                        'dolor_cintura': ant.dolor_cintura,
                         'fracturas': ant.fracturas,
                         'dolores_articulares': ant.dolores_articulares,
                         'falta_aire': ant.falta_aire,
-                        'traumatismos_craneo': ant.tramatismos_craneo,
+                        'traumatismos_craneo': ant.traumatismos_craneo,
                         'dolor_pecho': ant.dolor_pecho,
                         'perdida_conocimiento': ant.perdida_conocimiento,
                         'presion_arterial': ant.presion_arterial,
                         'muerte_subita_familiar': ant.muerte_subita_familiar,
                         'enfermedad_cardiaca_familiar': ant.enfermedad_cardiaca_familiar,
                         'soplo_cardiaco': ant.soplo_cardiaco,
-                        'abstenerce_competencia': ant.abstenerce_competencia,
+                        'abstenerce_competencia': ant.abstenerse_competencia,
                         'antecedentes_coronarios_familiares': ant.antecedentes_coronarios_familiares,
                         'fumar_hipertension_diabetes': ant.fumar_hipertension_diabetes,
                         'consumo_cocaina_anabolicos': ant.consumo_cocaina_anabolicos,
@@ -463,48 +463,6 @@ class MedicoHomeView(LoginRequiredMixin, ListView):
         context['jugador_id'] = jugador_id  # 🔑 Enviar el ID del jugador al contexto
 
         return render(request, 'medico/medico_home.html', context)
-""" def electro_basal_view(request, jugador_id):
-    jugador = get_object_or_404(Jugador, id=jugador_id)
-    registro_medico = RegistroMedico.objects.filter(jugador=jugador).first()
-    
-    if not registro_medico:
-        return JsonResponse({"error": "No se encontró el registro médico del jugador."}, status=404)
-
-    electro_basal = ElectroBasal.objects.filter(ficha_medica=registro_medico).first()
-    form_saved = False
-    form_complete = False
-
-    if request.method == 'POST':
-        electro_basal_form = ElectroBasalForm(request.POST, instance=electro_basal)
-        if electro_basal_form.is_valid():
-            with transaction.atomic():
-                electro_basal = electro_basal_form.save(commit=False)
-                
-                if not electro_basal.ficha_medica_id:
-                    electro_basal.ficha_medica_id = registro_medico.idfichaMedica
-                electro_basal.save()
-
-                form_saved = True
-
-            # Si es una solicitud AJAX, devolvemos JSON en lugar de renderizar un template
-            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-                return JsonResponse({"success": True, "message": "Formulario guardado exitosamente."})
-    else:
-        electro_basal_form = ElectroBasalForm(instance=electro_basal)
-        if electro_basal:
-            form_complete = all(
-                getattr(electro_basal, field.name) 
-                for field in electro_basal_form
-            )
-
-    # Renderizar solo para solicitudes normales (no AJAX)
-    return render(request, 'medico/medico_home.html', {
-        'jugador': jugador,
-        'electro_basal_form': electro_basal_form,
-        'form_saved': form_saved,
-        'form_complete': form_complete,
-    })
- """
 
 
 def electro_basal_view(request, jugador_id):

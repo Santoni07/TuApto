@@ -21,7 +21,7 @@ class RegistroMedicoForm(forms.ModelForm):
 class AntecedenteEnfermedadesForm(forms.ModelForm):
     class Meta:
         model = AntecedenteEnfermedades
-        exclude = ['alerg_observ', 'fhd_observacion', 'cca_observaciones','idfichaMedica']
+        exclude = ['alerg_observ', 'fhd_observacion', 'cca_observaciones','jugador']
         labels = {
             'fue_operado': '¿Fue operado en los últimos 4 meses?',
             'toma_medicacion': '¿Toma regularmente alguna medicación?',

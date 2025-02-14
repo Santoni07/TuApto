@@ -14,82 +14,6 @@ from RegistroMedico.models import AntecedenteEnfermedades, RegistroMedico
 from .forms import *
 from .models import *
 
-""" def registrar_persona(request):
-    profile = request.user.profile
-
-    # Intentamos obtener la Persona asociada al profile del usuario
-    persona, created = Persona.objects.get_or_create(profile=profile)
-
-    if created:
-        print(f"Persona creada: {persona}")
-    else:
-        print(f"Persona encontrada: {persona}")
-
-    # Verificamos si los campos obligatorios de la persona están completos
-    campos_completos = all([
-        persona.direccion,
-        persona.telefono,
-    ])
-
-    # Intentamos obtener el jugador asociado a la persona
-    try:
-        jugador = Jugador.objects.get(persona=persona)
-        campos_jugador_completos = all([
-            jugador.grupo_sanguineo,
-        ])
-    except Jugador.DoesNotExist:
-        jugador = None  # Si no hay jugador, se establece en None
-        campos_jugador_completos = False
-
-    # Intentamos obtener la relación de equipo y categoría asociada al jugador
-    jugador_equipo_categoria = None
-    if jugador:
-        try:
-            jugador_equipo_categoria = JugadorCategoriaEquipo.objects.get(jugador=jugador)
-            equipo_categoria_completo = True
-        except JugadorCategoriaEquipo.DoesNotExist:
-            equipo_categoria_completo = False
-    else:
-        equipo_categoria_completo = False
-
-    # Verificamos si todos los campos obligatorios están completos
-    if campos_completos and campos_jugador_completos and equipo_categoria_completo:
-        return redirect('menu_jugador')  # Redirigir si ya está completo
-
-    # Manejo de los formularios
-    if request.method == 'POST':
-        # Formularios para persona y jugador
-        form_persona = PersonaForm(request.POST, instance=persona)
-        form_jugador = JugadorForm(request.POST, instance=jugador) if jugador else JugadorForm(request.POST)
-
-        if form_persona.is_valid() and form_jugador.is_valid():
-            # Guardar la persona sin crear una nueva si ya existe
-            persona_guardada = form_persona.save(commit=False)
-            persona_guardada.profile = profile
-            persona_guardada.save()
-
-            # Guardar el jugador y asignar la persona
-            jugador_guardado = form_jugador.save(commit=False)
-            jugador_guardado.persona = persona_guardada
-            jugador_guardado.save()
-
-            return redirect('seleccionar_categoria_equipo')  # Redirigir al siguiente paso tras guardar
-    else:
-        form_persona = PersonaForm(instance=persona)
-        form_jugador = JugadorForm(instance=jugador) if jugador else JugadorForm()
-
-    context = {
-        'form_persona': form_persona,
-        'form_jugador': form_jugador,
-        'persona': persona,
-        'profile': profile,
-        'jugador': jugador,
-        'jugador_equipo_categoria': jugador_equipo_categoria,
-    }
-    return render(request, 'persona/registrar_persona.html', context)
-
-
- """
 
 
 
@@ -277,20 +201,24 @@ def menu_jugador(request):
     try:
         ficha_medica = RegistroMedico.objects.get(jugador=jugador)
     except RegistroMedico.DoesNotExist:
-        ficha_medica = None  # O maneja según lo que desees
-       # Si no hay ficha médica, definir una estructura vacía para evitar errores en la plantilla
+        ficha_medica = None  
+
     ficha_medica_data = {
         'estado': ficha_medica.estado if ficha_medica else "No disponible",
         'consentimiento_persona': ficha_medica.consentimiento_persona if ficha_medica else False
     }
-    # Obtener los antecedentes usando la ficha médica
-    antecedentes = AntecedenteEnfermedades.objects.filter(idfichaMedica=ficha_medica)
+
+    # Obtener los antecedentes usando el jugador
+    antecedentes = AntecedenteEnfermedades.objects.filter(jugador=jugador)
 
     # Obtener las categorías, equipos y torneos relacionados al jugador
     jugador_categoria_equipos = JugadorCategoriaEquipo.objects.select_related(
         'categoria_equipo__categoria__torneo',
         'categoria_equipo__equipo'
     ).filter(jugador=jugador)
+
+    # Inicializar una lista para almacenar torneos
+    torneos = []
 
     # Crear una estructura para almacenar la información del jugador, categorías, equipos y torneos
     jugador_info = {
@@ -304,17 +232,23 @@ def menu_jugador(request):
         'categorias_equipo': []
     }
 
-    # Iterar sobre las categorías y equipos asociados al jugador
     for jugador_categoria in jugador_categoria_equipos:
         categoria_equipo = jugador_categoria.categoria_equipo
-        torneo = categoria_equipo.categoria.torneo
-
+        torneo = categoria_equipo.categoria.torneo  # Obtener el torneo asociado a la categoría
+        
         categoria_info = {
             'nombre_categoria': categoria_equipo.categoria.nombre,
             'nombre_equipo': categoria_equipo.equipo.nombre,
-            'torneo': torneo.nombre
+            'torneo': {
+                'nombre': torneo.nombre,
+                'descripcion' : torneo.descripcion,
+                'direccion': torneo.direccion if hasattr(torneo, 'direccion') else "No disponible",
+                'telefono': torneo.telefono if hasattr(torneo, 'telefono') else "No disponible",
+                'imagen' : torneo.imagen.url if torneo.imagen else None
+            }
         }
         jugador_info['categorias_equipo'].append(categoria_info)
+
 
     # Pasar el contexto necesario a la plantilla
     context = {
@@ -323,12 +257,14 @@ def menu_jugador(request):
         'jugador': jugador,
         'jugador_id': jugador.id,
         'jugador_info': jugador_info,
-        'antecedentes': antecedentes,  # Incluir antecedentes en el contexto
+        'antecedentes': antecedentes,
         'ficha_medica': ficha_medica,
-        'ficha_medica_data':ficha_medica_data,
+        'ficha_medica_data': ficha_medica_data,
+        'torneos': torneos,  # Se pasa la lista de torneos al contexto
     }
 
-    return render(request, 'persona/menu_jugador.html', context) 
+    return render(request, 'persona/menu_jugador.html', context)
+
 
 
 

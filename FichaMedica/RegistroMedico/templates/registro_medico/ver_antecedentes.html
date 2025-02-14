@@ -149,7 +149,7 @@
                         <a href="{% url 'menu_jugador' %}" class="btn btn-primary me-2">Volver al Menú del Jugador</a>
                         <!-- Agregamos 'me-2' para separar los botones -->
                         {% if not ficha_medica.consentimiento_persona %}
-                        <a href="{% url 'registroMedico:modificar_antecedente' antecedente.idantecedente_enfermedades %}" class="btn btn-success">
+                        <a href="{% url 'registroMedico:modificar_antecedente' antecedente.id %}" class="btn btn-success">
                             Modificar Antecedente
                         </a>
                         {% endif %}

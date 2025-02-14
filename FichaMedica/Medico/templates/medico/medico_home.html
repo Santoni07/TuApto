@@ -191,78 +191,34 @@
                                         </tr>
                                     </thead>
                                     <tbody>
+                                      
                                         {% for jugador in jugadores_info %}
+                                        {% for categoria_equipo in jugador.categorias_equipo %}
                                             <tr class="text-center jugador-row" data-id="{{ jugador.id }}">
                                                 <td>{{ jugador.apellido }}</td>
                                                 <td>{{ jugador.nombre }}</td>
                                                 <td>{{ jugador.dni }}</td>
                                                 <td>{{ jugador.registro_medico_estado|default:"Sin Registro" }}</td>
-                                                <td class="d-none d-lg-table-cell">
-                                                    {% for categoria_equipo in jugador.categorias_equipo %}
-                                                        {{ categoria_equipo.nombre_categoria }}<br>
-                                                    {% empty %}
-                                                        Sin categoría
-                                                    {% endfor %}
-                                                </td>
-                                                <td class="d-none d-lg-table-cell">
-                                                    {% for categoria_equipo in jugador.categorias_equipo %}
-                                                        {{ categoria_equipo.nombre_equipo }}<br>
-                                                    {% empty %}
-                                                        Sin equipo
-                                                    {% endfor %}
-                                                </td>
-                                                <td class="d-none d-lg-table-cell">
-                                                    {% for categoria_equipo in jugador.categorias_equipo %}
-                                                        {{ categoria_equipo.torneo }}<br>
-                                                    {% empty %}
-                                                        Sin torneo
-                                                    {% endfor %}
-                                                </td>
+                                                <td class="d-none d-lg-table-cell">{{ categoria_equipo.nombre_categoria }}</td>
+                                                <td class="d-none d-lg-table-cell">{{ categoria_equipo.nombre_equipo }}</td>
+                                                <td class="d-none d-lg-table-cell">{{ categoria_equipo.torneo }}</td>
                                                 <td>
-                                                    <div class="btn-group" role="group" aria-label="Basic example">
+                                                    <div class="btn-group" role="group">
                                                         {% if jugador.registro_medico_estado == "PROCESO" %}
-                                                            {% if jugador.electrocardiograma_cargado %}
-                                                                {% if jugador.edad >= 35 %}
-                                                                    {% if jugador.ergonometria_cargado %}
-                                                                        <!-- Si el jugador es mayor de 35 y tiene ambos estudios cargados -->
-                                                                        <a href="#" class="btn btn-warning me-2 btn-seleccionar" id="cargarFichaBtn" data-id="{{ jugador.id }}">Cargar Ficha</a>
-                                                                    {% else %}
-                                                                        <!-- Si es mayor de 35 pero falta ergonometría -->
-                                                                        <div class="text-center">
-                                                                            <p class="text-danger mb-2">Falta Ergonometría</p>
-                                                                            <a href="#" class="btn btn-warning btn-seleccionar" id="cargarFichaBtn" data-id="{{ jugador.id }}">Cargar Ficha</a>
-                                                                        </div>
-                                                                    {% endif %}
-                                                                {% else %}
-                                                                    <!-- Si el jugador es menor de 35 y tiene electrocardiograma cargado -->
-                                                                    <a href="#" class="btn btn-warning me-2 btn-seleccionar" id="cargarFichaBtn" data-id="{{ jugador.id }}">Cargar Ficha</a>
-                                                                {% endif %}
-                                                            {% else %}
-                                                                <!-- Si falta el electrocardiograma (indispensable para todos) -->
-                                                                <div class="text-center">
-                                                                    <p class="text-danger mb-2">Falta Electrocardiograma</p>
-                                                                    {% if jugador.edad >= 35 and not jugador.ergonometria_cargado %}
-                                                                        <p class="text-danger mb-2">Falta Ergonometría</p>
-                                                                    {% endif %}
-                                                                    <a href="#" class="btn btn-warning btn-seleccionar" id="cargarFichaBtn" data-id="{{ jugador.id }}">Cargar Ficha</a>
-                                                                </div>
-                                                            {% endif %}
-                                                        {% elif jugador.registro_medico_estado == "PENDIENTE" %}
-                                                            <a href="#" class="btn btn-warning me-2 btn-seleccionar" onclick="toggleSearchMenu()" data-id="{{ jugador.id }}">Modificar</a>
-                                                        {% elif jugador.registro_medico_estado == "RECHAZADO" or jugador.registro_medico_estado == "APROBADA" %}
-                                                            <div class="d-flex justify-content-center gap-2">
-                                                                <a href="{% url 'ficha_medica' jugador.id %}" class="btn btn-success px-4 py-2" target="_blank">Ver</a>
-                                                                {% comment %} <a href="{% url 'eliminar_ficha_medica' jugador.id %}" class="btn btn-danger px-4 py-2" 
-                                                                onclick="return confirm('¿Estás seguro de que deseas eliminar esta ficha médica?');">Eliminar</a> {% endcomment %}
-                                                            </div>
+                                                            <a href="#" class="btn btn-warning btn-seleccionar" id="cargarFichaBtn" data-id="{{ jugador.id }}">Cargar Ficha</a>
+                                                        {% elif jugador.registro_medico_estado == "APROBADA" %}
+                                                            <a href="{% url 'ficha_medica' jugador.id %}" class="btn btn-success" target="_blank">Ver</a>
                                                         {% endif %}
                                                     </div>
                                                 </td>
                                             </tr>
-                                        {% empty %}
-                                            <tr>
-                                                <td colspan="11" class="text-center">No se encontraron resultados.</td>
-                                            </tr>
+                                        {% endfor %}
+                                    {% empty %}
+                                        <tr>
+                                            <td colspan="8" class="text-center">No se encontraron jugadores.</td>
+                                        </tr>
+                                
+                                    
                                         {% endfor %}
                                     </tbody>
                                 </table>
@@ -272,7 +228,7 @@
                                         
         {% for jugador in jugadores_info %}                    
                 <div class="row jugador-container" id="formularioContainer" data-id="{{ jugador.id }}" style="display: none;">
-                        
+                    
                                     <!-- Sección de Antecedentes -->
                                     <div class="container mt-5" id="ficha_medica_section" data-id="{{ jugador.id }}" >  
                                         
@@ -505,7 +461,7 @@
                                             </div>
                                         </div>
                                     </div>  
-                                    
+                                 
                 <div class="col-lg-6 col-md-8 mx-auto">
                                 
                                                         

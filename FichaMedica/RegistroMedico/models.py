@@ -9,42 +9,41 @@ from django.utils.timezone import now
 
 
 class AntecedenteEnfermedades(models.Model):
-    
-    idantecedente_enfermedades = models.AutoField(primary_key=True)
+    jugador = models.OneToOneField(Jugador, on_delete=models.CASCADE, related_name='antecedentes')
+
     fue_operado = models.BooleanField(null=True, blank=True, default=None)
     toma_medicacion = models.BooleanField(null=True, blank=True, default=None)
     estuvo_internado = models.BooleanField(null=True, blank=True, default=None)
     sufre_hormigueos = models.BooleanField(null=True, blank=True, default=None)
     es_diabetico = models.BooleanField(null=True, blank=True, default=None)
-    es_amatico = models.BooleanField(null=True, blank=True, default=None)  # 'asmático' corregido como 'es_amatico'
+    es_asmatico = models.BooleanField(null=True, blank=True, default=None)  
     es_alergico = models.BooleanField(null=True, blank=True, default=None)
     alerg_observ = models.CharField(max_length=100, null=True, blank=True, default=None)
     antecedente_epilepsia = models.BooleanField(null=True, blank=True, default=None)
     desviacion_columna = models.BooleanField(null=True, blank=True, default=None)
-    dolor_cintira = models.BooleanField(null=True, blank=True, default=None)
+    dolor_cintura = models.BooleanField(null=True, blank=True, default=None)
     fracturas = models.BooleanField(null=True, blank=True, default=None)
     dolores_articulares = models.BooleanField(null=True, blank=True, default=None)
     falta_aire = models.BooleanField(null=True, blank=True, default=None)
-    tramatismos_craneo = models.BooleanField(null=True, blank=True, default=None)
+    traumatismos_craneo = models.BooleanField(null=True, blank=True, default=None)
     dolor_pecho = models.BooleanField(null=True, blank=True, default=None)
     perdida_conocimiento = models.BooleanField(null=True, blank=True, default=None)
     presion_arterial = models.BooleanField(null=True, blank=True, default=None)
     muerte_subita_familiar = models.BooleanField(null=True, blank=True, default=None)
     enfermedad_cardiaca_familiar = models.BooleanField(null=True, blank=True, default=None)
     soplo_cardiaco = models.BooleanField(null=True, blank=True, default=None)
-    abstenerce_competencia = models.BooleanField(null=True, blank=True, default=None)
+    abstenerse_competencia = models.BooleanField(null=True, blank=True, default=None)
     antecedentes_coronarios_familiares = models.BooleanField(null=True, blank=True, default=None)
     fumar_hipertension_diabetes = models.BooleanField(null=True, blank=True, default=None)
     fhd_observacion = models.CharField(max_length=100, null=True, blank=True, default=None)
     consumo_cocaina_anabolicos = models.BooleanField(null=True, blank=True, default=None)
     cca_observaciones = models.CharField(max_length=100, null=True, blank=True, default=None)
 
-    # Relación con la tabla 'fichamedica'
-    idfichaMedica = models.OneToOneField('RegistroMedico', on_delete=models.CASCADE, unique=True)
-
     class Meta:
         db_table = 'antecedente_enfermedades'
 
+    def __str__(self):
+        return f"Antecedentes de {self.jugador.persona.profile.nombre} {self.jugador.persona.profile.apellido}"
 
 class RegistroMedico(models.Model):
     ESTADO_FICHA = [
@@ -52,35 +51,44 @@ class RegistroMedico(models.Model):
         ('PROCESO', 'En proceso'),
         ('APROBADA', 'Aprobada'),
         ('RECHAZADA', 'Rechazada'),
+        ('VENCIDO', 'Vencido'),  # Nuevo estado agregado
     ]
     
-    idfichaMedica = models.AutoField(primary_key=True)
-    jugador = models.ForeignKey(Jugador, on_delete=models.CASCADE ,related_name='registros_medicos')
-    torneo = models.ForeignKey(Torneo, on_delete=models.CASCADE)  # Relación con Torneo
-    estado = models.CharField(max_length=45, choices=ESTADO_FICHA, blank=True, null=True)  # Estado actual de la ficha médica
-    fecha_creacion = models.DateTimeField(auto_now_add=True) 
-    fecha_caducidad = models.DateField(blank=True, null=True)  # Inicialmente null
-    fecha_de_llenado = models.DateField(blank=True, null=True)  # Campo para fecha de llenado
-    observacion = models.CharField(max_length=200, blank=True, null=True)  # Observaciones adicionales
-    consentimiento_persona = models.BooleanField(null=True, blank=True)  # Consentimiento de la persona
-    medico = models.ForeignKey(Medico, on_delete=models.SET_NULL, null=True, blank=True)  # Relación opcional con el modelo Medico
-    
+    jugador = models.ForeignKey(Jugador, on_delete=models.CASCADE, related_name='registros_medicos')
+    torneo = models.ForeignKey(Torneo, on_delete=models.CASCADE)
+    estado = models.CharField(max_length=45, choices=ESTADO_FICHA, blank=True, null=True)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    fecha_caducidad = models.DateField(blank=True, null=True)
+    fecha_de_llenado = models.DateField(blank=True, null=True)
+    observacion = models.CharField(max_length=200, blank=True, null=True)
+    consentimiento_persona = models.BooleanField(null=True, blank=True)
+    medico = models.ForeignKey(Medico, on_delete=models.SET_NULL, null=True, blank=True)
+
     class Meta:
-        db_table = 'fichaRegistro'
+        db_table = 'ficha_registro'
 
     def __str__(self):
-        return f"{self.jugador.persona.profile.nombre} {self.jugador.persona.profile.apellido}"
+        return f"Ficha Médica {self.id} - {self.jugador.persona.profile.nombre} {self.jugador.persona.profile.apellido} - {self.torneo.nombre}"
+
     @staticmethod
-    def eliminar_fichas_vencidas():
-        hoy = now().date()  # Obtiene la fecha actual
-        fichas_vencidas = RegistroMedico.objects.filter(fecha_caducidad__lt=hoy)
+    def marcar_fichas_vencidas():
+        """Marca como 'VENCIDO' las fichas médicas que han pasado su fecha de caducidad."""
+        hoy = now().date()
+        fichas_vencidas = RegistroMedico.objects.filter(fecha_caducidad__lt=hoy, estado__in=['PENDIENTE', 'PROCESO', 'APROBADA'])
 
         if fichas_vencidas.exists():
-            print(f"Eliminando {fichas_vencidas.count()} fichas médicas vencidas...")
-            fichas_vencidas.delete()
-            
-            
-            
+            fichas_vencidas.update(estado='VENCIDO')
+            print(f"Se han marcado {fichas_vencidas.count()} fichas médicas como 'VENCIDO'.")
+
+    @staticmethod
+    def eliminar_fichas_vencidas():
+        """Elimina fichas médicas que estén en estado 'VENCIDO'."""
+        fichas_a_eliminar = RegistroMedico.objects.filter(estado='VENCIDO')
+
+        if fichas_a_eliminar.exists():
+            print(f"Eliminando {fichas_a_eliminar.count()} fichas médicas en estado 'VENCIDO'...")
+            fichas_a_eliminar.delete()
+    
 class EstudiosMedico(models.Model):
     TIPO_ESTUDIO = [
         ('ORINA', 'Análisis de Orina'),
