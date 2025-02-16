@@ -749,7 +749,7 @@ def ficha_medica_views(request, jugador_id):
     else:
         registro_medico_form = RegistroMedicoUpdateForm(instance=registro_medico)
 
-    antecedentes = AntecedenteEnfermedades.objects.filter(idfichaMedica=registro_medico)
+    antecedentes = AntecedenteEnfermedades.objects.filter(jugador=jugador)
     electro_basal = ElectroBasal.objects.filter(ficha_medica=registro_medico).first()
     electro_esfuerzo = ElectroEsfuerzo.objects.filter(ficha_medica=registro_medico).first()
     cardiovascular = Cardiovascular.objects.filter(ficha_medica=registro_medico).first()
@@ -797,23 +797,23 @@ def ficha_medica_views(request, jugador_id):
                             'estuvo_internado': ant.estuvo_internado,
                             'sufre_hormigueos': ant.sufre_hormigueos,
                             'es_diabetico': ant.es_diabetico,
-                            'es_asmatico': ant.es_amatico,
+                            'es_asmatico': ant.es_asmatico,
                             'es_alergico': ant.es_alergico,
                             'alerg_observ': ant.alerg_observ,
                             'antecedente_epilepsia': ant.antecedente_epilepsia,
                             'desviacion_columna': ant.desviacion_columna,
-                            'dolor_cintura': ant.dolor_cintira,
+                            'dolor_cintura': ant.dolor_cintura,
                             'fracturas': ant.fracturas,
                             'dolores_articulares': ant.dolores_articulares,
                             'falta_aire': ant.falta_aire,
-                            'traumatismos_craneo': ant.tramatismos_craneo,
+                            'traumatismos_craneo': ant.traumatismos_craneo,
                             'dolor_pecho': ant.dolor_pecho,
                             'perdida_conocimiento': ant.perdida_conocimiento,
                             'presion_arterial': ant.presion_arterial,
                             'muerte_subita_familiar': ant.muerte_subita_familiar,
                             'enfermedad_cardiaca_familiar': ant.enfermedad_cardiaca_familiar,
                             'soplo_cardiaco': ant.soplo_cardiaco,
-                            'abstenerce_competencia': ant.abstenerce_competencia,
+                            'abstenerce_competencia': ant.abstenerse_competencia,
                             'antecedentes_coronarios_familiares': ant.antecedentes_coronarios_familiares,
                             'fumar_hipertension_diabetes': ant.fumar_hipertension_diabetes,
                             'consumo_cocaina_anabolicos': ant.consumo_cocaina_anabolicos,
