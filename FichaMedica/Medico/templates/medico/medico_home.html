@@ -190,7 +190,7 @@
                                             <th scope="col" class="fw-bold">Acciones</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
+                               {% comment %}  <tbody>
                                       
                                         {% for jugador in jugadores_info %}
                                         {% for categoria_equipo in jugador.categorias_equipo %}
@@ -220,15 +220,63 @@
                                 
                                     
                                         {% endfor %}
-                                    </tbody>
-                                </table>
+                                </tbody> {% endcomment %}
+                                
+                                <tbody>
+    {% for jugador in jugadores_info %}
+    <p>Jugador :{{ jugador.id}}</p>
+    <p> Ficha Medica :{{ jugador.registro_id}}</p>
+    <p> Estado :{{ jugador.estado}}</p>
+        <tr class="text-center">
+            <td>{{ jugador.apellido }}</td>
+            <td>{{ jugador.nombre }}</td>
+            <td>{{ jugador.dni }}</td>
+            <td>{{ jugador.estado }}</td>
+            <td class="d-none d-lg-table-cell">{{ jugador.categoria }}</td>
+            <td class="d-none d-lg-table-cell">{{ jugador.equipo }}</td>
+            <td class="d-none d-lg-table-cell">{{ jugador.torneo }}</td>
+            <td>
+                {% if jugador.registro_medico.id %}
+                    {% if jugador.registro_medico.estado == "PROCESO" %}
+                        <a href="{% url 'registro_medico_update_view' jugador.registro_medico.id %}" 
+                           class="btn btn-warning btn-seleccionar"  data-id="{{ jugador.id }}">
+                           Cargar Ficha {{ jugador.registro_medico.id }}
+                        </a>
+                    {% elif jugador.registro_medico.estado == "APROBADA" %}
+                        <a href="{% url 'ficha_medica' jugador.registro_medico.id %}" 
+                           class="btn btn-success">
+                           Ver Ficha {{ jugador.registro_medico.id }}
+                        </a>
+                    {% endif %}
+                {% else %}
+                    <span>Sin Registro</span>
+                {% endif %}
+            </td>
+      
+            
+        </tr>
+    {% empty %}
+        <tr>
+            <td colspan="8" class="text-center">No se encontraron jugadores con registros médicos.</td>
+        </tr>
+    {% endfor %}
+</tbody>
+
+                                
+                                
+                            
+                            </table>
+                            
+                            
                             </div>
                         
    
                                         
-        {% for jugador in jugadores_info %}                    
-                <div class="row jugador-container" id="formularioContainer" data-id="{{ jugador.id }}" style="display: none;">
+                            {% for jugador in jugadores_info %}
                     
+           
+                <div class="row jugador-container" id="formularioContainer" data-id="{{ jugador.id }}" style="display: none;">
+            
                                     <!-- Sección de Antecedentes -->
                                     <div class="container mt-5" id="ficha_medica_section" data-id="{{ jugador.id }}" >  
                                         
@@ -293,15 +341,15 @@
                                                                             </tr>
                                                                             <tr>
                                                                                 <td class="align-left">Torneo</td>
-                                                                                <td class="text-center">{{ jugador.categorias_equipo.0.torneo }}</td>
+                                                                                <td class="text-center">{{ jugador.torneo }}</td>
                                                                             </tr>
                                                                             <tr>
                                                                                 <td class="align-left">Categoría</td>
-                                                                                <td class="text-center">{{ jugador.categorias_equipo.0.nombre_categoria }}</td>
+                                                                                <td class="text-center">{{ jugador.categoria }}</td>
                                                                             </tr>
                                                                             <tr>
                                                                                 <td class="align-left">Equipo</td>
-                                                                                <td class="text-center">{{ jugador.categorias_equipo.0.nombre_equipo }}</td>
+                                                                                <td class="text-center">{{ jugador.equipo }}</td>
                                                                             </tr>
                                                             
                                                                         </tbody>
@@ -1060,6 +1108,7 @@
 
                 </div>
 
+     
         {% endfor %}
     </div>
 </main>

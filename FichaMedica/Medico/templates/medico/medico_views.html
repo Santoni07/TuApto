@@ -7,6 +7,9 @@
     .card-body{
         background-color: #f0f0f0;
     }
+    header {
+        display: none !important;
+    }
 </style>
 
 
@@ -18,28 +21,28 @@
             </a>
         </header>
 
-        {% for torneo in jugador_info.categorias_equipo %}
+        
         <div class="row align-items-center mb-2">
             <!-- Columna central para la descripción -->
             <div class="col-md-9 d-flex justify-content-center flex-column text-center">
-                <h4>{{ torneo.descripcion }}</h4>
+                <h4>{{ jugador_info.torneo_descripcion }}</h4>
                 <div>
-                    <p><strong>{{ torneo.direccion }}</strong></p>
-                    <p>Tel: <strong>{{ torneo.telefono }}</strong></p>
+                    <p><strong>{{ jugador_info.torneo_direccion }}</strong></p>
+                    <p>Tel: <strong>{{ jugador_info.torneo_telefono }}</strong></p>
                 </div>
             </div>
     
-            <!-- Columna derecha para el logo -->
-            <div class="col-md-3 text-center">
-                {% if torneo.imagen %}
-                    <img src="{{ torneo.imagen }}" class="img-fluid" style="width: 300px;">
-                {% else %}
-                    <p>No hay logo disponible</p>
-                {% endif %}
-            </div>
+            <!-- Columna derecha para el logo del torneo -->
+        <div class="col-md-3 text-center">
+            {% if jugador_info.imagen_torneo %}
+                <img src="{{ jugador_info.imagen_torneo }}" class="img-fluid" style="width: 300px;" alt="imagen">
+            {% else %}
+                <p>No hay logo disponible</p>
+            {% endif %}
         </div>
-        <hr>
-    {% endfor %}
+    </div>
+    <hr>
+
     
     
 
@@ -78,21 +81,21 @@
                             <h2>Equipos y Categorías</h2>
                         </div>
                         <div class="card-body">
-                            {% for categoria in jugador_info.categorias_equipo %}
+                           
                                 <div class="row text-center">
                                     <div class="col-md-4">
-                                        <p>Torneo: <strong>{{ categoria.torneo }}</strong></p>
+                                        <p>Torneo: <strong>{{ jugador_info.torneo }}</strong></p>
                                     </div>
                                     
                                     <div class="col-md-4">
-                                        <p>Categoría: <strong>{{ categoria.nombre_categoria }}</strong></p>
+                                        <p>Categoría: <strong>{{ jugador_info.categoria }}</strong></p>
                                     </div>
                                     <div class="col-md-4">
-                                        <p>Equipo: <strong>{{ categoria.nombre_equipo }}</strong></p>
+                                        <p>Equipo: <strong>{{ jugador_info.equipo }}</strong></p>
                                     </div>
                                 </div>
                             
-                            {% endfor %}
+                            
                         </div>
                     </div>
 
@@ -399,4 +402,15 @@
             <button type="submit" class="btn btn-primary">Descargar</button>
         </form>
     </div>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(".btn-seleccionar").forEach(btn => {
+            btn.addEventListener("click", function () {
+                console.log("Clic en:", this.dataset.id);
+            });
+        });
+    });
+</script>
+
+
 {% endblock %}

@@ -4,7 +4,7 @@ from django.views.generic import ListView
 from django.db.models import Q
 from django.db import transaction
 from weasyprint import HTML
-from persona.models import Jugador
+from persona.models import Jugador,JugadorCategoriaEquipo
 from RegistroMedico.models import RegistroMedico, AntecedenteEnfermedades
 from django.contrib.auth.mixins import LoginRequiredMixin
 from Medico.models import Medico
@@ -13,220 +13,8 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.http import JsonResponse
-
 from django.urls import reverse
 
-
-""" class MedicoHomeView(LoginRequiredMixin, ListView):
-    model = Jugador
-    template_name = 'medico/medico_home.html'
-    context_object_name = 'jugadores'
-
-            
-            queryset = super().get_queryset().select_related('persona__profile').prefetch_related(
-                Prefetch(
-                    'jugadorcategoriaequipo_set',
-                    queryset=JugadorCategoriaEquipo.objects.select_related(
-                        'categoria_equipo__categoria__torneo', 'categoria_equipo__equipo'
-                    )
-                )
-            )
-
-            # Obtener el término de búsqueda
-            search_query = self.request.GET.get('search_query', '').strip()
-
-            # Verificar si el término de búsqueda es un DNI
-            if search_query:
-                if search_query.isdigit() and len(search_query) == 8:
-                    # Filtrar según el DNI
-                    queryset = queryset.filter(
-                        Q(persona__profile__dni__icontains=search_query)
-                    )
-                elif search_query.isalpha():
-                    # Búsqueda por nombre o apellido
-                    queryset = queryset.filter(
-                        Q(persona__profile__nombre__icontains=search_query) |
-                        Q(persona__profile__apellido__icontains=search_query)
-                    )
-                else:
-                    # Mostrar un mensaje de error si no cumple con el formato de DNI
-                    messages.error(self.request, "El valor ingresado para la busqueda por DNI es incorrecto. Debe contener exactamente 8 números.")
-                    return queryset.none()
-            else:
-                # Retornar un conjunto vacío si no se realiza ninguna búsqueda
-                return queryset.none()
-
-            return queryset
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        search_query = self.request.GET.get('search_query', '')
-        context['search_query'] = search_query
-
-        try:
-            context['medico'] = Medico.objects.get(profile=self.request.user.profile)
-        except Medico.DoesNotExist:
-            context['medico'] = None
-
-        jugadores_info = []
-        for jugador in context['jugadores']:
-            jugador_info = {
-                'id': jugador.id,
-                'edad': jugador.persona.profile.edad,
-                'dni': jugador.persona.profile.dni,
-                'nombre': jugador.persona.profile.nombre,
-                'apellido': jugador.persona.profile.apellido,
-                'direccion': jugador.persona.direccion,
-                'telefono': jugador.persona.telefono,
-                'grupo_sanguineo': jugador.grupo_sanguineo,
-                'cobertura_medica': jugador.cobertura_medica,
-                'numero_afiliado': jugador.numero_afiliado,
-                'categorias_equipo': [],
-                'antecedentes': [],
-                'estudios_medicos': [],
-                'electro_basal_form': ElectroBasalForm(),
-                'electro_esfuerzo_form': None,
-                'cardiovascular_form': None,
-                'laboratorio_form': None,
-                'oftalmologico_form': None,
-                'torax_form': None,
-                'registro_medico_form': None,
-                'estudio_medico_form': EstudioMedicoForm(),
-                'ergonometria_cargado': False,  # Agregar la comprobación para el electrocardiograma
-                'otros_examenes_form': OtrosExamenesClinicosForm(),
-                
-            }
-
-            # Registro médico y antecedentes
-            registro_medico = RegistroMedico.objects.filter(jugador=jugador).first()
-            if registro_medico:
-                jugador_info['registro_medico_estado'] = registro_medico.estado
-
-                # Verificar si hay un electrocardiograma cargado
-                estudios_medicos = EstudiosMedico.objects.filter(ficha_medica=registro_medico, tipo_estudio='ERGOMETRIA')
-                jugador_info['ergonometria_cargado'] = estudios_medicos.exists()
-
-                # Obtener estudios médicos
-                estudios_medicos = EstudiosMedico.objects.filter(ficha_medica=registro_medico)
-                jugador_info['estudios_medicos'] = [
-                    {
-                        'pk': estudio.pk,
-                        'tipo': estudio.get_tipo_estudio_display(),
-                        'archivo': estudio.archivo.url if estudio.archivo else None,
-                        'observaciones': estudio.observaciones,
-                    } for estudio in estudios_medicos
-                ]
-
-                jugador_info['registro_medico_estado'] = registro_medico.estado
-
-                # Obtener antecedentes
-                antecedentes = AntecedenteEnfermedades.objects.filter(idfichaMedica=registro_medico)
-                jugador_info['antecedentes'] = [
-                    {
-                        'fue_operado': ant.fue_operado,
-                        'toma_medicacion': ant.toma_medicacion,
-                        'estuvo_internado': ant.estuvo_internado,
-                        'sufre_hormigueos': ant.sufre_hormigueos,
-                        'es_diabetico': ant.es_diabetico,
-                        'es_asmatico': ant.es_amatico,
-                        'es_alergico': ant.es_alergico,
-                        'alerg_observ': ant.alerg_observ,
-                        'antecedente_epilepsia': ant.antecedente_epilepsia,
-                        'desviacion_columna': ant.desviacion_columna,
-                        'dolor_cintura': ant.dolor_cintira,
-                        'fracturas': ant.fracturas,
-                        'dolores_articulares': ant.dolores_articulares,
-                        'falta_aire': ant.falta_aire,
-                        'traumatismos_craneo': ant.tramatismos_craneo,
-                        'dolor_pecho': ant.dolor_pecho,
-                        'perdida_conocimiento': ant.perdida_conocimiento,
-                        'presion_arterial': ant.presion_arterial,
-                        'muerte_subita_familiar': ant.muerte_subita_familiar,
-                        'enfermedad_cardiaca_familiar': ant.enfermedad_cardiaca_familiar,
-                        'soplo_cardiaco': ant.soplo_cardiaco,
-                        'abstenerce_competencia': ant.abstenerce_competencia,
-                        'antecedentes_coronarios_familiares': ant.antecedentes_coronarios_familiares,
-                        'fumar_hipertension_diabetes': ant.fumar_hipertension_diabetes,
-                        'consumo_cocaina_anabolicos': ant.consumo_cocaina_anabolicos,
-                        'cca_observaciones': ant.cca_observaciones,
-                    }
-                    for ant in antecedentes
-                ]
-                
-                # Instanciar formularios con datos existentes, si están presentes
-                jugador_info['electro_basal_form'] = ElectroBasalForm(
-                    instance=ElectroBasal.objects.filter(ficha_medica=registro_medico).first()
-                )
-                jugador_info['electro_esfuerzo_form'] = ElectroEsfuerzoForm(
-                    instance=ElectroEsfuerzo.objects.filter(ficha_medica=registro_medico).first()
-                )
-                jugador_info['cardiovascular_form'] = CardiovascularForm(
-                    instance=Cardiovascular.objects.filter(ficha_medica=registro_medico).first()
-                )
-                jugador_info['laboratorio_form'] = LaboratorioForm(
-                    instance=Laboratorio.objects.filter(ficha_medica=registro_medico).first()
-                )
-                jugador_info['oftalmologico_form'] = OftalmologicoForm(
-                    instance=Oftalmologico.objects.filter(ficha_medica=registro_medico).first()
-                )
-                jugador_info['torax_form'] = ToraxForm(
-                    instance=Torax.objects.filter(ficha_medica=registro_medico).first()
-                )
-                jugador_info['otros_examenes_form'] = OtrosExamenesClinicosForm(
-                    instance=OtrosExamenesClinicos.objects.filter(ficha_medica=registro_medico).first()
-                )
-            
-            # Categorías y equipos asociados al jugador
-            jugador_categoria_equipos = jugador.jugadorcategoriaequipo_set.all()
-            jugador_info['categorias_equipo'] = [
-                {
-                    'nombre_categoria': jce.categoria_equipo.categoria.nombre,
-                    'nombre_equipo': jce.categoria_equipo.equipo.nombre,
-                    'torneo': jce.categoria_equipo.categoria.torneo.nombre
-                } for jce in jugador_categoria_equipos
-            ]
-            
-            jugadores_info.append(jugador_info)
-
-        context['jugadores_info'] = jugadores_info
-         # Pasar el pk al contexto
-        context['pk'] = self.kwargs.get('pk') 
-        return context
-
-    def post(self, request, *args, **kwargs):
-        print("Datos del formulario:", request.POST)
-        #Comprobar si todos los formularios estan salvados 
-        form_saved = False
-        form_complete = False
-        
-        
-        
-        
-        # Procesar el formulario de estudios médicos cuando el método sea POST
-        form = EstudioMedicoForm(request.POST, request.FILES)
-        if form.is_valid():
-            estudio_medico = form.save(commit=False)
-            # Asociar el estudio médico con el jugador o ficha médica correspondiente
-            jugador_id = request.POST.get('jugador_id')  # O lo que uses para identificar al jugador
-            jugador = Jugador.objects.get(id=jugador_id)
-            print("Jugador ID:", jugador_id)
-            registro_medico = RegistroMedico.objects.filter(jugador=jugador).first()
-            print("Registro Médico:", registro_medico)
-            if registro_medico:
-                estudio_medico.ficha_medica = registro_medico
-                estudio_medico.save()
-                messages.success(request, "Estudio médico cargado exitosamente.")
-            else:
-                messages.error(request, "No se encontró el registro médico del jugador.")
-
-            # Redirigir o mostrar el formulario actualizado
-            return redirect('medico_home')  # Asegúrate de que esta URL esté definida en tus URLs
-        else:
-            print("Error : " ,form.errors)
-            messages.error(request, "Hubo un error al cargar el estudio médico.")
-            return redirect('medico_home')
-         """
-         
 
 class MedicoHomeView(LoginRequiredMixin, ListView):
     model = Jugador
@@ -288,13 +76,10 @@ class MedicoHomeView(LoginRequiredMixin, ListView):
             print("⚠️ No se encontraron jugadores con los criterios de búsqueda.")
 
         return queryset
-        
-
-    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        # Pasar los valores actuales de búsqueda al contexto para mantenerlos en los inputs
+        # Pasar los valores actuales de búsqueda al contexto
         context['search_dni'] = self.request.GET.get('search_dni', '')
         context['search_name'] = self.request.GET.get('search_name', '')
 
@@ -304,145 +89,144 @@ class MedicoHomeView(LoginRequiredMixin, ListView):
             context['medico'] = None
 
         jugadores_info = []
-        for jugador in context['jugadores']:
-            jugador_info = {
-                'id': jugador.id,
-                'edad': jugador.persona.profile.edad,
-                'dni': jugador.persona.profile.dni,
-                'nombre': jugador.persona.profile.nombre,
-                'apellido': jugador.persona.profile.apellido,
-                'direccion': jugador.persona.direccion,
-                'telefono': jugador.persona.telefono,
-                'grupo_sanguineo': jugador.grupo_sanguineo,
-                'cobertura_medica': jugador.cobertura_medica,
-                'numero_afiliado': jugador.numero_afiliado,
-                'categorias_equipo': [],
-                'antecedentes': [],
-                'estudios_medicos': [],
-                'electro_basal_form': ElectroBasalForm(),
-                'electro_esfuerzo_form': ElectroEsfuerzoForm(),
-                'cardiovascular_form': CardiovascularForm(),
-                'laboratorio_form': LaboratorioForm(),
-                'oftalmologico_form': OftalmologicoForm(),
-                'torax_form': ToraxForm(),
-                'registro_medico_form': RegistroMedicoForm(),
-                'estudio_medico_form': EstudioMedicoForm(),
-                'ergonometria_cargado': False,
-                'electrocardiograma_cargado': False,  # Agregando la verificación del electrocardiograma
-                'otros_examenes_form': OtrosExamenesClinicosForm(),
-            }
+        registro_seleccionado = self.request.GET.get('registro_id', None)
 
-            registro_medico = RegistroMedico.objects.filter(jugador=jugador).first()
-            if registro_medico:
-                jugador_info['registro_medico_estado'] = registro_medico.estado
+        if 'jugadores' in context and context['jugadores'].exists():
+            for jugador in context['jugadores']:
+                registros_medicos = RegistroMedico.objects.filter(jugador=jugador)
 
-                # Verificar si los estudios médicos han sido cargados
-                jugador_info['ergonometria_cargado'] = EstudiosMedico.objects.filter(
-                    ficha_medica=registro_medico, tipo_estudio='ERGOMETRIA'
-                ).exists()
+                for registro in registros_medicos:
+                    jugador_categoria_equipo = JugadorCategoriaEquipo.objects.filter(
+                        jugador=jugador,
+                        categoria_equipo__categoria__torneo=registro.torneo
+                    ).first()
 
-                jugador_info['electrocardiograma_cargado'] = EstudiosMedico.objects.filter(
-                    ficha_medica=registro_medico, tipo_estudio='ELECTRO'
-                ).exists()
+                    jugador_info = {
+                        'id': jugador.id,
+                        'registro_id': registro.id if registro else "ERROR",
+                        'edad': jugador.persona.profile.edad,
+                        'dni': jugador.persona.profile.dni,
+                        'nombre': jugador.persona.profile.nombre,
+                        'apellido': jugador.persona.profile.apellido,
+                        'direccion': jugador.persona.direccion,
+                        'telefono': jugador.persona.telefono,
+                        'grupo_sanguineo': jugador.grupo_sanguineo,
+                        'cobertura_medica': jugador.cobertura_medica,
+                        'numero_afiliado': jugador.numero_afiliado,
+                        'registro_medico': registros_medicos.filter(
+                            torneo=jugador_categoria_equipo.categoria_equipo.categoria.torneo
+                        ).first(),
+                        
+                        # ✅ Obtener la categoría, equipo y torneo desde JugadorCategoriaEquipo
+                        'categoria': jugador_categoria_equipo.categoria_equipo.categoria.nombre if jugador_categoria_equipo else "Sin categoría",
+                        'equipo': jugador_categoria_equipo.categoria_equipo.equipo.nombre if jugador_categoria_equipo else "Sin equipo",
+                        'torneo': jugador_categoria_equipo.categoria_equipo.categoria.torneo.nombre if jugador_categoria_equipo else "Sin torneo",
 
-                # Obtener todos los estudios médicos y mapearlos
-                estudios_medicos = EstudiosMedico.objects.filter(ficha_medica=registro_medico)
-                jugador_info['estudios_medicos'] = [
-                    {
-                        'pk': estudio.pk,
-                        'tipo': estudio.get_tipo_estudio_display(),
-                        'archivo': estudio.archivo.url if estudio.archivo else None,
-                        'observaciones': estudio.observaciones,
-                    } for estudio in estudios_medicos
-                ]
+                        # ✅ Estado del registro
+                        'estado': registro.estado,
 
-                # Obtener antecedentes médicos del jugador
-                antecedentes = AntecedenteEnfermedades.objects.filter(jugador=jugador)
-                jugador_info['antecedentes'] = [
-                    {
-                        'fue_operado': ant.fue_operado,
-                        'toma_medicacion': ant.toma_medicacion,
-                        'estuvo_internado': ant.estuvo_internado,
-                        'sufre_hormigueos': ant.sufre_hormigueos,
-                        'es_diabetico': ant.es_diabetico,
-                        'es_asmatico': ant.es_asmatico,
-                        'es_alergico': ant.es_alergico,
-                        'alerg_observ': ant.alerg_observ,
-                        'antecedente_epilepsia': ant.antecedente_epilepsia,
-                        'desviacion_columna': ant.desviacion_columna,
-                        'dolor_cintura': ant.dolor_cintura,
-                        'fracturas': ant.fracturas,
-                        'dolores_articulares': ant.dolores_articulares,
-                        'falta_aire': ant.falta_aire,
-                        'traumatismos_craneo': ant.traumatismos_craneo,
-                        'dolor_pecho': ant.dolor_pecho,
-                        'perdida_conocimiento': ant.perdida_conocimiento,
-                        'presion_arterial': ant.presion_arterial,
-                        'muerte_subita_familiar': ant.muerte_subita_familiar,
-                        'enfermedad_cardiaca_familiar': ant.enfermedad_cardiaca_familiar,
-                        'soplo_cardiaco': ant.soplo_cardiaco,
-                        'abstenerce_competencia': ant.abstenerse_competencia,
-                        'antecedentes_coronarios_familiares': ant.antecedentes_coronarios_familiares,
-                        'fumar_hipertension_diabetes': ant.fumar_hipertension_diabetes,
-                        'consumo_cocaina_anabolicos': ant.consumo_cocaina_anabolicos,
-                        'cca_observaciones': ant.cca_observaciones,
+                        # ✅ Información del torneo
+                        'torneo_descripcion': jugador_categoria_equipo.categoria_equipo.categoria.torneo.descripcion if jugador_categoria_equipo else "Sin Descripción",
+                        'torneo_direccion': jugador_categoria_equipo.categoria_equipo.categoria.torneo.direccion if jugador_categoria_equipo else "Sin Dirección",
+                        'torneo_telefono': jugador_categoria_equipo.categoria_equipo.categoria.torneo.telefono if jugador_categoria_equipo else "Sin Teléfono",
+                        'imagen_torneo': jugador_categoria_equipo.categoria_equipo.categoria.torneo.imagen.url if jugador_categoria_equipo and jugador_categoria_equipo.categoria_equipo.categoria.torneo.imagen else None,
+
+                        # ✅ Obtener todos los estudios médicos asociados al registro médico
+                        'estudios_medicos': [
+                            {
+                                'pk': estudio.pk,
+                                'tipo': estudio.get_tipo_estudio_display(),
+                                'archivo': estudio.archivo.url if estudio.archivo else None,
+                                'observaciones': estudio.observaciones,
+                            }
+                            for estudio in EstudiosMedico.objects.filter(ficha_medica=registro)
+                        ],
+
+                        # ✅ Obtener todos los antecedentes médicos asociados al jugador
+                        'antecedentes': [
+                            {
+                                'fue_operado': ant.fue_operado,
+                                'toma_medicacion': ant.toma_medicacion,
+                                'estuvo_internado': ant.estuvo_internado,
+                                'sufre_hormigueos': ant.sufre_hormigueos,
+                                'es_diabetico': ant.es_diabetico,
+                                'es_asmatico': ant.es_asmatico,
+                                'es_alergico': ant.es_alergico,
+                                'alerg_observ': ant.alerg_observ,
+                                'antecedente_epilepsia': ant.antecedente_epilepsia,
+                                'desviacion_columna': ant.desviacion_columna,
+                                'dolor_cintura': ant.dolor_cintura,
+                                'fracturas': ant.fracturas,
+                                'dolores_articulares': ant.dolores_articulares,
+                                'falta_aire': ant.falta_aire,
+                                'traumatismos_craneo': ant.traumatismos_craneo,
+                                'dolor_pecho': ant.dolor_pecho,
+                                'perdida_conocimiento': ant.perdida_conocimiento,
+                                'presion_arterial': ant.presion_arterial,
+                                'muerte_subita_familiar': ant.muerte_subita_familiar,
+                                'enfermedad_cardiaca_familiar': ant.enfermedad_cardiaca_familiar,
+                                'soplo_cardiaco': ant.soplo_cardiaco,
+                                'abstenerce_competencia': ant.abstenerse_competencia,
+                                'antecedentes_coronarios_familiares': ant.antecedentes_coronarios_familiares,
+                                'fumar_hipertension_diabetes': ant.fumar_hipertension_diabetes,
+                                'consumo_cocaina_anabolicos': ant.consumo_cocaina_anabolicos,
+                                'cca_observaciones': ant.cca_observaciones,
+                            }
+                            for ant in AntecedenteEnfermedades.objects.filter(jugador=jugador)
+                        ],
                     }
-                    for ant in antecedentes
-                ]
 
-                # Instanciar formularios con datos existentes
-                jugador_info['electro_basal_form'] = ElectroBasalForm(
-                    instance=ElectroBasal.objects.filter(ficha_medica=registro_medico).first()
-                )
-                jugador_info['electro_esfuerzo_form'] = ElectroEsfuerzoForm(
-                    instance=ElectroEsfuerzo.objects.filter(ficha_medica=registro_medico).first()
-                )
-                jugador_info['cardiovascular_form'] = CardiovascularForm(
-                    instance=Cardiovascular.objects.filter(ficha_medica=registro_medico).first()
-                )
-                jugador_info['laboratorio_form'] = LaboratorioForm(
-                    instance=Laboratorio.objects.filter(ficha_medica=registro_medico).first()
-                )
-                jugador_info['oftalmologico_form'] = OftalmologicoForm(
-                    instance=Oftalmologico.objects.filter(ficha_medica=registro_medico).first()
-                )
-                jugador_info['torax_form'] = ToraxForm(
-                    instance=Torax.objects.filter(ficha_medica=registro_medico).first()
-                )
-                jugador_info['otros_examenes_form'] = OtrosExamenesClinicosForm(
-                    instance=OtrosExamenesClinicos.objects.filter(ficha_medica=registro_medico).first()
-                )
+                    # ✅ 🔹 MOSTRAR SOLO FORMULARIOS DEL REGISTRO SELECCIONADO
+                    if registro_seleccionado and str(registro.id) == registro_seleccionado:
+                        print(f"🟢 Mostrando formularios para el registro ID: {registro.id}")
+                        
+                        jugador_info['electro_basal_form'] = ElectroBasalForm(
+                            instance=ElectroBasal.objects.filter(ficha_medica=registro).first()
+                        )
+                        jugador_info['electro_esfuerzo_form'] = ElectroEsfuerzoForm(
+                            instance=ElectroEsfuerzo.objects.filter(ficha_medica=registro).first()
+                        )
+                        jugador_info['cardiovascular_form'] = CardiovascularForm(
+                            instance=Cardiovascular.objects.filter(ficha_medica=registro).first()
+                        )
+                        jugador_info['laboratorio_form'] = LaboratorioForm(
+                            instance=Laboratorio.objects.filter(ficha_medica=registro).first()
+                        )
+                        jugador_info['oftalmologico_form'] = OftalmologicoForm(
+                            instance=Oftalmologico.objects.filter(ficha_medica=registro).first()
+                        )
+                        jugador_info['torax_form'] = ToraxForm(
+                            instance=Torax.objects.filter(ficha_medica=registro).first()
+                        )
+                        jugador_info['otros_examenes_form'] = OtrosExamenesClinicosForm(
+                            instance=OtrosExamenesClinicos.objects.filter(ficha_medica=registro).first()
+                        )
+                    else:
+                        print(f"🔴 Ocultando formularios del registro ID: {registro.id}")
 
-            # Obtener las categorías y equipos del jugador
-            jugador_categoria_equipos = jugador.jugadorcategoriaequipo_set.all()
-            jugador_info['categorias_equipo'] = [
-                {
-                    'nombre_categoria': jce.categoria_equipo.categoria.nombre,
-                    'nombre_equipo': jce.categoria_equipo.equipo.nombre,
-                    'torneo': jce.categoria_equipo.categoria.torneo.nombre
-                } for jce in jugador_categoria_equipos
-            ]
+                    jugadores_info.append(jugador_info)
 
-            jugadores_info.append(jugador_info)
+        else:
+            print("⚠️ No se encontraron jugadores en la búsqueda.")
 
         context['jugadores_info'] = jugadores_info
-        context['pk'] = self.kwargs.get('pk')
-        
         return context
 
     def post(self, request, *args, **kwargs):
-        print("Datos del formulario:", request.POST)
+        print("📌 Datos del formulario:", request.POST)
 
         form_saved = False
         form_complete = False
         jugador_id = request.POST.get('jugador_id')
+        registro_id = request.POST.get('registro_id')  # Asegurar que el ID del registro se pasa correctamente
 
         form = EstudioMedicoForm(request.POST, request.FILES)
         if form.is_valid():
             estudio_medico = form.save(commit=False)
 
+            # Obtener el registro médico específico
             jugador = get_object_or_404(Jugador, id=jugador_id)
-            registro_medico = RegistroMedico.objects.filter(jugador=jugador).first()
+            registro_medico = get_object_or_404(RegistroMedico, id=registro_id, jugador=jugador)
 
             if registro_medico:
                 estudio_medico.ficha_medica = registro_medico
@@ -452,7 +236,7 @@ class MedicoHomeView(LoginRequiredMixin, ListView):
             else:
                 messages.error(request, "❌ No se encontró el registro médico del jugador.")
         else:
-            print("Error:", form.errors)
+            print("❌ Error en el formulario:", form.errors)
             messages.error(request, "❌ Hubo un error al cargar el estudio médico.")
 
         # Asegurarse de que el queryset esté definido
@@ -461,6 +245,7 @@ class MedicoHomeView(LoginRequiredMixin, ListView):
         context = self.get_context_data()
         context['form_saved'] = form_saved
         context['jugador_id'] = jugador_id  # 🔑 Enviar el ID del jugador al contexto
+        context['registro_id'] = registro_id  # 🔑 Enviar el ID del registro médico al contexto
 
         return render(request, 'medico/medico_home.html', context)
 
@@ -684,7 +469,49 @@ def oftalmologico_view(request, jugador_id):
     })
 
 
+""" def registro_medico_update_view(request, registro_id):
+    print(f"📌 Intentando cargar el registro médico con ID: {registro_id}")
 
+    # Asegurar que el registro existe
+    registro_medico = get_object_or_404(RegistroMedico, id=registro_id)
+    jugador = registro_medico.jugador  
+
+    print(f"✅ Registro encontrado: Ficha Médica {registro_medico.id} - {jugador.persona.profile.nombre} {jugador.persona.profile.apellido}")
+
+    if request.method == 'POST':
+        print("📌 Datos recibidos en POST:", request.POST)
+
+        registro_medico_form = RegistroMedicoUpdateForm(request.POST, instance=registro_medico)
+
+        if registro_medico_form.is_valid():
+            with transaction.atomic():
+                registro_medico = registro_medico_form.save(commit=False)
+
+                # Asignar al médico logueado si existe
+                medico = Medico.objects.filter(profile=request.user.profile).first()
+                if medico:
+                    registro_medico.medico = medico
+
+                registro_medico.save()
+                messages.success(request, "✅ Registro médico actualizado correctamente.")
+                
+                return redirect(f'/medico/medico_home/?search_dni={jugador.persona.profile.dni}&search_name={jugador.persona.profile.nombre}')
+        
+
+        else:
+            messages.error(request, "⚠️ Error en el formulario. Revisa los campos.")
+    else:
+        registro_medico_form = RegistroMedicoUpdateForm(instance=registro_medico)
+
+    # 🔹 Filtrar TODOS los registros médicos del jugador
+    registros_medicos = RegistroMedico.objects.filter(jugador=jugador)
+
+    return render(request, 'medico/medico_home.html', {
+        'jugador': jugador,
+        'registro_medico': registro_medico,
+        'registro_medico_form': registro_medico_form,
+        'registros_medicos': registros_medicos,  # ✅ Pasar lista de registros
+    }) """
 
 def registro_medico_update_view(request, jugador_id):
     jugador = get_object_or_404(Jugador, id=jugador_id)
@@ -720,22 +547,27 @@ def registro_medico_update_view(request, jugador_id):
     })
 
 
+
 def ficha_medica_views(request, jugador_id):
     jugador = get_object_or_404(Jugador, id=jugador_id)
+
+    # 🔹 Filtrar solo el registro médico correspondiente al torneo
     registro_medico = RegistroMedico.objects.filter(jugador=jugador).first()
 
-        # Verificar si el usuario tiene un perfil de médico asociado
+    if not registro_medico:
+        return HttpResponse("No se encontró el registro médico del jugador.", status=404)
+
+    # 🔹 Obtener la categoría, equipo y torneo en base al registro médico
+    jugador_categoria_equipo = JugadorCategoriaEquipo.objects.filter(jugador=jugador).first()
+
+    # Verificar si hay un perfil de médico asociado
     try:
         medico = Medico.objects.get(profile=request.user.profile)
         rol_usuario = medico.profile.rol
     except Medico.DoesNotExist:
-        rol_usuario = None  # En caso de que no sea un médico
+        rol_usuario = None
 
     print("Rol del usuario logueado:", rol_usuario)
-    
-    
-    if not registro_medico:
-        return HttpResponse("No se encontró el registro médico del jugador.", status=404)
 
     if request.method == 'POST':
         registro_medico_form = RegistroMedicoUpdateForm(request.POST, instance=registro_medico)
@@ -749,7 +581,10 @@ def ficha_medica_views(request, jugador_id):
     else:
         registro_medico_form = RegistroMedicoUpdateForm(instance=registro_medico)
 
+    # 🔹 Filtrar antecedentes en base al jugador
     antecedentes = AntecedenteEnfermedades.objects.filter(jugador=jugador)
+
+    # 🔹 Obtener solo los estudios médicos de este registro médico
     electro_basal = ElectroBasal.objects.filter(ficha_medica=registro_medico).first()
     electro_esfuerzo = ElectroEsfuerzo.objects.filter(ficha_medica=registro_medico).first()
     cardiovascular = Cardiovascular.objects.filter(ficha_medica=registro_medico).first()
@@ -758,16 +593,16 @@ def ficha_medica_views(request, jugador_id):
     torax = Torax.objects.filter(ficha_medica=registro_medico).first()
     otros_examenes = OtrosExamenesClinicos.objects.filter(ficha_medica=registro_medico).first()
 
-    # Convertir URLs relativas de imágenes en absolutas
-    for categoria in jugador.jugadorcategoriaequipo_set.all():
-        if categoria.categoria_equipo.categoria.torneo.imagen:
-             categoria.categoria_equipo.categoria.torneo.imagen_url = request.build_absolute_uri(
-                categoria.categoria_equipo.categoria.torneo.imagen.url
-            )
-    
+    # 🔹 Convertir URLs relativas de imágenes en absolutas (solo si existen)
+    if jugador_categoria_equipo and jugador_categoria_equipo.categoria_equipo.categoria.torneo.imagen:
+        jugador_categoria_equipo.categoria_equipo.categoria.torneo.imagen_url = request.build_absolute_uri(
+            jugador_categoria_equipo.categoria_equipo.categoria.torneo.imagen.url
+        )
+
     if registro_medico.medico and registro_medico.medico.firma:
         registro_medico.medico.firma = request.build_absolute_uri(registro_medico.medico.firma.url)
 
+    # 🔹 Armar la información del jugador y su ficha médica
     jugador_info = {
         'id': jugador.id,
         'edad': jugador.persona.profile.edad,
@@ -780,44 +615,51 @@ def ficha_medica_views(request, jugador_id):
         'grupo_sanguineo': jugador.grupo_sanguineo,
         'cobertura_medica': jugador.cobertura_medica,
         'numero_afiliado': jugador.numero_afiliado,
-        'categorias_equipo': [
+
+        # 🔹 Agregar la categoría, equipo y torneo del registro médico seleccionado
+        'categoria': jugador_categoria_equipo.categoria_equipo.categoria.nombre if jugador_categoria_equipo else "Sin categoría",
+        'equipo': jugador_categoria_equipo.categoria_equipo.equipo.nombre if jugador_categoria_equipo else "Sin equipo",
+        'torneo': jugador_categoria_equipo.categoria_equipo.categoria.torneo.nombre if jugador_categoria_equipo else "Sin torneo",
+        'imagen_torneo': jugador_categoria_equipo.categoria_equipo.categoria.torneo.imagen.url if jugador_categoria_equipo and jugador_categoria_equipo.categoria_equipo.categoria.torneo.imagen else None,
+        'torneo_descripcion': jugador_categoria_equipo.categoria_equipo.categoria.torneo.descripcion if jugador_categoria_equipo else "Sin Descripcion",
+        'torneo_direccion': jugador_categoria_equipo.categoria_equipo.categoria.torneo.direccion if jugador_categoria_equipo else "Sin Direccion",
+        'torneo_telefono': jugador_categoria_equipo.categoria_equipo.categoria.torneo.telefono if jugador_categoria_equipo else "Sin Telefono",
+        
+        
+        # 🔹 Obtener antecedentes del jugador
+        'antecedentes': [
             {
-                'nombre_categoria': jce.categoria_equipo.categoria.nombre,
-                'nombre_equipo': jce.categoria_equipo.equipo.nombre,
-                'torneo': jce.categoria_equipo.categoria.torneo.nombre,
-                 'imagen': jce.categoria_equipo.categoria.torneo.imagen.url if jce.categoria_equipo.categoria.torneo.imagen else None,
-                'descripcion': jce.categoria_equipo.categoria.torneo.descripcion,
-                'direccion': jce.categoria_equipo.categoria.torneo.direccion,
-                'telefono': jce.categoria_equipo.categoria.torneo.telefono,
+                'fue_operado': ant.fue_operado,
+                'toma_medicacion': ant.toma_medicacion,
+                'estuvo_internado': ant.estuvo_internado,
+                'sufre_hormigueos': ant.sufre_hormigueos,
+                'es_diabetico': ant.es_diabetico,
+                'es_asmatico': ant.es_asmatico,
+                'es_alergico': ant.es_alergico,
+                'alerg_observ': ant.alerg_observ,
+                'antecedente_epilepsia': ant.antecedente_epilepsia,
+                'desviacion_columna': ant.desviacion_columna,
+                'dolor_cintura': ant.dolor_cintura,
+                'fracturas': ant.fracturas,
+                'dolores_articulares': ant.dolores_articulares,
+                'falta_aire': ant.falta_aire,
+                'traumatismos_craneo': ant.traumatismos_craneo,
+                'dolor_pecho': ant.dolor_pecho,
+                'perdida_conocimiento': ant.perdida_conocimiento,
+                'presion_arterial': ant.presion_arterial,
+                'muerte_subita_familiar': ant.muerte_subita_familiar,
+                'enfermedad_cardiaca_familiar': ant.enfermedad_cardiaca_familiar,
+                'soplo_cardiaco': ant.soplo_cardiaco,
+                'abstenerce_competencia': ant.abstenerse_competencia,
+                'antecedentes_coronarios_familiares': ant.antecedentes_coronarios_familiares,
+                'fumar_hipertension_diabetes': ant.fumar_hipertension_diabetes,
+                'consumo_cocaina_anabolicos': ant.consumo_cocaina_anabolicos,
+                'cca_observaciones': ant.cca_observaciones,
             }
-            for jce in jugador.jugadorcategoriaequipo_set.all()
+            for ant in antecedentes
         ],
-        'antecedentes': [{'fue_operado': ant.fue_operado,
-                            'toma_medicacion': ant.toma_medicacion,
-                            'estuvo_internado': ant.estuvo_internado,
-                            'sufre_hormigueos': ant.sufre_hormigueos,
-                            'es_diabetico': ant.es_diabetico,
-                            'es_asmatico': ant.es_asmatico,
-                            'es_alergico': ant.es_alergico,
-                            'alerg_observ': ant.alerg_observ,
-                            'antecedente_epilepsia': ant.antecedente_epilepsia,
-                            'desviacion_columna': ant.desviacion_columna,
-                            'dolor_cintura': ant.dolor_cintura,
-                            'fracturas': ant.fracturas,
-                            'dolores_articulares': ant.dolores_articulares,
-                            'falta_aire': ant.falta_aire,
-                            'traumatismos_craneo': ant.traumatismos_craneo,
-                            'dolor_pecho': ant.dolor_pecho,
-                            'perdida_conocimiento': ant.perdida_conocimiento,
-                            'presion_arterial': ant.presion_arterial,
-                            'muerte_subita_familiar': ant.muerte_subita_familiar,
-                            'enfermedad_cardiaca_familiar': ant.enfermedad_cardiaca_familiar,
-                            'soplo_cardiaco': ant.soplo_cardiaco,
-                            'abstenerce_competencia': ant.abstenerse_competencia,
-                            'antecedentes_coronarios_familiares': ant.antecedentes_coronarios_familiares,
-                            'fumar_hipertension_diabetes': ant.fumar_hipertension_diabetes,
-                            'consumo_cocaina_anabolicos': ant.consumo_cocaina_anabolicos,
-                            'cca_observaciones': ant.cca_observaciones,} for ant in antecedentes],
+
+        # 🔹 Agregar los formularios de estudios médicos específicos de este registro
         'electro_basal_form': ElectroBasalForm(instance=electro_basal),
         'electro_esfuerzo_form': ElectroEsfuerzoForm(instance=electro_esfuerzo),
         'cardiovascular_form': CardiovascularForm(instance=cardiovascular),
@@ -825,7 +667,6 @@ def ficha_medica_views(request, jugador_id):
         'oftalmologico_form': OftalmologicoForm(instance=oftalmologico),
         'torax_form': ToraxForm(instance=torax),
         'otros_examenes_form': OtrosExamenesClinicosForm(instance=otros_examenes),
-        
         'registro_medico_form': registro_medico_form,
     }
 
@@ -1067,6 +908,7 @@ def ficha_medica_views(request, jugador_id):
         'jugador_info': jugador_info,
         'registro_medico': registro_medico,
         'rol_usuario': rol_usuario,
+        'ocultar_header': True, 
     }
     return render(request, 'medico/medico_views.html', context)
 
