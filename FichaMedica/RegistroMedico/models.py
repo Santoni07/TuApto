@@ -144,7 +144,7 @@ class ElectroBasal(models.Model):
         verbose_name_plural = 'Electro Basales'
 
     def __str__(self):
-        return f"Electro Basal {self.idelectro_basal} - Ficha Médica {self.ficha_medica.idfichaMedica}"
+        return f"Electro Basal {self.idelectro_basal} "
 
 class ElectroEsfuerzo(models.Model):
     idelectro_esfuerzo = models.AutoField(primary_key=True)
@@ -163,7 +163,7 @@ class ElectroEsfuerzo(models.Model):
         verbose_name_plural = 'Electro Esfuerzos'
 
     def __str__(self):
-        return f"Electro Esfuerzo {self.idelectro_esfuerzo} - Ficha Médica {self.ficha_medica.idfichaMedica}"
+        return f"Electro Esfuerzo {self.idelectro_esfuerzo}"
     
     
 class Cardiovascular(models.Model):
@@ -189,7 +189,7 @@ class Cardiovascular(models.Model):
         verbose_name_plural = 'Exámenes Cardiovasculares'
 
     def __str__(self):
-        return f"Cardiovascular {self.idcardiovascular} - Ficha Médica {self.ficha_medica.idfichaMedica}"
+        return f"Cardiovascular {self.idcardiovascular} "
     
 class Laboratorio(models.Model):
     idlaboratorio = models.AutoField(primary_key=True)
@@ -213,7 +213,7 @@ class Laboratorio(models.Model):
         verbose_name_plural = 'Exámenes de Laboratorio'
 
     def __str__(self):
-        return f"Laboratorio {self.idlaboratorio} - Ficha Médica {self.ficha_medica.idfichaMedica}"
+        return f"Laboratorio {self.idlaboratorio} "
     
 class Torax(models.Model):
     idtorax = models.AutoField(primary_key=True)
@@ -232,7 +232,7 @@ class Torax(models.Model):
         verbose_name_plural = 'Exámenes de Tórax'
 
     def __str__(self):
-        return f"Tórax {self.idtorax} - Ficha Médica {self.ficha_medica.idfichaMedica}"
+        return f"Tórax {self.idtorax} "
     
 
 class Oftalmologico(models.Model):
@@ -253,7 +253,7 @@ class Oftalmologico(models.Model):
         verbose_name_plural = 'Exámenes Oftalmológicos'
 
     def __str__(self):
-        return f"Oftalmológico {self.idoftalmologico} - Ficha Médica {self.ficha_medica.idfichaMedica}"
+        return f"Oftalmológico {self.idoftalmologico} "
     
 
 class OtrosExamenesClinicos(models.Model):
@@ -263,8 +263,7 @@ class OtrosExamenesClinicos(models.Model):
     digestivo_observaciones = models.CharField(max_length=200, null=True, blank=True,default='Sin observaciones')
     osteoarticular_observaciones = models.CharField(max_length=200, null=True, blank=True,default='Sin observaciones')
 
-    def __str__(self):
-        return f"Otros Exámenes Clínicos de {self.ficha_medica}"
+    
     
     
 class EliminacionFichaMedica(models.Model):
@@ -272,5 +271,3 @@ class EliminacionFichaMedica(models.Model):
     medico = models.CharField(max_length=255)  # Nombre del médico que eliminó la ficha
     fecha_eliminacion = models.DateTimeField(default=now)  # Fecha de eliminación
 
-    def __str__(self):
-        return f"Ficha eliminada de {self.jugador} por {self.medico} el {self.fecha_eliminacion.strftime('%d-%m-%Y %H:%M')}"

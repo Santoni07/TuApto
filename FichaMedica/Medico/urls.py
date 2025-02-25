@@ -24,7 +24,8 @@ urlpatterns = [
     # Ruta para el formulario Otros Examenes Clinicos
     path('otros_examenes_clinicos/<int:jugador_id>/', views.otros_examenes_clinicos_view, name='otros_examenes_clinicos_view'),
     # Ruta para el formulario de Registo medico
-    path('registro_medico_update/<int:jugador_id>/', views.registro_medico_update_view, name='registro_medico_update_view'),
+    path('registro_medico_update/<int:registro_id>/', views.registro_medico_update_view, name='registro_medico_update_view'),
+
    
 
     path('ficha_medica/<int:jugador_id>/', views.ficha_medica_views, name='ficha_medica'),

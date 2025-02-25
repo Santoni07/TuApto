@@ -175,7 +175,7 @@
                                         <!-- Tabla de jugadores -->
                             <div class="table-responsive bg-white p-3 rounded shadow">
                                 <div class="card-header bg-info text-white text-center p-4 w-100">
-                                    <h2 class="mb-0 fw-bold">Lista de Jugadores</h2>
+                                    <h2 class="mb-0 fw-bold"></h2>
                                 </div>
                                 <table class="table table-bordered align-middle" >
                                     <thead class="table-light text-center "  >
@@ -190,91 +190,59 @@
                                             <th scope="col" class="fw-bold">Acciones</th>
                                         </tr>
                                     </thead>
-                               {% comment %}  <tbody>
-                                      
+                              
+                                
+                                    <tbody>
                                         {% for jugador in jugadores_info %}
-                                        {% for categoria_equipo in jugador.categorias_equipo %}
-                                            <tr class="text-center jugador-row" data-id="{{ jugador.id }}">
+                                            <tr class="text-center">
                                                 <td>{{ jugador.apellido }}</td>
                                                 <td>{{ jugador.nombre }}</td>
                                                 <td>{{ jugador.dni }}</td>
-                                                <td>{{ jugador.registro_medico_estado|default:"Sin Registro" }}</td>
-                                                <td class="d-none d-lg-table-cell">{{ categoria_equipo.nombre_categoria }}</td>
-                                                <td class="d-none d-lg-table-cell">{{ categoria_equipo.nombre_equipo }}</td>
-                                                <td class="d-none d-lg-table-cell">{{ categoria_equipo.torneo }}</td>
+                                                <td>{{ jugador.estado }}</td>
+                                                <td class="d-none d-lg-table-cell">{{ jugador.categoria }}</td>
+                                                <td class="d-none d-lg-table-cell">{{ jugador.equipo }}</td>
+                                                <td class="d-none d-lg-table-cell">{{ jugador.torneo }}</td>
                                                 <td>
-                                                    <div class="btn-group" role="group">
-                                                        {% if jugador.registro_medico_estado == "PROCESO" %}
-                                                            <a href="#" class="btn btn-warning btn-seleccionar" id="cargarFichaBtn" data-id="{{ jugador.id }}">Cargar Ficha</a>
-                                                        {% elif jugador.registro_medico_estado == "APROBADA" %}
-                                                            <a href="{% url 'ficha_medica' jugador.id %}" class="btn btn-success" target="_blank">Ver</a>
+                                                    {% if jugador.registro_id %}
+                                                        {% if jugador.estado == "PROCESO" %}
+                                                        <a href="{% url 'registro_medico_update_view' jugador.registro_id %}" 
+                                                        class="btn btn-warning btn-seleccionar"
+                                                        onclick="window.location.href=this.href; return false;">
+                                                        Cargar Ficha {{ jugador.registro_id }}
+                                                        </a>
+                                                     
+                                                        {% elif jugador.estado == "APROBADA" %}
+                                                            <a href="{% url 'ficha_medica' jugador.registro_id %}" 
+                                                            class="btn btn-success">
+                                                            Ver Ficha {{ jugador.registro_id }}
+                                                            </a>
                                                         {% endif %}
-                                                    </div>
+                                                    {% else %}
+                                                        <span>Sin Registro</span>
+                                                    {% endif %}
                                                 </td>
                                             </tr>
+                                        {% empty %}
+                                            <tr>
+                                                <td colspan="8" class="text-center">No se encontraron jugadores con registros médicos.</td>
+                                            </tr>
                                         {% endfor %}
-                                    {% empty %}
-                                        <tr>
-                                            <td colspan="8" class="text-center">No se encontraron jugadores.</td>
-                                        </tr>
-                                
+                                    </tbody>
                                     
-                                        {% endfor %}
-                                </tbody> {% endcomment %}
-                                
-                                <tbody>
-    {% for jugador in jugadores_info %}
-    <p>Jugador :{{ jugador.id}}</p>
-    <p> Ficha Medica :{{ jugador.registro_id}}</p>
-    <p> Estado :{{ jugador.estado}}</p>
-        <tr class="text-center">
-            <td>{{ jugador.apellido }}</td>
-            <td>{{ jugador.nombre }}</td>
-            <td>{{ jugador.dni }}</td>
-            <td>{{ jugador.estado }}</td>
-            <td class="d-none d-lg-table-cell">{{ jugador.categoria }}</td>
-            <td class="d-none d-lg-table-cell">{{ jugador.equipo }}</td>
-            <td class="d-none d-lg-table-cell">{{ jugador.torneo }}</td>
-            <td>
-                {% if jugador.registro_medico.id %}
-                    {% if jugador.registro_medico.estado == "PROCESO" %}
-                        <a href="{% url 'registro_medico_update_view' jugador.registro_medico.id %}" 
-                           class="btn btn-warning btn-seleccionar"  data-id="{{ jugador.id }}">
-                           Cargar Ficha {{ jugador.registro_medico.id }}
-                        </a>
-                    {% elif jugador.registro_medico.estado == "APROBADA" %}
-                        <a href="{% url 'ficha_medica' jugador.registro_medico.id %}" 
-                           class="btn btn-success">
-                           Ver Ficha {{ jugador.registro_medico.id }}
-                        </a>
-                    {% endif %}
-                {% else %}
-                    <span>Sin Registro</span>
-                {% endif %}
-            </td>
-      
-            
-        </tr>
-    {% empty %}
-        <tr>
-            <td colspan="8" class="text-center">No se encontraron jugadores con registros médicos.</td>
-        </tr>
-    {% endfor %}
-</tbody>
 
                                 
                                 
                             
-                            </table>
+                                </table>
                             
                             
                             </div>
                         
    
                                         
-                            {% for jugador in jugadores_info %}
+        {% for jugador in jugadores_info %}
                     
-           
+            {% if jugador.estado == "PROCESO" %}
                 <div class="row jugador-container" id="formularioContainer" data-id="{{ jugador.id }}" style="display: none;">
             
                                     <!-- Sección de Antecedentes -->
@@ -653,11 +621,11 @@
                                         <div class="card-header">
                                             <button class="btn btn-secondary w-100" onclick="toggleForm('electro_esfuerzo_form-{{ jugador.id }}')">Electro Esfuerzo</button>
                                         </div>
-                                        <div id="electro_esfuerzo_form-{{ jugador.id }}" class="collapse" style="display:none;">
+                                        <div id="electro_esfuerzo_form-{{ jugador.id }}"  {% if form_saved %}style="display:none;"{% endif %}>
                                             <div class="card-body">
                                                 <form method="POST" class="ajax-form" action="{% url 'electro_esfuerzo_view' jugador.id %}">
                                                     {% csrf_token %}
-                                                    {{ jugador.electro_esfuerzo_form.as_p }}
+                                                    {{ jugador.electro_esfuerzo_form.observaciones}}
                                                     <div class="d-flex justify-content-end">
                                                         <button type="submit" class="btn btn-primary w-20">Guardar</button>
                                                     </div>  
@@ -1108,7 +1076,7 @@
 
                 </div>
 
-     
+            {% endif %}
         {% endfor %}
     </div>
 </main>
@@ -1129,88 +1097,124 @@
 </script>
 
 <script>
-    
-        document.addEventListener("DOMContentLoaded", function () {
-            document.querySelectorAll(".btn-seleccionar").forEach(function (boton) {
-                boton.addEventListener("click", function (event) {
-                    event.preventDefault();
-    
-                    let jugadorId = this.getAttribute("data-id");
-    
-                    if (!jugadorId) {
-                        console.error("⚠️ Error: No se encontró el ID del jugador.");
-                        return;
-                    }
-    
-                    console.log("Jugador seleccionado con ID:", jugadorId);
-    
-                    // Ocultar todas las filas de jugadores excepto la seleccionada
-                    document.querySelectorAll(".jugador-row").forEach(function (fila) {
-                        if (fila.getAttribute("data-id") !== jugadorId) {
-                            fila.style.display = "none";
-                        } else {
-                            fila.style.display = "table-row";
-                        }
-                    });
-    
-                    // 🔹 Mostrar los formularios del jugador seleccionado
-                    document.querySelectorAll(".jugador-container").forEach(function (formContainer) {
-                        if (formContainer.getAttribute("data-id") === jugadorId) {
-                            formContainer.style.display = "block";  
-                        } else {
-                            formContainer.style.display = "none";
-                        }
-                    });
-    
-                    console.log("✅ Mostrando solo los formularios del jugador con ID:", jugadorId);
-    
-                    // 🔹 Asegurar que el formulario de antecedentes permanezca CERRADO por defecto
-                    let antecedentesForm = document.getElementById(`antecedentes-content-${jugadorId}`);
-    
-                    if (antecedentesForm) {
-                        antecedentesForm.style.display = "none"; 
-                        console.log("🔹 El formulario de antecedentes se mantiene cerrado.");
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(".btn-seleccionar").forEach(function (boton) {
+            boton.addEventListener("click", function (event) {
+                event.preventDefault();
+
+                let jugadorId = this.getAttribute("data-id");
+
+                if (!jugadorId) {
+                    console.error("⚠️ Error: No se encontró el ID del jugador.");
+                    return;
+                }
+
+                console.log("Jugador seleccionado con ID:", jugadorId);
+
+                // 🔹 Ocultar todas las filas de jugadores excepto la seleccionada
+                document.querySelectorAll(".jugador-row").forEach(function (fila) {
+                    if (fila.getAttribute("data-id") !== jugadorId) {
+                        fila.style.display = "none";
                     } else {
-                        console.warn("⚠️ No se encontró el formulario de antecedentes para el jugador con ID:", jugadorId);
+                        fila.style.display = "table-row";
                     }
                 });
-            });
-    
-            // 🔹 Permitir que el usuario despliegue/cierre el formulario de antecedentes manualmente
-            document.querySelectorAll(".btn-toggle-antecedentes").forEach(function (boton) {
-                boton.addEventListener("click", function (event) {
-                    event.preventDefault();
-    
-                    let jugadorId = this.getAttribute("data-id");
-                    let antecedentesForm = document.getElementById(`antecedentes-content-${jugadorId}`);
-    
-                    if (antecedentesForm) {
-                        if (antecedentesForm.style.display === "none" || antecedentesForm.style.display === "") {
-                            antecedentesForm.style.display = "block";
-                            console.log("✅ Mostrando formulario de antecedentes para el jugador con ID:", jugadorId);
-                        } else {
-                            antecedentesForm.style.display = "none";
-                            console.log("❌ Ocultando formulario de antecedentes para el jugador con ID:", jugadorId);
-                        }
-                    } else {
-                        console.warn("⚠️ No se encontró el formulario de antecedentes para el jugador con ID:", jugadorId);
-                    }
+
+                // 🔹 Ocultar todos los formularios antes de mostrar el seleccionado
+                document.querySelectorAll(".jugador-container").forEach(function (formContainer) {
+                    formContainer.style.display = "none";
                 });
+
+                // 🔹 Mostrar solo los formularios del jugador seleccionado
+                let formularioSeleccionado = document.getElementById(`formularioContainer-${jugadorId}`);
+                if (formularioSeleccionado) {
+                    formularioSeleccionado.style.display = "block";
+                } else {
+                    console.warn("⚠️ No se encontró el contenedor de formularios para el jugador con ID:", jugadorId);
+                }
+
+                // 🔹 Asegurar que el formulario de antecedentes permanezca CERRADO por defecto
+                let antecedentesForm = document.getElementById(`antecedentes-content-${jugadorId}`);
+                if (antecedentesForm) {
+                    antecedentesForm.style.display = "none";
+                    console.log("🔹 El formulario de antecedentes se mantiene cerrado.");
+                } else {
+                    console.warn("⚠️ No se encontró el formulario de antecedentes para el jugador con ID:", jugadorId);
+                }
             });
         });
-  
-    
+
+        // 🔹 Permitir que el usuario despliegue/cierre el formulario de antecedentes manualmente
+        document.querySelectorAll(".btn-toggle-antecedentes").forEach(function (boton) {
+            boton.addEventListener("click", function (event) {
+                event.preventDefault();
+
+                let jugadorId = this.getAttribute("data-id");
+                let antecedentesForm = document.getElementById(`antecedentes-content-${jugadorId}`);
+
+                if (antecedentesForm) {
+                    antecedentesForm.style.display = antecedentesForm.style.display === "none" ? "block" : "none";
+                    console.log(antecedentesForm.style.display === "block"
+                        ? `✅ Mostrando formulario de antecedentes para el jugador con ID: ${jugadorId}`
+                        : `❌ Ocultando formulario de antecedentes para el jugador con ID: ${jugadorId}`);
+                } else {
+                    console.warn("⚠️ No se encontró el formulario de antecedentes para el jugador con ID:", jugadorId);
+                }
+            });
+        });
+    });
 
     // 🔹 Función para abrir/cerrar formularios específicos dentro del jugador seleccionado
     function toggleForm(formId) {
         let form = document.getElementById(formId);
-        if (form.style.display === "none" || form.style.display === "") {
-            form.style.display = "block";
+        if (form) {
+            form.style.display = form.style.display === "none" || form.style.display === "" ? "block" : "none";
         } else {
-            form.style.display = "none";
+            console.warn(`⚠️ No se encontró el formulario con ID: ${formId}`);
         }
     }
 
+    // 🔹 Función para verificar si todos los formularios están completos antes de habilitar el botón de guardar
+    document.addEventListener("DOMContentLoaded", function() {
+        function verificarFormularios() {
+            let formularios = document.querySelectorAll(".ajax-form");
+            let botonGuardar = document.getElementById("guardarFichaBtn");
+            let todosCompletos = true;
+
+            formularios.forEach(formulario => {
+                if (formulario.id === "certificadoMedicoForm") return;
+
+                let inputs = formulario.querySelectorAll("input, select, textarea");
+                inputs.forEach(input => {
+                    if (input.hasAttribute("required") && input.value.trim() === "") {
+                        todosCompletos = false;
+                    }
+                });
+            });
+
+            botonGuardar.disabled = !todosCompletos;
+        }
+
+        let formularios = document.querySelectorAll(".ajax-form");
+        formularios.forEach(formulario => {
+            formulario.addEventListener("input", verificarFormularios);
+        });
+
+        verificarFormularios();
+    });
+
+    // 🔹 Mostrar el formulario correcto al recargar la página si hay un jugador seleccionado
+    document.addEventListener("DOMContentLoaded", function () {
+        const params = new URLSearchParams(window.location.search);
+        const jugadorId = params.get("jugador_id");
+
+        if (jugadorId) {
+            const formSection = document.getElementById(`formularioContainer-${jugadorId}`);
+            if (formSection) {
+                formSection.style.display = "block"; // Mostrar el formulario del jugador seleccionado
+            }
+        }
+    });
 </script>
 <script>
     document.addEventListener("DOMContentLoaded", function() {

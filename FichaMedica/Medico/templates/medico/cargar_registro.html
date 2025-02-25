@@ -1,0 +1,906 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    body{
+        background-color: #ecf0f1; 
+    }
+    .card-header {
+        width:100%;
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #ced4da;
+        text-align: center;
+    }
+    .align-left {
+        text-align: left;
+    }
+
+    .table {
+        border-collapse: collapse;
+        background-color: beige;
+    }
+
+    .table-bordered td,
+    .table-bordered th {
+        border: 2px solid black; /* Color de las líneas */
+    }
+
+    .thead-dark {
+        background-color: #343a40; /* Color de fondo para el encabezado */
+        color: white; /* Color del texto del encabezado */
+    }
+
+    @media (max-width: 680px) {
+        .table-responsive {
+            overflow-x: auto; /* Permite el desplazamiento en dispositivos pequeños */
+        }
+    }
+    
+</style> 
+<!-- Sección de Antecedentes -->
+<div class="col-lg-6 col-md-8 mx-auto">
+    <h2 class="text-center mb-4">Ficha Médica</h2>
+
+    <div id="antecedentes-section" class="row">
+        
+            <div class="card mb-3 player-forms" data-id="{{ jugador.id }}">
+                <div class="card-header">
+                    <button class="btn btn-secondary w-100 btn-toggle-antecedentes" data-id="{{ jugador.id }}">
+                        Ver Antecedentes
+                    </button>
+                </div>
+
+                <div class="card mb-3 player-forms " id="antecedentes-content-{{ jugador.id }}" >
+                    <!-- Información del Jugador -->
+                    <div class="mt-4">
+                        <div class="table-responsive">
+                            <table class="table table-bordered text-center" style="border: 2px solid black; background-color: beige;">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th class="text-center">Información del Jugador</th>
+                                        <th class="text-center">Detalles</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td class="align-left">Nombre</td> <td class="text-center">{{ nombre }}</td></tr>
+                                    <tr><td class="align-left">Apellido</td> <td class="text-center">{{ apellido }}</td></tr>
+                                    <tr><td class="align-left">Dirección</td> <td class="text-center">{{ direccion }}</td></tr>
+                                    <tr><td class="align-left">Teléfono</td> <td class="text-center">{{ telefono }}</td></tr>
+                                    <tr><td class="align-left">Grupo Sanguíneo</td> <td class="text-center">{{ grupo_sanguineo }}</td></tr>
+                                    <tr><td class="align-left">Cobertura Médica</td> <td class="text-center">{{ cobertura_medica }}</td></tr>
+                                    <tr><td class="align-left">N° Afiliado</td> <td class="text-center">{{ numero_afiliado }}</td></tr>
+                                    <tr><td class="align-left">Torneo</td> <td class="text-center">{{ torneo_descripcion }}</td></tr>
+                                    <tr><td class="align-left">Categoría</td> <td class="text-center">{{ categoria }}</td></tr>
+                                    <tr><td class="align-left">Equipo</td> <td class="text-center">{{ equipo }}</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Tabla de Antecedentes Médicos -->
+                    <div class="table-responsive">
+                        <table class="table table-bordered text-center" style="border: 2px solid black;">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>Antecedente de Enfermedades</th>
+                                    <th class="text-center">Respuesta</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for antecedente in antecedentes %}
+                                    <tr><td>¿Fue operado en los últimos 4 meses?</td> <td class="text-center">{{ antecedente.fue_operado|yesno:"Sí,No" }}</td></tr>
+                                    <tr><td>¿Toma regularmente alguna medicación?</td> <td class="text-center">{{ antecedente.toma_medicacion|yesno:"Sí,No" }}</td></tr>
+                                    <tr><td>¿Estuvo internado en el último año?</td> <td class="text-center">{{ antecedente.estuvo_internado|yesno:"Sí,No" }}</td></tr>
+                                    <tr><td>¿Sufre de hormigueos en las manos?</td> <td class="text-center">{{ antecedente.sufre_hormigueos|yesno:"Sí,No" }}</td></tr>
+                                    <tr><td>¿Es diabético?</td> <td class="text-center">{{ antecedente.es_diabetico|yesno:"Sí,No" }}</td></tr>
+                                    <tr><td>¿Es asmático?</td> <td class="text-center">{{ antecedente.es_asmatico|yesno:"Sí,No" }}</td></tr>
+                                    <tr><td>¿Es alérgico?</td> <td class="text-center">{{ antecedente.es_alergico|yesno:"Sí,No" }}</td></tr>
+                                    <tr><td>Observaciones de alergias:</td> <td class="align-left">{{ antecedente.alerg_observ }}</td></tr>
+                                    <tr><td>¿Tiene antecedentes de epilepsia o convulsiones?</td> <td class="text-center">{{ antecedente.antecedente_epilepsia|yesno:"Sí,No" }}</td></tr>
+                                    <tr><td>¿Tiene desviación de columna?</td> <td class="text-center">{{ antecedente.desviacion_columna|yesno:"Sí,No" }}</td></tr>
+                                    <tr><td>¿Tiene dolor de cintura después de hacer ejercicio?</td> <td class="text-center">{{ antecedente.dolor_cintura|yesno:"Sí,No" }}</td></tr>
+                                    <tr><td>¿Ha tenido fracturas, luxaciones o lesiones ligamentarias en los últimos 4 meses?</td> <td class="text-center">{{ antecedente.fracturas|yesno:"Sí,No" }}</td></tr>
+                                    <tr><td>¿Tiene dolores articulares?</td> <td class="text-center">{{ antecedente.dolores_articulares|yesno:"Sí,No" }}</td></tr>
+                                    <tr>
+                                                                                
+                                        <td class="align-left">¿ Alguna vez experimentó excesiva falta de aire mientras realizaba ejercicios físicos ?</td>
+                                        <td class="text-center">{{ antecedente.falta_aire|yesno:"Sí,No" }}</td>
+                                    </tr>
+                                    <tr>
+                                        
+                                        <td>¿Ha tenido traumatismos de cráneo con pérdida del conocimiento en los últimos 4 meses ?</td>
+                                        <td class="text-center">{{ jugador.antecedenteenfermedades.tramatismos_craneo|yesno:"Sí,No" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>¿Alguna vez sintió dolor en el pecho mientras realizaba ejercicios físicos o inmediatamente después?</td>
+                                        <td class="text-center">{{ jugador.antecedenteenfermedades.dolor_pecho|yesno:"Sí,No" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>¿Alguna vez perdió el conocimiento mientras realizaba ejercicios físicos o inmediatamente después?</td>
+                                        <td class="text-center">{{ antecedente.perdida_conocimiento|yesno:"Sí,No" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>¿Le han detectado alguna vez presión arterial alta?</td>
+                                        <td class="text-center">{{ antecedente.presion_arterial|yesno:"Sí,No" }}</td>
+                                    </tr>
+                                    <tr>
+                                        
+                                        <td>¿ Alguien de la familia ha sufrido una muerte súbita antes de los 45 años?</td>
+                                        <td class="text-center">{{ antecedente.muerte_subita_familiar|yesno:"Sí,No" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>¿Algún familiar directo tiene alguna enfermedad cardiaca, diagnóstico de engrosamiento anormal del corazón o de Síndrome de Marfán?</td>
+                                        <td class="text-center">{{ antecedente.enfermedad_cardiaca_familiar|yesno:"Sí,No" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>¿Le han detectado alguna vez un soplo cardíaco?</td>
+                                        <td class="text-center">{{ antecedente.soplo_cardiaco|yesno:"Sí,No" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>¿Algún médico le ha sugerido en alguna oportunidad abstenerse de participar en competiciones atléticas?</td>
+                                        <td class="text-center">{{ antecedente.abstenerce_competencia|yesno:"Sí,No" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>¿Algún familiar suyo de menos de 65 años (Padres, abuelos, hermanos/as) tiene antecedentes de enfermedad coronaria incluyendo ataques cardíacos, cirugías de by pass, angioplastia o angina?</td>
+                                        <td class="text-center">{{ antecedente.antecedentes_coronarios_familiares|yesno:"Sí,No" }}</td>
+                                    </tr>
+                                    <tr>
+                                    
+                                        <td >¿Fuma, es hipertenso o diabético, tiene colesterol alto?</td>
+                                        <td class="text-center">{{ antecedente.fumar_hipertension_diabetes|yesno:"Sí,No" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Observaciones:</td>
+                                        <td class="text-center">{{ antecedente.fhd_observacion }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>¿Consumo de cocaína o anabólicos?</td>
+                                        <td class="text-center">{{ antecedente.consumo_cocaina_anabolicos|yesno:"Sí,No" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Observaciones:</td>
+                                        <td class="text-center" >{{ antecedente.cca_observaciones }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>   
+       
+    </div>
+
+
+                                
+                                                        
+                                                    
+                <!-- Estudios Médicos -->
+                    <div class="card mb-3 player-forms" data-id="{{ jugador.id }}" >
+                        <div class="card-header">
+                            <button class="btn btn-secondary w-100" onclick="toggleForm('estudios-medicos-{{ jugador.id }}')">
+                                Estudios Médicos
+                            </button>
+                        </div>
+                        <div id="estudios-medicos-{{ jugador.id }}" class="card-body" 
+                        style="{% if jugador.id|stringformat:"s" == jugador_id %}display: block;{% else %}display: none;{% endif %}">
+                            <!-- Mostrar Estudios Existentes -->
+                            {% for estudio in jugador.estudios_medicos %}
+                            <div class="mb-2">
+                                <strong>Tipo: </strong>{{ estudio.tipo }}
+                                {% if estudio.archivo %}
+                                <a href="{{ estudio.archivo }}" target="_blank" class="btn btn-link">Ver archivo</a>
+                                <!-- Botón Eliminar -->
+                                <form action="{% url 'registroMedico:eliminar_estudio_medico' estudio.pk %}" method="POST" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Seguro que quieres eliminar este archivo?')">Eliminar</button>
+                                </form>
+                                {% else %}
+                                <span class="text-danger">No cargado</span>
+                                {% endif %}
+                                <p><strong>Observaciones:</strong> {{ estudio.observaciones|default:"Sin observaciones" }}</p>
+                            </div>
+                            {% endfor %}
+                            {% if not jugador.estudios_medicos %}
+                            <p>No hay estudios médicos cargados.</p>
+                            {% endif %}
+                            <h3 class="text-center">Cargar Estudios</h3>
+                            <!-- Formulario para Cargar Nuevos Estudios -->
+                            <form ="cargarEstudioForm_{{ jugador.id }}" method="POST" enctype="multipart/form-data" >
+                                {% csrf_token %}
+                                <!-- Campo oculto para el ID del Jugador -->
+                                <input type="hidden" name="jugador_id" value="{{ jugador.id }}">
+                                <div class="mb-3">
+                                    <label for="tipo_{{ jugador.id }}" class="form-label">Tipo de Estudio</label>
+                                    <select id="tipo_{{ jugador.id }}" name="tipo_estudio" class="form-select" required>
+                                        <option value="" disabled selected>Seleccionar Tipo</option>
+                                        <option value="ORINA">Análisis de Orina</option>
+                                        <option value="ELECTRO">Electrocardiograma</option>
+                                        <option value="ERGOMETRIA">Ergometría</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="archivo_{{ jugador.id }}" class="form-label">Archivo</label>
+                                    <input type="file" id="archivo_{{ jugador.id }}" name="archivo" class="form-control" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="observaciones_{{ jugador.id }}" class="form-label">Observaciones</label>
+                                    <textarea id="observaciones_{{ jugador.id }}" name="observaciones" class="form-control"></textarea>
+                                </div>
+                                <div class="d-flex justify-content-end">
+                                    <button type="submit" class="btn btn-primary w-20">Cargar Estudio Médico</button>
+                                </div>
+                            
+                            </form>
+                        </div>
+                    </div>
+
+
+                    <!-- Electro Basal -->
+                    <div class="card mb-3 player-forms" data-id="{{ jugador.id }}">
+                        <div class="card-header">
+                            <button class="btn btn-secondary w-100" onclick="toggleForm('electro-basal-form-{{ jugador.id }}')">Electro Basal</button>
+                        </div>
+                        <div id="electro-basal-form-{{ jugador.id }}" {% if form_saved %}style="display:none;"{% endif %}>
+                            <div class="card-body">
+                                <form method="POST" class="ajax-form" action="{% url 'electro_basal_view' jugador.id %}">
+                                    {% csrf_token %}
+                            
+
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label for="{{electro_basal_form.ritmo.id_for_label }}">Ritmo:</label>
+                                                {{ electro_basal_form.ritmo }}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label for="{{ electro_basal_form.PQ.id_for_label }}">PQ:</label>
+                                                {{ electro_basal_form.PQ }}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label for="{{ electro_basal_form.frecuencia.id_for_label }}">Frecuencia:</label>
+                                                {{ electro_basal_form.frecuencia }}
+                                            </div>
+                                        </div>
+                                    </div>
+                    
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label for="{{ electro_basal_form.arritmias.id_for_label }}">Arritmias:</label>
+                                                {{ electro_basal_form.arritmias }}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label for="{{ electro_basal_form.ejeQRS.id_for_label }}">EjeQRS:</label>
+                                                {{ electro_basal_form.ejeQRS }}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label for="{{ electro_basal_form.trazadoNormal.id_for_label }}">Trazado Normal:</label>
+                                                {{ electro_basal_form.trazadoNormal }}
+                                            </div>
+                                        </div>
+                                    </div>
+                    
+                                    <div class="mb-3">
+                                        <label for="{{ electro_basal_form.observaciones.id_for_label }}">Observaciones:</label>
+                                        {{ electro_basal_form.observaciones }}
+                                    </div>
+                    
+                                    <div class="d-flex justify-content-end">
+                                        <button type="submit" class="btn btn-primary w-20">Guardar</button>
+                            
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    
+
+
+
+
+
+                    
+                <!-- Electro Esfuerzo -->
+                    <div class="card mb-3 player-forms" data-id="{{ jugador.id }}" >
+                        <div class="card-header">
+                            <button class="btn btn-secondary w-100" onclick="toggleForm('electro_esfuerzo_form-{{ jugador.id }}')">Electro Esfuerzo</button>
+                        </div>
+                        <div id="electro_esfuerzo_form-{{ jugador.id }}"  {% if form_saved %}style="display:none;"{% endif %}>
+                            <div class="card-body">
+                                <form method="POST" class="ajax-form" action="{% url 'electro_esfuerzo_view' jugador.id %}">
+                                    {% csrf_token %}
+                
+                                                {{ electro_esfuerzo_form.observaciones}}
+
+                                        <div class="d-flex justify-content-end">
+                                            <button type="submit" class="btn btn-primary w-20">Guardar</button>
+                                        </div>  
+                                    
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                
+                
+                
+                <!-- Cardiovascular -->
+                    <div class="card mb-3 player-forms" data-id="{{ jugador.id }}">
+                        <div class="card-header">
+                            <button class="btn btn-secondary w-100" onclick="toggleForm('cardiovascular_form-{{ jugador.id }}')">Cardiovascular</button>
+                        </div>
+                        <div id="cardiovascular_form-{{ jugador.id }}" class="collapse" style="display:none;">
+                            <div class="card-body">
+                                <form method="POST" class="ajax-form" action="{% url 'cardiovascular_view' jugador.id %}">
+                                    {% csrf_token %}
+
+                                    <!-- Contenedor para los primeros 3 campos (izquierda) -->
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label for="{{cardiovascular_form.auscultacion.id_for_label }}" class="form-label">{{ cardiovascular_form.auscultacion.label }}</label>
+                                                {{ cardiovascular_form.auscultacion }}
+                                                {% if cardiovascular_form.auscultacion.help_text %}
+                                                    <small class="form-text text-muted">{{ cardiovascular_form.auscultacion.help_text }}</small>
+                                                {% endif %}
+                                                {% for error in cardiovascular_form.auscultacion.errors %}
+                                                    <div class="text-danger">{{ error }}</div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label for="{{ cardiovascular_form.R1.id_for_label }}" class="form-label">{{ cardiovascular_form.R1.label }}</label>
+                                                {{ cardiovascular_form.R1 }}
+                                                {% if cardiovascular_form.R1.help_text %}
+                                                    <small class="form-text text-muted">{{ cardiovascular_form.R1.help_text }}</small>
+                                                {% endif %}
+                                                {% for error in cardiovascular_form.R1.errors %}
+                                                    <div class="text-danger">{{ error }}</div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label for="{{ cardiovascular_form.R2.id_for_label }}" class="form-label">{{ cardiovascular_form.R2.label }}</label>
+                                                {{ cardiovascular_form.R2 }}
+                                                {% if cardiovascular_form.R2.help_text %}
+                                                    <small class="form-text text-muted">{{ cardiovascular_form.R2.help_text }}</small>
+                                                {% endif %}
+                                                {% for error in cardiovascular_form.R2.errors %}
+                                                    <div class="text-danger">{{ error }}</div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Contenedor para los otros 3 campos (derecha) -->
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label for="{{ cardiovascular_form.soplos.id_for_label }}" class="form-label">{{ cardiovascular_form.soplos.label }}</label>
+                                                {{ cardiovascular_form.soplos }}
+                                                {% if cardiovascular_form.soplos.help_text %}
+                                                    <small class="form-text text-muted">{{ cardiovascular_form.soplos.help_text }}</small>
+                                                {% endif %}
+                                                {% for error in cardiovascular_form.soplos.errors %}
+                                                    <div class="text-danger">{{ error }}</div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label for="{{ cardiovascular_form.tension_arterial.id_for_label }}" class="form-label">{{ cardiovascular_form.tension_arterial.label }}</label>
+                                                {{ cardiovascular_form.tension_arterial }}
+                                                {% if cardiovascular_form.tension_arterial.help_text %}
+                                                    <small class="form-text text-muted">{{ cardiovascular_form.tension_arterial.help_text }}</small>
+                                                {% endif %}
+                                                {% for error in cardiovascular_form.tension_arterial.errors %}
+                                                    <div class="text-danger">{{ error }}</div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label for="{{ cardiovascular_form.ruidos_agregados.id_for_label }}" class="form-label">{{ cardiovascular_form.ruidos_agregados.label }}</label>
+                                                {{ cardiovascular_form.ruidos_agregados }}
+                                                {% if cardiovascular_form.ruidos_agregados.help_text %}
+                                                    <small class="form-text text-muted">{{ cardiovascular_form.ruidos_agregados.help_text }}</small>
+                                                {% endif %}
+                                                {% for error in cardiovascular_form.ruidos_agregados.errors %}
+                                                    <div class="text-danger">{{ error }}</div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Campo 'observaciones' (en una fila completa debajo) -->
+                                    <div class="mb-3">
+                                        <label for="{{ cardiovascular_form.observaciones.id_for_label }}" class="form-label">{{ cardiovascular_form.observaciones.label }}</label>
+                                        {{ cardiovascular_form.observaciones }}
+                                        {% if cardiovascular_form.observaciones.help_text %}
+                                            <small class="form-text text-muted">{{ cardiovascular_form.observaciones.help_text }}</small>
+                                        {% endif %}
+                                        {% for error in cardiovascular_form.observaciones.errors %}
+                                            <div class="text-danger">{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+
+                                    <!-- Botón de submit -->
+                                    <div class="d-flex justify-content-end">
+                                        <button type="submit" class="btn btn-primary w-20">Guardar</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+
+        
+    
+            <!-- Laboratorio -->
+            <div class="card mb-3 player-forms" data-id="{{ jugador.id }}">
+                <div class="card-header">
+                    <button class="btn btn-secondary w-100" onclick="toggleForm('laboratorio_form-{{ jugador.id }}')">Laboratorio</button>
+                </div>
+                <div id="laboratorio_form-{{ jugador.id }}" class="collapse" style="display:none;">
+                    <div class="card-body">
+                        <form method="POST" class="ajax-form" action="{% url 'laboratorio_view' jugador.id %}">
+                            {% csrf_token %}
+
+                            <!-- Contenedor para los campos a la izquierda (Uremia, Glucemia, Otros) -->
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label for="{{ laboratorio_form.uremia.id_for_label }}" class="form-label">{{ laboratorio_form.uremia.label }}</label>
+                                        {{ laboratorio_form.uremia }}
+                                        {% if laboratorio_form.uremia.help_text %}
+                                            <small class="form-text text-muted">{{ laboratorio_form.uremia.help_text }}</small>
+                                        {% endif %}
+                                        {% for error in laboratorio_form.uremia.errors %}
+                                            <div class="text-danger">{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label for="{{ laboratorio_form.glucemia.id_for_label }}" class="form-label">{{ laboratorio_form.glucemia.label }}</label>
+                                        {{ laboratorio_form.glucemia }}
+                                        {% if laboratorio_form.glucemia.help_text %}
+                                            <small class="form-text text-muted">{{ laboratorio_form.glucemia.help_text }}</small>
+                                        {% endif %}
+                                        {% for error in laboratorio_form.glucemia.errors %}
+                                            <div class="text-danger">{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label for="{{ laboratorio_form.otros.id_for_label }}" class="form-label">{{ laboratorio_form.otros.label }}</label>
+                                        {{ laboratorio_form.otros }}
+                                        {% if laboratorio_form.otros.help_text %}
+                                            <small class="form-text text-muted">{{ laboratorio_form.otros.help_text }}</small>
+                                        {% endif %}
+                                        {% for error in laboratorio_form.otros.errors %}
+                                            <div class="text-danger">{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Contenedor para los campos a la derecha (Citológico, Orina, Colesterol) -->
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label for="{{ laboratorio_form.citologico.id_for_label }}" class="form-label">{{ laboratorio_form.citologico.label }}</label>
+                                        {{ laboratorio_form.citologico }}
+                                        {% if laboratorio_form.citologico.help_text %}
+                                            <small class="form-text text-muted">{{ laboratorio_form.citologico.help_text }}</small>
+                                        {% endif %}
+                                        {% for error in laboratorio_form.citologico.errors %}
+                                            <div class="text-danger">{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label for="{{ laboratorio_form.orina.id_for_label }}" class="form-label">{{ laboratorio_form.orina.label }}</label>
+                                        {{ laboratorio_form.orina }}
+                                        {% if laboratorio_form.orina.help_text %}
+                                            <small class="form-text text-muted">{{ laboratorio_form.orina.help_text }}</small>
+                                        {% endif %}
+                                        {% for error in laboratorio_form.orina.errors %}
+                                            <div class="text-danger">{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label for="{{ laboratorio_form.colesterol.id_for_label }}" class="form-label">{{ laboratorio_form.colesterol.label }}</label>
+                                        {{ laboratorio_form.colesterol }}
+                                        {% if laboratorio_form.colesterol.help_text %}
+                                            <small class="form-text text-muted">{{ laboratorio_form.colesterol.help_text }}</small>
+                                        {% endif %}
+                                        {% for error in laboratorio_form.colesterol.errors %}
+                                            <div class="text-danger">{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Botón de submit -->
+                            <div class="d-flex justify-content-end">
+                                <button type="submit" class="btn btn-primary w-20">Guardar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+   
+        <!-- Oftalmológico -->
+        <div class="card mb-3 player-forms" data-id="{{ jugador.id }}">
+            <div class="card-header">
+                <button class="btn btn-secondary w-100" onclick="toggleForm('oftalmologico_form-{{ jugador.id }}')">Oftalmológico</button>
+            </div>
+            <div id="oftalmologico_form-{{ jugador.id }}" class="collapse" style="display:none;">
+                <div class="card-body">
+                    <form method="POST" class="ajax-form" action="{% url 'oftalmologico_view' jugador.id %}">
+                        {% csrf_token %}
+
+                        <!-- Contenedor para los campos (OD a la derecha y OI a la izquierda) -->
+                        <div class="row">
+                            <!-- Ojo Izquierdo (OI) a la izquierda -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ oftalmologico_form.oi.id_for_label }}" class="form-label">{{ oftalmologico_form.oi.label }}</label>
+                                    {{ oftalmologico_form.oi }}
+                                    {% if oftalmologico_form.oi.help_text %}
+                                        <small class="form-text text-muted">{{ oftalmologico_form.oi.help_text }}</small>
+                                    {% endif %}
+                                    {% for error in oftalmologico_form.oi.errors %}
+                                        <div class="text-danger">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <!-- Ojo Derecho (OD) a la derecha -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ oftalmologico_form.od.id_for_label }}" class="form-label">{{ oftalmologico_form.od.label }}</label>
+                                    {{ oftalmologico_form.od }}
+                                    {% if oftalmologico_form.od.help_text %}
+                                        <small class="form-text text-muted">{{ oftalmologico_form.od.help_text }}</small>
+                                    {% endif %}
+                                    {% for error in oftalmologico_form.od.errors %}
+                                        <div class="text-danger">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Botón de submit -->
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-primary w-20">Guardar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    
+              <!-- Otros Exámenes Clínicos -->
+            <div class="card mb-3 player-forms" data-id="{{ jugador.id }}">
+                <div class="card-header">
+                    <button class="btn btn-secondary w-100" onclick="toggleForm('otros_examenes_clinicos_form-{{ jugador.id }}')">Otros Exámenes Clínicos</button>
+                </div>
+                <div id="otros_examenes_clinicos_form-{{ jugador.id }}" class="collapse" style="display:none;">
+                    <div class="card-body">
+                        <form method="POST" class="ajax-form" action="{% url 'otros_examenes_clinicos_view' jugador.id %}">
+                            {% csrf_token %}
+                            {{ otros_examenes_form.as_p }}
+                            <div class="d-flex justify-content-end">
+                                <button type="submit" class="btn btn-primary w-20">Guardar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Certificado Médico -->
+            <div class="card mb-3 player-forms" data-id="{{ jugador.id }}">
+                <div class="card-header">
+                    <button class="btn btn-secondary w-100" onclick="toggleForm('certificadoMedico-{{ jugador.id }}')">Certificado Médico</button>
+                </div>
+                <div id="certificadoMedico-{{ jugador.id }}" class="collapse" style="display:none;">
+                    <div class="card-body">
+                        <form method="post" action="{% url 'registro_medico_update_view' jugador.id %}">
+                            {% csrf_token %}
+                            
+                            <p>Habiendo tomado conocimiento de los "Antecedentes de Enfermedad" consignados en el anverso, realizados los estudios citados precedentemente y efectuada la evaluación clínico/médica correspondiente al Sr/Sra:</p>
+                            <p><strong>Nombre:</strong> {{ nombre }} - {{ apellido }}</p>
+                            <p><strong>Edad:</strong> {{ jugador.edad }}</p>
+                            <p><strong>DNI:</strong> {{ dni }}</p>
+                            <p>Declaro lo siguiente:</p>
+
+                            <!-- Estado -->
+                            <div class="form-group">
+                                <label for="estado">Estado:</label>
+                                <select class="form-control" id="estado" name="estado" onchange="toggleFields()">
+                                    <option value="APROBADA" {% if registro_medico.estado == "APROBADA" %}selected{% endif %}>APROBADA</option>
+                                    <option value="RECHAZADA" {% if registro_medico.estado == "RECHAZADA" %}selected{% endif %}>RECHAZADA</option>
+                                    <option value="PENDIENTE" {% if registro_medico.estado == "PENDIENTE" %}selected{% endif %}>PENDIENTE</option>
+                                </select>
+                            </div>
+
+                            <!-- Fecha de Llenado -->
+                            <div class="form-group">
+                                <label for="fecha_de_llenado">Fecha de Llenado:</label>
+                                <input type="date" class="form-control" id="fecha_de_llenado" name="fecha_de_llenado" 
+                                    value="{{ registro_medico.fecha_de_llenado|date:'Y-m-d' }}">
+                            </div>
+
+                            <!-- Fecha de Caducidad -->
+                            <div class="form-group">
+                                <label for="fecha_caducidad">Fecha de Caducidad:</label>
+                                <input type="date" class="form-control" id="fecha_caducidad" name="fecha_caducidad" 
+                                    value="{{ registro_medico.fecha_caducidad|date:'Y-m-d' }}">
+                            </div>
+
+                            <!-- Observaciones -->
+                            <div class="form-group" id="observacion_div" style="display:none;">
+                                <label for="observaciones">Observaciones:</label>
+                                <input type="text" class="form-control" id="observacion" name="observacion" value="{{ registro_medico.observacion }}">
+                            </div>
+
+                            <p>Firma y sello del Médico:</p>
+                            <div class="form-group">
+                                <label for="firma">Firma:</label>
+                                <input type="text" class="form-control" id="firma" name="firma" value="{{ user.profile.nombre }} {{ user.profile.apellido }}" readonly>
+                            </div>
+
+                            <p>Esta certificación tiene validez por el año en curso a partir de la fecha de emisión y es válida sin enmiendas solo en original.</p>
+
+                            <!-- Verificación de requisitos antes de habilitar el botón -->
+                            {% if jugador.electrocardiograma_cargado %}
+                                {% if jugador.edad >= 35 %}
+                                    {% if jugador.ergonometria_cargado %}
+                                        <div class="d-flex justify-content-center mt-3">
+                                            <button type="submit" id="guardarFichaBtn" class="btn btn-primary w-50">Guardar</button>
+                                        </div>
+                                    {% else %}
+                                        <div class="text-center mt-3">
+                                            <p class="text-danger">Falta Ergonometría</p>
+                                        </div>
+                                    {% endif %}
+                                {% else %}
+                                    <div class="d-flex justify-content-center mt-3">
+                                        <button type="submit" id="guardarFichaBtn" class="btn btn-primary w-50">Guardar</button>
+                                    </div>
+                                {% endif %}
+                            {% else %}
+                                <div class="text-center mt-3">
+                                    <p class="text-danger">Falta Electrocardiograma</p>
+                                    {% if jugador.edad >= 35 and not jugador.ergonometria_cargado %}
+                                        <p class="text-danger">Falta Ergonometría</p>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="container text-center mt-5">
+                <button onclick="location.href='{% url 'medico_home' %}'" class="btn btn-primary">Volver a Inicio</button>
+            </div>
+</div>
+</div>
+
+
+
+</div>
+
+<script>
+// script para e llenado automatico de la fecha 
+    document.addEventListener('DOMContentLoaded', function() {
+        const fechaDeLlenado = document.getElementById('fecha_de_llenado');
+        if (fechaDeLlenado && !fechaDeLlenado.value) {
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
+        fechaDeLlenado.value = `${yyyy}-${mm}-${dd}`;
+        }
+    });
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".btn-seleccionar").forEach(function (boton) {
+    boton.addEventListener("click", function (event) {
+        
+
+        let jugadorId = this.getAttribute("data-id");
+
+        if (!jugadorId) {
+            console.error("⚠️ Error: No se encontró el ID del jugador.");
+            return;
+        }
+
+        console.log("Jugador seleccionado con ID:", jugadorId);
+
+        // 🔹 Ocultar todas las filas de jugadores excepto la seleccionada
+        document.querySelectorAll(".jugador-row").forEach(function (fila) {
+            if (fila.getAttribute("data-id") !== jugadorId) {
+                fila.style.display = "none";
+            } else {
+                fila.style.display = "table-row";
+            }
+        });
+
+        // 🔹 Ocultar todos los formularios antes de mostrar el seleccionado
+        document.querySelectorAll(".jugador-container").forEach(function (formContainer) {
+            formContainer.style.display = "none";
+        });
+
+        // 🔹 Mostrar solo los formularios del jugador seleccionado
+        let formularioSeleccionado = document.getElementById(`formularioContainer-${jugadorId}`);
+        if (formularioSeleccionado) {
+            formularioSeleccionado.style.display = "block";
+        } else {
+            console.warn("⚠️ No se encontró el contenedor de formularios para el jugador con ID:", jugadorId);
+        }
+
+        // 🔹 Asegurar que el formulario de antecedentes permanezca CERRADO por defecto
+        let antecedentesForm = document.getElementById(`antecedentes-content-${jugadorId}`);
+        if (antecedentesForm) {
+            antecedentesForm.style.display = "none";
+            console.log("🔹 El formulario de antecedentes se mantiene cerrado.");
+        } else {
+            console.warn("⚠️ No se encontró el formulario de antecedentes para el jugador con ID:", jugadorId);
+        }
+    });
+});
+
+// 🔹 Permitir que el usuario despliegue/cierre el formulario de antecedentes manualmente
+document.querySelectorAll(".btn-toggle-antecedentes").forEach(function (boton) {
+boton.addEventListener("click", function (event) {
+    
+
+    let jugadorId = this.getAttribute("data-id");
+    let antecedentesForm = document.getElementById(`antecedentes-content-${jugadorId}`);
+
+    if (antecedentesForm) {
+        antecedentesForm.style.display = antecedentesForm.style.display === "none" ? "block" : "none";
+        console.log(antecedentesForm.style.display === "block"
+            ? `✅ Mostrando formulario de antecedentes para el jugador con ID: ${jugadorId}`
+            : `❌ Ocultando formulario de antecedentes para el jugador con ID: ${jugadorId}`);
+    } else {
+        console.warn("⚠️ No se encontró el formulario de antecedentes para el jugador con ID:", jugadorId);
+    }
+});
+});
+});
+
+// 🔹 Función para abrir/cerrar formularios específicos dentro del jugador seleccionado
+function toggleForm(formId) {
+let form = document.getElementById(formId);
+if (form) {
+form.style.display = form.style.display === "none" || form.style.display === "" ? "block" : "none";
+} else {
+console.warn(`⚠️ No se encontró el formulario con ID: ${formId}`);
+}
+}
+
+// 🔹 Función para verificar si todos los formularios están completos antes de habilitar el botón de guardar
+document.addEventListener("DOMContentLoaded", function() {
+function verificarFormularios() {
+let formularios = document.querySelectorAll(".ajax-form");
+let botonGuardar = document.getElementById("guardarFichaBtn");
+let todosCompletos = true;
+
+formularios.forEach(formulario => {
+    if (formulario.id === "certificadoMedicoForm") return;
+
+    let inputs = formulario.querySelectorAll("input, select, textarea");
+    inputs.forEach(input => {
+        if (input.hasAttribute("required") && input.value.trim() === "") {
+            todosCompletos = false;
+        }
+    });
+});
+
+botonGuardar.disabled = !todosCompletos;
+}
+
+let formularios = document.querySelectorAll(".ajax-form");
+formularios.forEach(formulario => {
+formulario.addEventListener("input", verificarFormularios);
+});
+
+verificarFormularios();
+});
+
+// 🔹 Mostrar el formulario correcto al recargar la página si hay un jugador seleccionado
+document.addEventListener("DOMContentLoaded", function () {
+const params = new URLSearchParams(window.location.search);
+const jugadorId = params.get("jugador_id");
+
+if (jugadorId) {
+const formSection = document.getElementById(`formularioContainer-${jugadorId}`);
+if (formSection) {
+    formSection.style.display = "block"; // Mostrar el formulario del jugador seleccionado
+}
+}
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+function verificarFormularios() {
+let formularios = document.querySelectorAll(".ajax-form");
+let botonGuardar = document.getElementById("guardarFichaBtn");
+let todosCompletos = true;
+
+formularios.forEach(formulario => {
+    // Excluir el formulario de Certificado Médico (por ID o Clase)
+    if (formulario.id === "certificadoMedicoForm") {
+        return; // Salta este formulario
+    }
+
+    let inputs = formulario.querySelectorAll("input, select, textarea");
+    inputs.forEach(input => {
+        if (input.hasAttribute("required") && input.value.trim() === "") {
+            todosCompletos = false;
+        }
+    });
+});
+
+// Habilitar el botón si todos los formularios están completos
+botonGuardar.disabled = !todosCompletos;
+}
+
+// Escuchar eventos en todos los formularios
+let formularios = document.querySelectorAll(".ajax-form");
+formularios.forEach(formulario => {
+formulario.addEventListener("input", verificarFormularios);
+});
+
+// Verificación inicial
+verificarFormularios();
+});
+document.addEventListener("DOMContentLoaded", function () {
+const params = new URLSearchParams(window.location.search);
+const jugadorId = params.get("jugador_id");
+
+if (jugadorId) {
+const formSection = document.getElementById(`estudios-medicos-${jugadorId}`);
+if (formSection) {
+    formSection.style.display = "block"; // Mostrar el formulario
+}
+}
+});
+</script> 
+
+
+{% endblock %}

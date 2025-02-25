@@ -15,29 +15,20 @@ from django.template.loader import render_to_string
 from django.http import JsonResponse
 from django.urls import reverse
 
-
+#Vista medico_home
 class MedicoHomeView(LoginRequiredMixin, ListView):
     model = Jugador
     template_name = 'medico/medico_home.html'
     context_object_name = 'jugadores'
 
     def get_queryset(self):
-        # 🔹 Inicialmente, la lista está vacía
         queryset = Jugador.objects.all()
-
-        # Obtener los valores de búsqueda desde la URL
         search_dni = self.request.GET.get('search_dni', '').strip()
         search_name = self.request.GET.get('search_name', '').strip()
 
-        print("🔍 Búsqueda DNI:", search_dni)  # 🔹 Depuración: Ver si se recibe el DNI
-        print("🔍 Búsqueda Nombre:", search_name)  # 🔹 Depuración: Ver si se recibe el nombre
-
-        # Si no hay búsqueda, devolver una lista vacía
         if not search_dni and not search_name:
-            print("🔹 No se ingresaron datos de búsqueda. Retornando lista vacía.")
             return Jugador.objects.none()
 
-        # Filtrar por DNI
         if search_dni:
             if search_dni.isdigit() and len(search_dni) == 8:
                 queryset = queryset.filter(persona__profile__dni__icontains=search_dni)
@@ -45,41 +36,23 @@ class MedicoHomeView(LoginRequiredMixin, ListView):
                 messages.error(self.request, "El DNI ingresado debe contener exactamente 8 números.")
                 return Jugador.objects.none()
 
-        # 🔹 Filtrar por Nombre o Apellido (Búsqueda flexible)
         if search_name:
-            palabras = search_name.strip().split()  # Dividir el texto en palabras
+            palabras = search_name.strip().split()
             consulta = Q()
 
             if len(palabras) == 1:
-                # Si el usuario ingresa solo una palabra, buscar en nombre o apellido
                 consulta = Q(persona__profile__nombre__icontains=palabras[0]) | Q(persona__profile__apellido__icontains=palabras[0])
-
             elif len(palabras) >= 2:
-                # Si ingresa dos palabras, primero filtrar por la primera y luego por la segunda
                 primer_termino = palabras[0]
                 segundo_termino = palabras[1]
-
-                # Buscar primero por nombre y luego por apellido, o viceversa
                 consulta = (Q(persona__profile__nombre__icontains=primer_termino) & Q(persona__profile__apellido__icontains=segundo_termino)) | \
                         (Q(persona__profile__apellido__icontains=primer_termino) & Q(persona__profile__nombre__icontains=segundo_termino))
 
             queryset = queryset.filter(consulta)
 
-        # 🔹 Depuración: Mostrar los jugadores encontrados
-        jugadores_encontrados = queryset.values_list('id', 'persona__profile__nombre', 'persona__profile__apellido')
-        
-        if jugadores_encontrados:
-            print("✅ Jugadores encontrados:")
-            for jugador in jugadores_encontrados:
-                print(f"   - ID: {jugador[0]}, Nombre: {jugador[1]}, Apellido: {jugador[2]}")
-        else:
-            print("⚠️ No se encontraron jugadores con los criterios de búsqueda.")
-
         return queryset
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
-        # Pasar los valores actuales de búsqueda al contexto
         context['search_dni'] = self.request.GET.get('search_dni', '')
         context['search_name'] = self.request.GET.get('search_name', '')
 
@@ -89,431 +62,139 @@ class MedicoHomeView(LoginRequiredMixin, ListView):
             context['medico'] = None
 
         jugadores_info = []
-        registro_seleccionado = self.request.GET.get('registro_id', None)
+        registro_seleccionado = self.request.GET.get('registro_id', None)  # 🔹 Obtiene el registro seleccionado
 
         if 'jugadores' in context and context['jugadores'].exists():
             for jugador in context['jugadores']:
-                registros_medicos = RegistroMedico.objects.filter(jugador=jugador)
+                registros_medicos = RegistroMedico.objects.filter(jugador=jugador)  # 🔹 Obtener TODOS los registros médicos
 
-                for registro in registros_medicos:
+                for registro in registros_medicos:  # 🔹 Asegurarse de recorrer TODOS los registros
                     jugador_categoria_equipo = JugadorCategoriaEquipo.objects.filter(
                         jugador=jugador,
-                        categoria_equipo__categoria__torneo=registro.torneo
+                        categoria_equipo__categoria__torneo=registro.torneo  # 🔹 Asociar con el torneo correcto
                     ).first()
 
                     jugador_info = {
                         'id': jugador.id,
-                        'registro_id': registro.id if registro else "ERROR",
-                        'edad': jugador.persona.profile.edad,
                         'dni': jugador.persona.profile.dni,
                         'nombre': jugador.persona.profile.nombre,
                         'apellido': jugador.persona.profile.apellido,
-                        'direccion': jugador.persona.direccion,
-                        'telefono': jugador.persona.telefono,
-                        'grupo_sanguineo': jugador.grupo_sanguineo,
-                        'cobertura_medica': jugador.cobertura_medica,
-                        'numero_afiliado': jugador.numero_afiliado,
-                        'registro_medico': registros_medicos.filter(
-                            torneo=jugador_categoria_equipo.categoria_equipo.categoria.torneo
-                        ).first(),
-                        
-                        # ✅ Obtener la categoría, equipo y torneo desde JugadorCategoriaEquipo
                         'categoria': jugador_categoria_equipo.categoria_equipo.categoria.nombre if jugador_categoria_equipo else "Sin categoría",
                         'equipo': jugador_categoria_equipo.categoria_equipo.equipo.nombre if jugador_categoria_equipo else "Sin equipo",
-                        'torneo': jugador_categoria_equipo.categoria_equipo.categoria.torneo.nombre if jugador_categoria_equipo else "Sin torneo",
-
-                        # ✅ Estado del registro
-                        'estado': registro.estado,
-
-                        # ✅ Información del torneo
-                        'torneo_descripcion': jugador_categoria_equipo.categoria_equipo.categoria.torneo.descripcion if jugador_categoria_equipo else "Sin Descripción",
-                        'torneo_direccion': jugador_categoria_equipo.categoria_equipo.categoria.torneo.direccion if jugador_categoria_equipo else "Sin Dirección",
-                        'torneo_telefono': jugador_categoria_equipo.categoria_equipo.categoria.torneo.telefono if jugador_categoria_equipo else "Sin Teléfono",
-                        'imagen_torneo': jugador_categoria_equipo.categoria_equipo.categoria.torneo.imagen.url if jugador_categoria_equipo and jugador_categoria_equipo.categoria_equipo.categoria.torneo.imagen else None,
-
-                        # ✅ Obtener todos los estudios médicos asociados al registro médico
-                        'estudios_medicos': [
-                            {
-                                'pk': estudio.pk,
-                                'tipo': estudio.get_tipo_estudio_display(),
-                                'archivo': estudio.archivo.url if estudio.archivo else None,
-                                'observaciones': estudio.observaciones,
-                            }
-                            for estudio in EstudiosMedico.objects.filter(ficha_medica=registro)
-                        ],
-
-                        # ✅ Obtener todos los antecedentes médicos asociados al jugador
-                        'antecedentes': [
-                            {
-                                'fue_operado': ant.fue_operado,
-                                'toma_medicacion': ant.toma_medicacion,
-                                'estuvo_internado': ant.estuvo_internado,
-                                'sufre_hormigueos': ant.sufre_hormigueos,
-                                'es_diabetico': ant.es_diabetico,
-                                'es_asmatico': ant.es_asmatico,
-                                'es_alergico': ant.es_alergico,
-                                'alerg_observ': ant.alerg_observ,
-                                'antecedente_epilepsia': ant.antecedente_epilepsia,
-                                'desviacion_columna': ant.desviacion_columna,
-                                'dolor_cintura': ant.dolor_cintura,
-                                'fracturas': ant.fracturas,
-                                'dolores_articulares': ant.dolores_articulares,
-                                'falta_aire': ant.falta_aire,
-                                'traumatismos_craneo': ant.traumatismos_craneo,
-                                'dolor_pecho': ant.dolor_pecho,
-                                'perdida_conocimiento': ant.perdida_conocimiento,
-                                'presion_arterial': ant.presion_arterial,
-                                'muerte_subita_familiar': ant.muerte_subita_familiar,
-                                'enfermedad_cardiaca_familiar': ant.enfermedad_cardiaca_familiar,
-                                'soplo_cardiaco': ant.soplo_cardiaco,
-                                'abstenerce_competencia': ant.abstenerse_competencia,
-                                'antecedentes_coronarios_familiares': ant.antecedentes_coronarios_familiares,
-                                'fumar_hipertension_diabetes': ant.fumar_hipertension_diabetes,
-                                'consumo_cocaina_anabolicos': ant.consumo_cocaina_anabolicos,
-                                'cca_observaciones': ant.cca_observaciones,
-                            }
-                            for ant in AntecedenteEnfermedades.objects.filter(jugador=jugador)
-                        ],
+                        'torneo': registro.torneo.nombre if registro.torneo else "Sin torneo",  # 🔹 Mostrar el torneo del registro
+                        'estado': registro.estado,  # 🔹 Mostrar el estado del registro
+                        'registro_id': registro.id,  # 🔹 ID único por registro
+                        
                     }
 
-                    # ✅ 🔹 MOSTRAR SOLO FORMULARIOS DEL REGISTRO SELECCIONADO
-                    if registro_seleccionado and str(registro.id) == registro_seleccionado:
-                        print(f"🟢 Mostrando formularios para el registro ID: {registro.id}")
-                        
-                        jugador_info['electro_basal_form'] = ElectroBasalForm(
-                            instance=ElectroBasal.objects.filter(ficha_medica=registro).first()
-                        )
-                        jugador_info['electro_esfuerzo_form'] = ElectroEsfuerzoForm(
-                            instance=ElectroEsfuerzo.objects.filter(ficha_medica=registro).first()
-                        )
-                        jugador_info['cardiovascular_form'] = CardiovascularForm(
-                            instance=Cardiovascular.objects.filter(ficha_medica=registro).first()
-                        )
-                        jugador_info['laboratorio_form'] = LaboratorioForm(
-                            instance=Laboratorio.objects.filter(ficha_medica=registro).first()
-                        )
-                        jugador_info['oftalmologico_form'] = OftalmologicoForm(
-                            instance=Oftalmologico.objects.filter(ficha_medica=registro).first()
-                        )
-                        jugador_info['torax_form'] = ToraxForm(
-                            instance=Torax.objects.filter(ficha_medica=registro).first()
-                        )
-                        jugador_info['otros_examenes_form'] = OtrosExamenesClinicosForm(
-                            instance=OtrosExamenesClinicos.objects.filter(ficha_medica=registro).first()
-                        )
-                    else:
-                        print(f"🔴 Ocultando formularios del registro ID: {registro.id}")
+                
+                    jugadores_info.append(jugador_info)  # 🔹 AGREGAR CADA REGISTRO MÉDICO A LA LISTA
 
-                    jugadores_info.append(jugador_info)
-
-        else:
-            print("⚠️ No se encontraron jugadores en la búsqueda.")
-
-        context['jugadores_info'] = jugadores_info
+        context['jugadores_info'] = jugadores_info  # 🔹 Ahora se mostrarán todos los registros médicos en filas separadas
         return context
 
     def post(self, request, *args, **kwargs):
-        print("📌 Datos del formulario:", request.POST)
+            print("📌 Datos del formulario:", request.POST)
 
-        form_saved = False
-        form_complete = False
-        jugador_id = request.POST.get('jugador_id')
-        registro_id = request.POST.get('registro_id')  # Asegurar que el ID del registro se pasa correctamente
+            form_saved = False
+            form_complete = False
+            jugador_id = request.POST.get('jugador_id')
+            registro_id = request.POST.get('registro_id')  # Asegurar que el ID del registro se pasa correctamente
 
-        form = EstudioMedicoForm(request.POST, request.FILES)
-        if form.is_valid():
-            estudio_medico = form.save(commit=False)
+            form = EstudioMedicoForm(request.POST, request.FILES)
+            if form.is_valid():
+                estudio_medico = form.save(commit=False)
 
-            # Obtener el registro médico específico
-            jugador = get_object_or_404(Jugador, id=jugador_id)
-            registro_medico = get_object_or_404(RegistroMedico, id=registro_id, jugador=jugador)
+                # Obtener el registro médico específico
+                jugador = get_object_or_404(Jugador, id=jugador_id)
+                registro_medico = get_object_or_404(RegistroMedico, id=registro_id, jugador=jugador)
 
-            if registro_medico:
-                estudio_medico.ficha_medica = registro_medico
-                estudio_medico.save()
-                messages.success(request, "✅ Estudio médico cargado exitosamente.")
-                form_saved = True
+                if registro_medico:
+                    estudio_medico.ficha_medica = registro_medico
+                    estudio_medico.save()
+                    messages.success(request, "✅ Estudio médico cargado exitosamente.")
+                    form_saved = True
+                else:
+                    messages.error(request, "❌ No se encontró el registro médico del jugador.")
             else:
-                messages.error(request, "❌ No se encontró el registro médico del jugador.")
-        else:
-            print("❌ Error en el formulario:", form.errors)
-            messages.error(request, "❌ Hubo un error al cargar el estudio médico.")
+                print("❌ Error en el formulario:", form.errors)
+                messages.error(request, "❌ Hubo un error al cargar el estudio médico.")
 
-        # Asegurarse de que el queryset esté definido
-        self.object_list = self.get_queryset()
+            # Asegurarse de que el queryset esté definido
+            self.object_list = self.get_queryset()
 
-        context = self.get_context_data()
-        context['form_saved'] = form_saved
-        context['jugador_id'] = jugador_id  # 🔑 Enviar el ID del jugador al contexto
-        context['registro_id'] = registro_id  # 🔑 Enviar el ID del registro médico al contexto
+            context = self.get_context_data()
+            context['form_saved'] = form_saved
+            context['jugador_id'] = jugador_id  # 🔑 Enviar el ID del jugador al contexto
+            context['registro_id'] = registro_id  # 🔑 Enviar el ID del registro médico al contexto
 
-        return render(request, 'medico/medico_home.html', context)
+            return render(request, 'medico/medico_home.html', context)
 
 
-def electro_basal_view(request, jugador_id):
+#Manejo de los formularios
+
+def manejar_formulario_medico(request, jugador_id, modelo, formulario_clase, template_name='medico/medico_home.html'):
+    """
+    Función genérica para manejar formularios médicos.
+
+    :param request: HTTP request object
+    :param jugador_id: ID del jugador
+    :param modelo: Modelo relacionado con el formulario
+    :param formulario_clase: Clase del formulario
+    :param template_name: Plantilla a renderizar
+    :return: HttpResponse con el formulario renderizado o JSON si es AJAX
+    """
+
     jugador = get_object_or_404(Jugador, id=jugador_id)
     registro_medico = RegistroMedico.objects.filter(jugador=jugador).first()
 
     if not registro_medico:
-        return JsonResponse({"error": "No se encontró el registro médico del jugador."}, status=404)
+        return HttpResponse("No se encontró el registro médico del jugador.", status=404)
 
+    # Buscar la instancia del modelo relacionado con la ficha médica
+    instancia = modelo.objects.filter(ficha_medica=registro_medico).first()
 
-    electro_basal = ElectroBasal.objects.filter(ficha_medica=registro_medico).first()
-    form_saved = False
-    form_complete = False
-   
     if request.method == 'POST':
-        electro_basal_form = ElectroBasalForm(request.POST, instance=electro_basal)
-        if electro_basal_form.is_valid():
+        formulario = formulario_clase(request.POST, instance=instancia)
+        if formulario.is_valid():
             with transaction.atomic():
-                electro_basal = electro_basal_form.save(commit=False)
-
-                # Asegurar que esté asociado con la ficha médica
-                if not electro_basal.ficha_medica_id:
-                    electro_basal.ficha_medica = registro_medico
-
-                electro_basal.save()
-                form_saved = True
-
+                instancia = formulario.save(commit=False)
+                instancia.ficha_medica = registro_medico
+                instancia.save()
             if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-                return JsonResponse({"success": True, "message": "✅ Formulario guardado exitosamente."})
-
+                return JsonResponse({"success": True, "message": "Formulario guardado exitosamente."})
     else:
-        # 🔹 Inicializar el formulario con la instancia existente de ElectroBasal
-        electro_basal_form = ElectroBasalForm(instance=electro_basal)
+        formulario = formulario_clase(instance=instancia)
 
-        # Verificar si el formulario está completo
-        if electro_basal:
-            electro_basal_form = ElectroBasalForm(instance=electro_basal)
-            form_complete = all([
-                getattr(electro_basal, field.name, None)
-                for field in electro_basal_form.visible_fields()
-            ])
-        else:
-            electro_basal_form = ElectroBasalForm()
-
-    return render(request, 'medico/medico_home.html', {
+    return render(request, template_name, {
         'jugador': jugador,
-        'electro_basal_form': electro_basal_form,
-        'form_saved': form_saved,
-        'form_complete': form_complete,
+        f'{modelo.__name__.lower()}_form': formulario,
     })
+
+# Vistas utilizando la función genérica
+def electro_basal_view(request, jugador_id):
+    return manejar_formulario_medico(request, jugador_id, ElectroBasal, ElectroBasalForm)
 
 def electro_esfuerzo_view(request, jugador_id):
-    jugador = get_object_or_404(Jugador, id=jugador_id)
-    registro_medico = RegistroMedico.objects.filter(jugador=jugador).first()
-    if not registro_medico:
-        return HttpResponse("No se encontró el registro médico del jugador.", status=404)
-
-    electro_esfuerzo = ElectroEsfuerzo.objects.filter(ficha_medica=registro_medico).first()
-    if request.method == 'POST':
-        electro_esfuerzo_form = ElectroEsfuerzoForm(request.POST, instance=electro_esfuerzo)
-        if electro_esfuerzo_form.is_valid():
-            with transaction.atomic():
-                electro_esfuerzo = electro_esfuerzo_form.save(commit=False)
-                electro_esfuerzo.ficha_medica = registro_medico
-                electro_esfuerzo.save()
-            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-                return JsonResponse({"success": True, "message": "Formulario guardado exitosamente."})
-    else:
-        electro_esfuerzo_form = ElectroEsfuerzoForm(instance=electro_esfuerzo)
-
-    return render(request, 'medico/medico_home.html', {
-        'jugador': jugador,
-        'electro_esfuerzo_form': electro_esfuerzo_form,
-    })
+    return manejar_formulario_medico(request, jugador_id, ElectroEsfuerzo, ElectroEsfuerzoForm)
 
 def otros_examenes_clinicos_view(request, jugador_id):
-    jugador = get_object_or_404(Jugador, id=jugador_id)
-    registro_medico = RegistroMedico.objects.filter(jugador=jugador).first()
-    if not registro_medico:
-        return HttpResponse("No se encontró el registro médico del jugador.", status=404)
-
-    otros_examenes = OtrosExamenesClinicos.objects.filter(ficha_medica=registro_medico).first()
-    if request.method == 'POST':
-        otros_examenes_form = OtrosExamenesClinicosForm(request.POST, instance=otros_examenes)
-        if otros_examenes_form.is_valid():
-            with transaction.atomic():
-                otros_examenes = otros_examenes_form.save(commit=False)
-                otros_examenes.ficha_medica = registro_medico
-                otros_examenes.save()
-            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-                return JsonResponse({"success": True, "message": "Formulario guardado exitosamente."})
-    else:
-        otros_examenes_form = OtrosExamenesClinicosForm(instance=otros_examenes)
-
-    return render(request, 'medico/medico_home.html', {
-        'jugador': jugador,
-        'otros_examenes_form': otros_examenes_form,
-    })
+    return manejar_formulario_medico(request, jugador_id, OtrosExamenesClinicos, OtrosExamenesClinicosForm)
 
 def cardiovascular_view(request, jugador_id):
-    # Obtener el jugador
-    jugador = get_object_or_404(Jugador, id=jugador_id)
-
-    # Obtener el registro médico del jugador
-    registro_medico = RegistroMedico.objects.filter(jugador=jugador).first()
-    if not registro_medico:
-        return HttpResponse("No se encontró el registro médico del jugador.", status=404)
-
-    # Obtener los datos de cardiovascular del registro médico
-    cardiovascular = Cardiovascular.objects.filter(ficha_medica=registro_medico).first()
-
-    # Si se recibe el formulario POST
-    if request.method == 'POST':
-        cardiovascular_form = CardiovascularForm(request.POST, instance=cardiovascular)
-        
-        # Si el formulario es válido
-        if cardiovascular_form.is_valid():
-            with transaction.atomic():
-                cardiovascular = cardiovascular_form.save(commit=False)
-                cardiovascular.ficha_medica = registro_medico  # Asignar el registro médico
-                cardiovascular.save()
-            
-            # Si es una petición AJAX, enviar una respuesta JSON
-            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-                return JsonResponse({"success": True, "message": "Formulario guardado exitosamente."})
-        
-        # Si no es AJAX, puedes mostrar los errores
-        else:
-            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-                return JsonResponse({"success": False, "errors": cardiovascular_form.errors})
-
-    # Si es GET, o no se envió un POST
-    else:
-        cardiovascular_form = CardiovascularForm(instance=cardiovascular)
-
-   
-  
-    
-   
-    return render(request, 'medico/medico_home.html', {
-        'jugador': jugador,
-        'cardiovascular_form': cardiovascular_form,
-        
-    })
-
+    return manejar_formulario_medico(request, jugador_id, Cardiovascular, CardiovascularForm)
 
 def laboratorio_view(request, jugador_id):
-    jugador = get_object_or_404(Jugador, id=jugador_id)
-    registro_medico = RegistroMedico.objects.filter(jugador=jugador).first()
-    if not registro_medico:
-        return HttpResponse("No se encontró el registro médico del jugador.", status=404)
-
-    laboratorio = Laboratorio.objects.filter(ficha_medica=registro_medico).first()
-    if request.method == 'POST':
-        laboratorio_form = LaboratorioForm(request.POST, instance=laboratorio)
-        if laboratorio_form.is_valid():
-            with transaction.atomic():
-                laboratorio = laboratorio_form.save(commit=False)
-                laboratorio.ficha_medica = registro_medico
-                laboratorio.save()
-            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-                return JsonResponse({"success": True, "message": "Formulario guardado exitosamente."})
-    else:
-        laboratorio_form = LaboratorioForm(instance=laboratorio)
-
-    return render(request, 'medico/medico_home.html', {
-        'jugador': jugador,
-        'laboratorio_form': laboratorio_form,
-    })
-
+    return manejar_formulario_medico(request, jugador_id, Laboratorio, LaboratorioForm)
 
 def torax_view(request, jugador_id):
-    jugador = get_object_or_404(Jugador, id=jugador_id)
-    registro_medico = RegistroMedico.objects.filter(jugador=jugador).first()
-    if not registro_medico:
-        return HttpResponse("No se encontró el registro médico del jugador.", status=404)
-
-    torax = Torax.objects.filter(ficha_medica=registro_medico).first()
-    if request.method == 'POST':
-        torax_form = ToraxForm(request.POST, instance=torax)
-        if torax_form.is_valid():
-            with transaction.atomic():
-                torax = torax_form.save(commit=False)
-                torax.ficha_medica = registro_medico
-                torax.save()
-            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-                return JsonResponse({"success": True, "message": "Formulario guardado exitosamente."})
-    else:
-        torax_form = ToraxForm(instance=torax)
-
-    return render(request, 'medico/medico_home.html', {
-        'jugador': jugador,
-        'torax_form': torax_form,
-    })
-
+    return manejar_formulario_medico(request, jugador_id, Torax, ToraxForm)
 
 def oftalmologico_view(request, jugador_id):
-    jugador = get_object_or_404(Jugador, id=jugador_id)
-    registro_medico = RegistroMedico.objects.filter(jugador=jugador).first()
-    if not registro_medico:
-        return HttpResponse("No se encontró el registro médico del jugador.", status=404)
+    return manejar_formulario_medico(request, jugador_id, Oftalmologico, OftalmologicoForm)
 
-    oftalmologico = Oftalmologico.objects.filter(ficha_medica=registro_medico).first()
-    if request.method == 'POST':
-        oftalmologico_form = OftalmologicoForm(request.POST, instance=oftalmologico)
-        if oftalmologico_form.is_valid():
-            with transaction.atomic():
-                oftalmologico = oftalmologico_form.save(commit=False)
-                oftalmologico.ficha_medica = registro_medico
-                oftalmologico.save()
-            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-                return JsonResponse({"success": True, "message": "Formulario guardado exitosamente."})
-    else:
-        oftalmologico_form = OftalmologicoForm(instance=oftalmologico)
-
-    return render(request, 'medico/medico_home.html', {
-        'jugador': jugador,
-        'oftalmologico_form': oftalmologico_form,
-    })
-
-
-""" def registro_medico_update_view(request, registro_id):
-    print(f"📌 Intentando cargar el registro médico con ID: {registro_id}")
-
-    # Asegurar que el registro existe
-    registro_medico = get_object_or_404(RegistroMedico, id=registro_id)
-    jugador = registro_medico.jugador  
-
-    print(f"✅ Registro encontrado: Ficha Médica {registro_medico.id} - {jugador.persona.profile.nombre} {jugador.persona.profile.apellido}")
-
-    if request.method == 'POST':
-        print("📌 Datos recibidos en POST:", request.POST)
-
-        registro_medico_form = RegistroMedicoUpdateForm(request.POST, instance=registro_medico)
-
-        if registro_medico_form.is_valid():
-            with transaction.atomic():
-                registro_medico = registro_medico_form.save(commit=False)
-
-                # Asignar al médico logueado si existe
-                medico = Medico.objects.filter(profile=request.user.profile).first()
-                if medico:
-                    registro_medico.medico = medico
-
-                registro_medico.save()
-                messages.success(request, "✅ Registro médico actualizado correctamente.")
-                
-                return redirect(f'/medico/medico_home/?search_dni={jugador.persona.profile.dni}&search_name={jugador.persona.profile.nombre}')
-        
-
-        else:
-            messages.error(request, "⚠️ Error en el formulario. Revisa los campos.")
-    else:
-        registro_medico_form = RegistroMedicoUpdateForm(instance=registro_medico)
-
-    # 🔹 Filtrar TODOS los registros médicos del jugador
-    registros_medicos = RegistroMedico.objects.filter(jugador=jugador)
-
-    return render(request, 'medico/medico_home.html', {
-        'jugador': jugador,
-        'registro_medico': registro_medico,
-        'registro_medico_form': registro_medico_form,
-        'registros_medicos': registros_medicos,  # ✅ Pasar lista de registros
-    }) """
-
-def registro_medico_update_view(request, jugador_id):
+# medico_update
+""" def registro_medico_update_view(request, jugador_id):
     jugador = get_object_or_404(Jugador, id=jugador_id)
     registro_medico = RegistroMedico.objects.filter(jugador=jugador).first()
 
@@ -545,6 +226,108 @@ def registro_medico_update_view(request, jugador_id):
         'registro_medico': registro_medico,  # Pasar el registro médico al contexto
         'registro_medico_form': registro_medico_form,
     })
+ """
+
+def registro_medico_update_view(request, registro_id):
+    registro_medico = get_object_or_404(RegistroMedico, id=registro_id)
+    jugador = registro_medico.jugador
+
+    if request.method == 'POST':
+        print(request.POST)  # Depuración: Verifica los valores enviados en el formulario
+        registro_medico_form = RegistroMedicoUpdateForm(request.POST, instance=registro_medico)
+        
+        if registro_medico_form.is_valid():
+            with transaction.atomic():
+                registro_medico = registro_medico_form.save(commit=False)
+                
+                # Obtener al médico logueado
+                medico = Medico.objects.filter(profile=request.user.profile).first()
+                if medico:
+                    registro_medico.medico = medico  # Asignar el médico logueado
+
+                registro_medico.save()
+                return redirect('registro_medico_update_view', registro_id=registro_id)
+        else:
+            print("Formulario no válido:", registro_medico_form.errors)  # Depuración
+
+    else:
+        registro_medico_form = RegistroMedicoUpdateForm(instance=registro_medico)
+
+    jugador_categoria_equipo = JugadorCategoriaEquipo.objects.filter(
+    jugador=jugador,
+    categoria_equipo__categoria__torneo=registro_medico.torneo
+    ).first()
+    # 🔹 Contexto con la información del jugador y su registro médico
+    context = {
+        'jugador': jugador,
+        'registro_medico': registro_medico,
+        'registro_medico_form': registro_medico_form,
+        'nombre': jugador.persona.profile.nombre,
+        'apellido': jugador.persona.profile.apellido,
+        'dni': jugador.persona.profile.dni,
+        'direccion': jugador.persona.direccion,
+        'telefono': jugador.persona.telefono,
+        'grupo_sanguineo': jugador.grupo_sanguineo,
+        'cobertura_medica': jugador.cobertura_medica,
+        'numero_afiliado': jugador.numero_afiliado,
+        'torneo_descripcion': registro_medico.torneo.descripcion if registro_medico.torneo else "Sin Descripción",
+        'torneo_direccion': registro_medico.torneo.direccion if registro_medico.torneo else "Sin Dirección",
+        'torneo_telefono': registro_medico.torneo.telefono if registro_medico.torneo else "Sin Teléfono",
+        'imagen_torneo': registro_medico.torneo.imagen.url if registro_medico.torneo and registro_medico.torneo.imagen else None,
+        'categoria': jugador_categoria_equipo.categoria_equipo.categoria.nombre if jugador_categoria_equipo else "Sin categoría",
+        'equipo': jugador_categoria_equipo.categoria_equipo.equipo.nombre if jugador_categoria_equipo else "Sin equipo",
+        
+        'antecedentes': [
+            {
+                'fue_operado': ant.fue_operado,
+                'toma_medicacion': ant.toma_medicacion,
+                'estuvo_internado': ant.estuvo_internado,
+                'sufre_hormigueos': ant.sufre_hormigueos,
+                'es_diabetico': ant.es_diabetico,
+                'es_asmatico': ant.es_asmatico,
+                'es_alergico': ant.es_alergico,
+                'alerg_observ': ant.alerg_observ,
+                'antecedente_epilepsia': ant.antecedente_epilepsia,
+                'desviacion_columna': ant.desviacion_columna,
+                'dolor_cintura': ant.dolor_cintura,
+                'fracturas': ant.fracturas,
+                'dolores_articulares': ant.dolores_articulares,
+                'falta_aire': ant.falta_aire,
+                'traumatismos_craneo': ant.traumatismos_craneo,
+                'dolor_pecho': ant.dolor_pecho,
+                'perdida_conocimiento': ant.perdida_conocimiento,
+                'presion_arterial': ant.presion_arterial,
+                'muerte_subita_familiar': ant.muerte_subita_familiar,
+                'enfermedad_cardiaca_familiar': ant.enfermedad_cardiaca_familiar,
+                'soplo_cardiaco': ant.soplo_cardiaco,
+                'abstenerce_competencia': ant.abstenerse_competencia,
+                'antecedentes_coronarios_familiares': ant.antecedentes_coronarios_familiares,
+                'fumar_hipertension_diabetes': ant.fumar_hipertension_diabetes,
+                'consumo_cocaina_anabolicos': ant.consumo_cocaina_anabolicos,
+                'cca_observaciones': ant.cca_observaciones,
+            }
+            for ant in AntecedenteEnfermedades.objects.filter(jugador=jugador)
+        ],
+        'estudios_medicos': [
+            {
+                'pk': estudio.pk,
+                'tipo': estudio.get_tipo_estudio_display(),
+                'archivo': estudio.archivo.url if estudio.archivo else None,
+                'observaciones': estudio.observaciones,
+            }
+            for estudio in EstudiosMedico.objects.filter(ficha_medica=registro_medico)
+        ],
+        'electro_basal_form': ElectroBasalForm(instance=ElectroBasal.objects.filter(ficha_medica=registro_medico).first()),
+        'electro_esfuerzo_form': ElectroEsfuerzoForm(instance=ElectroEsfuerzo.objects.filter(ficha_medica=registro_medico).first()),
+        'cardiovascular_form': CardiovascularForm(instance=Cardiovascular.objects.filter(ficha_medica=registro_medico).first()),
+        'laboratorio_form': LaboratorioForm(instance=Laboratorio.objects.filter(ficha_medica=registro_medico).first()),
+        'oftalmologico_form': OftalmologicoForm(instance=Oftalmologico.objects.filter(ficha_medica=registro_medico).first()),
+        'torax_form': ToraxForm(instance=Torax.objects.filter(ficha_medica=registro_medico).first()),
+        'otros_examenes_form': OtrosExamenesClinicosForm(instance=OtrosExamenesClinicos.objects.filter(ficha_medica=registro_medico).first()),
+    }
+
+    return render(request, 'medico/cargar_registro.html', context)
+# medico_views
 
 
 
