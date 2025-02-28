@@ -29,7 +29,8 @@
                             <h3 class="mb-0 fw-bold">Cargar Estudio Médico</h3>
                         </div>
                         <div class="card-body p-4">
-                            <form id="cargarEstudioForm" method="POST" enctype="multipart/form-data">
+                            <form id="cargarEstudioForm" method="POST" enctype="multipart/form-data" action="{% url 'registroMedico:cargar_estudio' jugador.id %}">
+
                                 {% csrf_token %}
 
                                 <div class="mb-3">

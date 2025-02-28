@@ -14,30 +14,32 @@
         background-size: cover;
         opacity: 0.4; /* Controla la transparencia de la imagen */
         z-index: -1; /* Coloca la imagen detrás del contenido */
-        }
-        
-        h3 {
-            font-size: 2rem; /* Tamaño grande */
-            color: #0066FF; /* Azul brillante */
-            /*font-weight: bold;  Fuente gruesa */
-            text-align: center; /* Centrado */
-            margin-bottom: 20px; /* Espacio inferior */
-        }
-
-   
+      }
+      
+      h3 {
+        font-size: 2rem; /* Tamaño grande */
+        color: #0066FF; /* Azul brillante */
+        text-align: center; /* Centrado */
+        margin-bottom: 20px; /* Espacio inferior */
+      }
     </style>
-    <div style="position: relative; z-index: 1; ">
+    
+    <div style="position: relative; z-index: 1;">
         <div class="container mt-5">
             <div class="card shadow-lg mx-auto" style="max-width: 500px;">
                 <div class="card-body text-center">
                     <h2 class="card-title text-danger">Eliminar Estudio Médico</h2>
-                    <p class="card-text">¿Estás seguro de que deseas eliminar el estudio <strong>{{ estudio.get_tipo_estudio_display }}</strong>?</p>
+                    <p class="card-text">
+                        ¿Estás seguro de que deseas eliminar el estudio 
+                        <strong>{{ estudio.get_tipo_estudio_display }}</strong>?
+                    </p>
                     
                     <form method="post">
                         {% csrf_token %}
                         <div class="d-flex justify-content-center gap-3 mt-4">
                             <button type="submit" class="btn btn-danger px-4">Eliminar</button>
-                            <a href="{% url 'registroMedico:ver_estudios' estudio.ficha_medica.id %}" class="btn btn-outline-secondary px-4">Cancelar</a>
+                            <a href="{% url 'registroMedico:ver_estudios' estudio.jugador.id %}" 
+                               class="btn btn-outline-secondary px-4">Cancelar</a>
                         </div>
                     </form>
                 </div>

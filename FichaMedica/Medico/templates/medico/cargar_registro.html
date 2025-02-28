@@ -185,9 +185,9 @@
                         <div id="estudios-medicos-{{ jugador.id }}" class="card-body" 
                         style="{% if jugador.id|stringformat:"s" == jugador_id %}display: block;{% else %}display: none;{% endif %}">
                             <!-- Mostrar Estudios Existentes -->
-                            {% for estudio in jugador.estudios_medicos %}
+                            {% for estudio in jugador.estudios_medicos.all %}
                             <div class="mb-2">
-                                <strong>Tipo: </strong>{{ estudio.tipo }}
+                                <strong>Tipo: </strong>{{  estudio.get_tipo_estudio_display }}
                                 {% if estudio.archivo %}
                                 <a href="{{ estudio.archivo }}" target="_blank" class="btn btn-link">Ver archivo</a>
                                 <!-- Botón Eliminar -->
@@ -243,7 +243,7 @@
                         </div>
                         <div id="electro-basal-form-{{ jugador.id }}" {% if form_saved %}style="display:none;"{% endif %}>
                             <div class="card-body">
-                                <form method="POST" class="ajax-form" action="{% url 'electro_basal_view' jugador.id %}">
+                                <form method="POST" class="ajax-form" action="{% url 'electro_basal_view' jugador.id registro_medico.id %}">
                                     {% csrf_token %}
                             
 
@@ -316,7 +316,7 @@
                         </div>
                         <div id="electro_esfuerzo_form-{{ jugador.id }}"  {% if form_saved %}style="display:none;"{% endif %}>
                             <div class="card-body">
-                                <form method="POST" class="ajax-form" action="{% url 'electro_esfuerzo_view' jugador.id %}">
+                                <form method="POST" class="ajax-form" action="{% url 'electro_esfuerzo_view' jugador.id registro_medico.id %}">
                                     {% csrf_token %}
                 
                                                 {{ electro_esfuerzo_form.observaciones}}
@@ -340,7 +340,7 @@
                         </div>
                         <div id="cardiovascular_form-{{ jugador.id }}" class="collapse" style="display:none;">
                             <div class="card-body">
-                                <form method="POST" class="ajax-form" action="{% url 'cardiovascular_view' jugador.id %}">
+                                <form method="POST" class="ajax-form" action="{% url 'cardiovascular_view' jugador.id registro_medico.id %}">
                                     {% csrf_token %}
 
                                     <!-- Contenedor para los primeros 3 campos (izquierda) -->
@@ -460,7 +460,7 @@
                 </div>
                 <div id="laboratorio_form-{{ jugador.id }}" class="collapse" style="display:none;">
                     <div class="card-body">
-                        <form method="POST" class="ajax-form" action="{% url 'laboratorio_view' jugador.id %}">
+                        <form method="POST" class="ajax-form" action="{% url 'laboratorio_view' jugador.id registro_medico.id %}">
                             {% csrf_token %}
 
                             <!-- Contenedor para los campos a la izquierda (Uremia, Glucemia, Otros) -->
@@ -564,7 +564,7 @@
             </div>
             <div id="oftalmologico_form-{{ jugador.id }}" class="collapse" style="display:none;">
                 <div class="card-body">
-                    <form method="POST" class="ajax-form" action="{% url 'oftalmologico_view' jugador.id %}">
+                    <form method="POST" class="ajax-form" action="{% url 'oftalmologico_view' jugador.id registro_medico.id %}">
                         {% csrf_token %}
 
                         <!-- Contenedor para los campos (OD a la derecha y OI a la izquierda) -->
@@ -607,6 +607,24 @@
             </div>
         </div>
 
+             <!-- Tórax -->
+             <div class="card mb-3 player-forms" data-id="{{ jugador.id }}" >
+                <div class="card-header">
+                    <button class="btn btn-secondary w-100" onclick="toggleForm('torax_form-{{ jugador.id }}')">Tórax</button>
+                </div>
+                <div id="torax_form-{{ jugador.id }}" class="collapse" style="display:none;">
+                    <div class="card-body">
+                        <form method="POST" class="ajax-form" action="{% url 'torax_view' jugador.id registro_medico.id %}">
+                            {% csrf_token %}
+                            {{ torax_form.observaciones }}
+                            <div class="d-flex justify-content-end">
+                                <button type="submit" class="btn btn-primary w-20">Guardar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
     
               <!-- Otros Exámenes Clínicos -->
             <div class="card mb-3 player-forms" data-id="{{ jugador.id }}">
@@ -615,7 +633,7 @@
                 </div>
                 <div id="otros_examenes_clinicos_form-{{ jugador.id }}" class="collapse" style="display:none;">
                     <div class="card-body">
-                        <form method="POST" class="ajax-form" action="{% url 'otros_examenes_clinicos_view' jugador.id %}">
+                        <form method="POST" class="ajax-form" action="{% url 'otros_examenes_clinicos_view' jugador.id registro_medico.id %}">
                             {% csrf_token %}
                             {{ otros_examenes_form.as_p }}
                             <div class="d-flex justify-content-end">
@@ -633,12 +651,13 @@
                 </div>
                 <div id="certificadoMedico-{{ jugador.id }}" class="collapse" style="display:none;">
                     <div class="card-body">
-                        <form method="post" action="{% url 'registro_medico_update_view' jugador.id %}">
+                        <form method="post" action="{% url 'registro_medico_update_view' registro_medico.id %}">
+
                             {% csrf_token %}
                             
                             <p>Habiendo tomado conocimiento de los "Antecedentes de Enfermedad" consignados en el anverso, realizados los estudios citados precedentemente y efectuada la evaluación clínico/médica correspondiente al Sr/Sra:</p>
                             <p><strong>Nombre:</strong> {{ nombre }} - {{ apellido }}</p>
-                            <p><strong>Edad:</strong> {{ jugador.edad }}</p>
+                            <p><strong>Edad:</strong> {{ edad }}</p>
                             <p><strong>DNI:</strong> {{ dni }}</p>
                             <p>Declaro lo siguiente:</p>
 
@@ -681,9 +700,9 @@
                             <p>Esta certificación tiene validez por el año en curso a partir de la fecha de emisión y es válida sin enmiendas solo en original.</p>
 
                             <!-- Verificación de requisitos antes de habilitar el botón -->
-                            {% if jugador.electrocardiograma_cargado %}
+                                {% if electrocardiograma_cargado %}
                                 {% if jugador.edad >= 35 %}
-                                    {% if jugador.ergonometria_cargado %}
+                                    {% if ergonometria_cargado %}
                                         <div class="d-flex justify-content-center mt-3">
                                             <button type="submit" id="guardarFichaBtn" class="btn btn-primary w-50">Guardar</button>
                                         </div>
@@ -697,14 +716,14 @@
                                         <button type="submit" id="guardarFichaBtn" class="btn btn-primary w-50">Guardar</button>
                                     </div>
                                 {% endif %}
-                            {% else %}
+                                {% else %}
                                 <div class="text-center mt-3">
                                     <p class="text-danger">Falta Electrocardiograma</p>
-                                    {% if jugador.edad >= 35 and not jugador.ergonometria_cargado %}
+                                    {% if jugador.edad >= 35 and not ergonometria_cargado %}
                                         <p class="text-danger">Falta Ergonometría</p>
                                     {% endif %}
                                 </div>
-                            {% endif %}
+                                {% endif %}
                         </form>
                     </div>
                 </div>
@@ -720,6 +739,35 @@
 
 
 </div>
+<!-- Modal de Confirmación -->
+<div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="successModalLabel">¡Ficha Médica Guardada!</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <p>La ficha médica se ha guardado correctamente.</p>
+            </div>
+            <div class="modal-footer d-flex justify-content-center">
+                <a href="{% url 'medico_home' %}" class="btn btn-success">Aceptar</a>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        let form = document.querySelector("form");
+        form.addEventListener("submit", function (event) {
+            event.preventDefault(); // Evitar la recarga inmediata
+            
+            // Mostrar el modal de éxito
+            let successModal = new bootstrap.Modal(document.getElementById('successModal'));
+            successModal.show();
+        });
+    });
+</script>
 
 <script>
 // script para e llenado automatico de la fecha 

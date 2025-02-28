@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import datetime, timedelta
 import os
 from django.db import models
 from persona.models import  Torneo ,Jugador
@@ -88,7 +88,9 @@ class RegistroMedico(models.Model):
         if fichas_a_eliminar.exists():
             print(f"Eliminando {fichas_a_eliminar.count()} fichas médicas en estado 'VENCIDO'...")
             fichas_a_eliminar.delete()
-    
+
+def default_fecha_caducidad():
+    return datetime.now().date() + timedelta(days=365)  # ✅ Sumar 1 año desde hoy
 class EstudiosMedico(models.Model):
     TIPO_ESTUDIO = [
         ('ORINA', 'Análisis de Orina'),
@@ -97,27 +99,30 @@ class EstudiosMedico(models.Model):
     ]
     
     idestudio = models.AutoField(primary_key=True)
-    ficha_medica = models.ForeignKey(RegistroMedico, on_delete=models.CASCADE)  # Relación con la ficha médica
-    tipo_estudio = models.CharField(max_length=20, choices=TIPO_ESTUDIO)  # Tipo de estudio médico
+    jugador = models.ForeignKey(Jugador, on_delete=models.CASCADE, related_name="estudios_medicos")  
+    tipo_estudio = models.CharField(max_length=20, choices=TIPO_ESTUDIO)  
     
-    archivo = models.FileField(upload_to='estudios/', null=True, blank=True)  # Archivo cargado (imágenes, PDFs, etc.)
-    observaciones = models.CharField(max_length=200, null=True, blank=True)  # Observaciones adicionales
+    archivo = models.FileField(upload_to='estudios/', null=True, blank=True)  
+    observaciones = models.CharField(max_length=200, null=True, blank=True)  
     
+    fecha_creacion = models.DateTimeField(default=now, editable=False)
+    fecha_caducidad = models.DateField(default=default_fecha_caducidad)  # ✅ Nueva función
+
     class Meta:
         db_table = 'estudios_medicos'
         verbose_name = 'Estudio Médico'
         verbose_name_plural = 'Estudios Médicos'
 
     def __str__(self):
-        return f'{self.get_tipo_estudio_display()} - {self.ficha_medica.jugador.persona.profile.nombre} {self.ficha_medica.jugador.persona.profile.apellido}'
+        return f'{self.get_tipo_estudio_display()} - {self.jugador.persona.profile.nombre} {self.jugador.persona.profile.apellido}'
 
-    # Señal para eliminar el archivo al eliminar el objeto
 
+# Señal para eliminar el archivo al eliminar el objeto
 @receiver(post_delete, sender=EstudiosMedico)
 def eliminar_archivo_post_delete(sender, instance, **kwargs):
-    if instance.archivo:
-        if os.path.isfile(instance.archivo.path):
-            os.remove(instance.archivo.path)
+    if instance.archivo and os.path.isfile(instance.archivo.path):
+        os.remove(instance.archivo.path)
+
 
 
 

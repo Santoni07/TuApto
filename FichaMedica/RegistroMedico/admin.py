@@ -1,3 +1,4 @@
+from datetime import timezone
 from django.contrib import admin
 from .models import (
     AntecedenteEnfermedades, RegistroMedico, EstudiosMedico, ElectroBasal, 
@@ -18,9 +19,18 @@ class RegistroMedicoAdmin(admin.ModelAdmin):
 
 @admin.register(EstudiosMedico)
 class EstudiosMedicoAdmin(admin.ModelAdmin):
-    list_display = ('idestudio', 'ficha_medica', 'tipo_estudio', 'archivo')
-    list_filter = ('tipo_estudio',)
-    search_fields = ('ficha_medica__jugador__persona__nombre', 'ficha_medica__jugador__persona__apellido')
+    list_display = ('idestudio', 'jugador', 'tipo_estudio', 'fecha_creacion', 'fecha_caducidad', 'archivo')
+    list_filter = ('tipo_estudio', 'fecha_caducidad')
+    search_fields = ('jugador__persona__profile__nombre', 'jugador__persona__profile__apellido', 'tipo_estudio')
+    ordering = ('-fecha_creacion',)  # Ordenar por fecha más reciente
+
+    def is_expired(self, obj):
+        """ Verifica si el estudio está vencido """
+        return obj.fecha_caducidad and obj.fecha_caducidad < timezone.now().date()
+    
+    is_expired.boolean = True
+    is_expired.short_description = "Vencido"
+
 
 @admin.register(ElectroBasal)
 class ElectroBasalAdmin(admin.ModelAdmin):

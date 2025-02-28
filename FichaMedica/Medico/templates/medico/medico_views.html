@@ -49,6 +49,58 @@
 
         <div class="container mt-5">
             <h1 class="text-center mb-4">Ficha Médica</h1>
+            <h3>ID del Registro Médico: {{ registro_medico.id }}</h3>
+<p>Jugador: {{ registro_medico.jugador }}</p>
+<p>Torneo: {{ registro_medico.torneo }}</p>
+<h3>Comprobación de IDs</h3>
+<p><strong>Registro Médico ID:</strong> {{ registro_medico.id }}</p>
+
+{% if jugador_info.electro_basal_form %}
+    <p><strong>ElectroBasal ID:</strong> {{ jugador_info.electro_basal_form.instance.idelectro_basal }}</p>
+{% else %}
+    <p>⚠ ElectroBasal no encontrado</p>
+{% endif %}
+
+{% if jugador_info.electro_esfuerzo_form %}
+    <p><strong>ElectroEsfuerzo ID:</strong> {{ jugador_info.electro_esfuerzo_form.instance.idelectro_esfuerzo }}</p>
+{% else %}
+    <p>⚠ ElectroEsfuerzo no encontrado</p>
+{% endif %}
+
+{% if jugador_info.cardiovascular_form %}
+    <p><strong>Cardiovascular ID:</strong> {{ jugador_info.cardiovascular_form.instance.idcardiovascular }}</p>
+{% else %}
+    <p>⚠ Cardiovascular no encontrado</p>
+{% endif %}
+
+{% if jugador_info.laboratorio_form %}
+    <p><strong>Laboratorio ID:</strong> {{ jugador_info.laboratorio_form.instance.idlaboratorio }}</p>
+{% else %}
+    <p>⚠ Laboratorio no encontrado</p>
+{% endif %}
+
+{% if jugador_info.oftalmologico_form %}
+    <p><strong>Oftalmológico ID:</strong> {{ jugador_info.oftalmologico_form.instance.idoftalmologico }}</p>
+{% else %}
+    <p>⚠ Oftalmológico no encontrado</p>
+{% endif %}
+
+{% if jugador_info.torax_form %}
+    <p><strong>Tórax ID:</strong> {{ jugador_info.torax_form.instance.idtorax }}</p>
+{% else %}
+    <p>⚠ Tórax no encontrado</p>
+{% endif %}
+
+{% if jugador_info.otros_examenes_form %}
+    <p><strong>Otros Exámenes ID:</strong> {{ jugador_info.otros_examenes_form.instance.id }}</p>
+{% else %}
+    <p>⚠ Otros Exámenes no encontrados</p>
+{% endif %}
+
+<p><strong>Ritmo:</strong> {{ jugador_info.electro_basal_form.ritmo.value }}</p>
+<p><strong>PQ:</strong> {{ jugador_info.electro_basal_form.instance.PQ }}</p>
+<p><strong>Frecuencia:</strong> {{ jugador_info.electro_basal_form.instance.frecuencia }}</p>
+
 
             <!-- Información Personal -->
             <div class="card mb-4">
@@ -229,9 +281,16 @@
                         <div class="row">
                             <!-- Columna Izquierda -->
                             <div class="col-md-6">
+                                {% if jugador_info.electro_basal_form %}
                                 <p><strong>Ritmo:</strong> {{ jugador_info.electro_basal_form.ritmo.value }}</p>
                                 <p><strong>PQ:</strong> {{ jugador_info.electro_basal_form.PQ.value }}</p>
                                 <p><strong>Frecuencia:</strong> {{ jugador_info.electro_basal_form.frecuencia.value }}</p>
+                            {% else %}
+                                <p><strong>Ritmo:</strong> No disponible</p>
+                                <p><strong>PQ:</strong> No disponible</p>
+                                <p><strong>Frecuencia:</strong> No disponible</p>
+                            {% endif %}
+                            
                             
                             </div>
                     

@@ -4,10 +4,12 @@ from django.views.generic import ListView
 from django.db.models import Q
 from django.db import transaction
 from weasyprint import HTML
+
 from persona.models import Jugador,JugadorCategoriaEquipo
 from RegistroMedico.models import RegistroMedico, AntecedenteEnfermedades
 from django.contrib.auth.mixins import LoginRequiredMixin
-from Medico.models import Medico
+
+
 from RegistroMedico.forms import *
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
@@ -132,24 +134,21 @@ class MedicoHomeView(LoginRequiredMixin, ListView):
 
 
 #Manejo de los formularios
+def manejar_formulario_medico(request, jugador_id, registro_id, modelo, formulario_clase, template_name='medico/medico_home.html'):
 
-def manejar_formulario_medico(request, jugador_id, modelo, formulario_clase, template_name='medico/medico_home.html'):
-    """
-    Función genérica para manejar formularios médicos.
+    print(f"🛠 Debug - jugador_id: {jugador_id}, registro_id: {registro_id} (Tipo: {type(registro_id)})")
+    
+    # Validar que registro_id sea un número entero
+    try:
+        registro_id = int(registro_id)
+    except ValueError:
+        return HttpResponse("Error: registro_id debe ser un número entero.", status=400)
 
-    :param request: HTTP request object
-    :param jugador_id: ID del jugador
-    :param modelo: Modelo relacionado con el formulario
-    :param formulario_clase: Clase del formulario
-    :param template_name: Plantilla a renderizar
-    :return: HttpResponse con el formulario renderizado o JSON si es AJAX
-    """
-
+    # Obtener jugador y registro médico
     jugador = get_object_or_404(Jugador, id=jugador_id)
-    registro_medico = RegistroMedico.objects.filter(jugador=jugador).first()
+    registro_medico = get_object_or_404(RegistroMedico, id=registro_id, jugador=jugador)
 
-    if not registro_medico:
-        return HttpResponse("No se encontró el registro médico del jugador.", status=404)
+    print(f"✅ Registro Médico encontrado: {registro_medico}")
 
     # Buscar la instancia del modelo relacionado con la ficha médica
     instancia = modelo.objects.filter(ficha_medica=registro_medico).first()
@@ -171,65 +170,34 @@ def manejar_formulario_medico(request, jugador_id, modelo, formulario_clase, tem
         f'{modelo.__name__.lower()}_form': formulario,
     })
 
+
 # Vistas utilizando la función genérica
-def electro_basal_view(request, jugador_id):
-    return manejar_formulario_medico(request, jugador_id, ElectroBasal, ElectroBasalForm)
+def electro_basal_view(request, jugador_id, registro_id):
+   return manejar_formulario_medico(request, jugador_id, registro_id, ElectroBasal, ElectroBasalForm)
 
-def electro_esfuerzo_view(request, jugador_id):
-    return manejar_formulario_medico(request, jugador_id, ElectroEsfuerzo, ElectroEsfuerzoForm)
+def electro_esfuerzo_view(request, jugador_id, registro_id):
+    return manejar_formulario_medico(request, jugador_id, registro_id, ElectroEsfuerzo, ElectroEsfuerzoForm)
 
-def otros_examenes_clinicos_view(request, jugador_id):
-    return manejar_formulario_medico(request, jugador_id, OtrosExamenesClinicos, OtrosExamenesClinicosForm)
+def otros_examenes_clinicos_view(request, jugador_id, registro_id):
+    return manejar_formulario_medico(request, jugador_id, registro_id, OtrosExamenesClinicos, OtrosExamenesClinicosForm)
 
-def cardiovascular_view(request, jugador_id):
-    return manejar_formulario_medico(request, jugador_id, Cardiovascular, CardiovascularForm)
+def cardiovascular_view(request, jugador_id, registro_id):
+    return manejar_formulario_medico(request, jugador_id, registro_id, Cardiovascular, CardiovascularForm)
 
-def laboratorio_view(request, jugador_id):
-    return manejar_formulario_medico(request, jugador_id, Laboratorio, LaboratorioForm)
+def laboratorio_view(request, jugador_id, registro_id):
+    return manejar_formulario_medico(request, jugador_id, registro_id, Laboratorio, LaboratorioForm)
 
-def torax_view(request, jugador_id):
-    return manejar_formulario_medico(request, jugador_id, Torax, ToraxForm)
+def torax_view(request, jugador_id, registro_id):
+    return manejar_formulario_medico(request, jugador_id, registro_id, Torax, ToraxForm)
 
-def oftalmologico_view(request, jugador_id):
-    return manejar_formulario_medico(request, jugador_id, Oftalmologico, OftalmologicoForm)
+def oftalmologico_view(request, jugador_id, registro_id):
+    return manejar_formulario_medico(request, jugador_id, registro_id, Oftalmologico, OftalmologicoForm)
 
-# medico_update
-""" def registro_medico_update_view(request, jugador_id):
-    jugador = get_object_or_404(Jugador, id=jugador_id)
-    registro_medico = RegistroMedico.objects.filter(jugador=jugador).first()
 
-    if not registro_medico:
-        return HttpResponse("No se encontró el registro médico del jugador.", status=404)
-
-    if request.method == 'POST':
-        print(request.POST)  # Verifica los valores enviados en el formulario
-        registro_medico_form = RegistroMedicoUpdateForm(request.POST, instance=registro_medico)
-        if registro_medico_form.is_valid():
-            with transaction.atomic():
-                registro_medico = registro_medico_form.save(commit=False)
-                
-                # Obtener al médico logueado
-                medico = Medico.objects.filter(profile=request.user.profile).first()
-                if medico:
-                    registro_medico.medico = medico  # Asignar el médico logueado
-
-                registro_medico.save()
-                return redirect('registro_medico_update_view', jugador_id=jugador_id)
-        else:
-            # Si el formulario no es válido, se puede imprimir para depurar
-            print("Formulario no válido:", registro_medico_form.errors)
-    else:
-        registro_medico_form = RegistroMedicoUpdateForm(instance=registro_medico)
-
-    return render(request, 'medico/medico_home.html', {
-        'jugador': jugador,
-        'registro_medico': registro_medico,  # Pasar el registro médico al contexto
-        'registro_medico_form': registro_medico_form,
-    })
- """
 
 def registro_medico_update_view(request, registro_id):
     registro_medico = get_object_or_404(RegistroMedico, id=registro_id)
+    print(f"Intentando obtener RegistroMedico con ID: {registro_id}")
     jugador = registro_medico.jugador
 
     if request.method == 'POST':
@@ -246,7 +214,7 @@ def registro_medico_update_view(request, registro_id):
                     registro_medico.medico = medico  # Asignar el médico logueado
 
                 registro_medico.save()
-                return redirect('registro_medico_update_view', registro_id=registro_id)
+                return redirect('medico_home')
         else:
             print("Formulario no válido:", registro_medico_form.errors)  # Depuración
 
@@ -264,6 +232,7 @@ def registro_medico_update_view(request, registro_id):
         'registro_medico_form': registro_medico_form,
         'nombre': jugador.persona.profile.nombre,
         'apellido': jugador.persona.profile.apellido,
+        'edad': jugador.persona.profile.edad,
         'dni': jugador.persona.profile.dni,
         'direccion': jugador.persona.direccion,
         'telefono': jugador.persona.telefono,
@@ -276,7 +245,8 @@ def registro_medico_update_view(request, registro_id):
         'imagen_torneo': registro_medico.torneo.imagen.url if registro_medico.torneo and registro_medico.torneo.imagen else None,
         'categoria': jugador_categoria_equipo.categoria_equipo.categoria.nombre if jugador_categoria_equipo else "Sin categoría",
         'equipo': jugador_categoria_equipo.categoria_equipo.equipo.nombre if jugador_categoria_equipo else "Sin equipo",
-        
+        'electrocardiograma_cargado': EstudiosMedico.objects.filter(jugador=jugador, tipo_estudio='ELECTRO').exists(),
+        'ergonometria_cargado': EstudiosMedico.objects.filter(jugador=jugador, tipo_estudio='ERGOMETRIA').exists(),
         'antecedentes': [
             {
                 'fue_operado': ant.fue_operado,
@@ -309,39 +279,53 @@ def registro_medico_update_view(request, registro_id):
             for ant in AntecedenteEnfermedades.objects.filter(jugador=jugador)
         ],
         'estudios_medicos': [
-            {
-                'pk': estudio.pk,
-                'tipo': estudio.get_tipo_estudio_display(),
-                'archivo': estudio.archivo.url if estudio.archivo else None,
-                'observaciones': estudio.observaciones,
-            }
-            for estudio in EstudiosMedico.objects.filter(ficha_medica=registro_medico)
-        ],
-        'electro_basal_form': ElectroBasalForm(instance=ElectroBasal.objects.filter(ficha_medica=registro_medico).first()),
-        'electro_esfuerzo_form': ElectroEsfuerzoForm(instance=ElectroEsfuerzo.objects.filter(ficha_medica=registro_medico).first()),
-        'cardiovascular_form': CardiovascularForm(instance=Cardiovascular.objects.filter(ficha_medica=registro_medico).first()),
-        'laboratorio_form': LaboratorioForm(instance=Laboratorio.objects.filter(ficha_medica=registro_medico).first()),
-        'oftalmologico_form': OftalmologicoForm(instance=Oftalmologico.objects.filter(ficha_medica=registro_medico).first()),
-        'torax_form': ToraxForm(instance=Torax.objects.filter(ficha_medica=registro_medico).first()),
-        'otros_examenes_form': OtrosExamenesClinicosForm(instance=OtrosExamenesClinicos.objects.filter(ficha_medica=registro_medico).first()),
+        {
+            'pk': estudio.pk,
+            'tipo': estudio.get_tipo_estudio_display(),
+            'archivo': estudio.archivo.url if estudio.archivo else None,
+            'observaciones': estudio.observaciones,
+        }
+        for estudio in EstudiosMedico.objects.filter(jugador=jugador)  # Ahora filtra por jugador
+    ],
+    'electro_basal_form': ElectroBasalForm(instance=ElectroBasal.objects.filter(ficha_medica=registro_medico).first() or ElectroBasal(ficha_medica=registro_medico)),
+    'electro_esfuerzo_form': ElectroEsfuerzoForm(instance=ElectroEsfuerzo.objects.filter(ficha_medica=registro_medico).first() or ElectroEsfuerzo(ficha_medica=registro_medico)),
+    'cardiovascular_form': CardiovascularForm(instance=Cardiovascular.objects.filter(ficha_medica=registro_medico).first() or Cardiovascular(ficha_medica=registro_medico)),
+    'laboratorio_form': LaboratorioForm(instance=Laboratorio.objects.filter(ficha_medica=registro_medico).first() or Laboratorio(ficha_medica=registro_medico)),
+    'oftalmologico_form': OftalmologicoForm(instance=Oftalmologico.objects.filter(ficha_medica=registro_medico).first() or Oftalmologico(ficha_medica=registro_medico)),
+    'torax_form': ToraxForm(instance=Torax.objects.filter(ficha_medica=registro_medico).first() or Torax(ficha_medica=registro_medico)),
+    'otros_examenes_form': OtrosExamenesClinicosForm(instance=OtrosExamenesClinicos.objects.filter(ficha_medica=registro_medico).first() or OtrosExamenesClinicos(ficha_medica=registro_medico)),
     }
 
-    return render(request, 'medico/cargar_registro.html', context)
+    return render(request, 'medico/cargar_registro.html', context) 
+
+
+
+
+
 # medico_views
 
 
 
-def ficha_medica_views(request, jugador_id):
-    jugador = get_object_or_404(Jugador, id=jugador_id)
+def ficha_medica_views(request, registro_id):
+  
 
     # 🔹 Filtrar solo el registro médico correspondiente al torneo
-    registro_medico = RegistroMedico.objects.filter(jugador=jugador).first()
+    registro_medico = get_object_or_404(RegistroMedico, id=registro_id)
+    print("El id del registro es : ",registro_id, registro_medico)
+    jugador = registro_medico.jugador 
 
     if not registro_medico:
         return HttpResponse("No se encontró el registro médico del jugador.", status=404)
 
     # 🔹 Obtener la categoría, equipo y torneo en base al registro médico
-    jugador_categoria_equipo = JugadorCategoriaEquipo.objects.filter(jugador=jugador).first()
+    jugador_categoria_equipo = JugadorCategoriaEquipo.objects.filter(
+    jugador=jugador,
+    categoria_equipo__categoria__torneo=registro_medico.torneo
+    ).first()
+    print("El jugador es : ", jugador)
+    print("La categoria es : ", jugador_categoria_equipo.categoria_equipo.categoria.nombre)
+    print("El equipo es : ", jugador_categoria_equipo.categoria_equipo.equipo.nombre)
+    print("El torneo es : ", registro_medico.torneo.nombre)
 
     # Verificar si hay un perfil de médico asociado
     try:
@@ -360,7 +344,7 @@ def ficha_medica_views(request, jugador_id):
             if medico:
                 registro_medico.medico = medico
             registro_medico.save()
-            return redirect('ficha_medica', jugador_id=jugador_id)
+            return redirect('ficha_medica', registro_id=registro_id)
     else:
         registro_medico_form = RegistroMedicoUpdateForm(instance=registro_medico)
 
@@ -368,14 +352,40 @@ def ficha_medica_views(request, jugador_id):
     antecedentes = AntecedenteEnfermedades.objects.filter(jugador=jugador)
 
     # 🔹 Obtener solo los estudios médicos de este registro médico
-    electro_basal = ElectroBasal.objects.filter(ficha_medica=registro_medico).first()
-    electro_esfuerzo = ElectroEsfuerzo.objects.filter(ficha_medica=registro_medico).first()
-    cardiovascular = Cardiovascular.objects.filter(ficha_medica=registro_medico).first()
-    laboratorio = Laboratorio.objects.filter(ficha_medica=registro_medico).first()
-    oftalmologico = Oftalmologico.objects.filter(ficha_medica=registro_medico).first()
-    torax = Torax.objects.filter(ficha_medica=registro_medico).first()
-    otros_examenes = OtrosExamenesClinicos.objects.filter(ficha_medica=registro_medico).first()
+    try:
+        electro_basal = ElectroBasal.objects.get(ficha_medica=registro_medico)
+    except ElectroBasal.DoesNotExist:
+        electro_basal = None
+    try:
+        electro_esfuerzo = ElectroEsfuerzo.objects.get(ficha_medica=registro_medico)
+    except ElectroEsfuerzo.DoesNotExist:
+        electro_esfuerzo = None
 
+    try:
+        cardiovascular = Cardiovascular.objects.get(ficha_medica=registro_medico)
+    except Cardiovascular.DoesNotExist:
+        cardiovascular = None
+
+    try:
+        laboratorio = Laboratorio.objects.get(ficha_medica=registro_medico)
+    except Laboratorio.DoesNotExist:
+        laboratorio = None
+
+    try:
+        oftalmologico = Oftalmologico.objects.get(ficha_medica=registro_medico)
+    except Oftalmologico.DoesNotExist:
+        oftalmologico = None
+
+    try:
+        torax = Torax.objects.get(ficha_medica=registro_medico)
+    except Torax.DoesNotExist:
+        torax = None
+
+    try:
+        otros_examenes = OtrosExamenesClinicos.objects.get(ficha_medica=registro_medico)
+    except OtrosExamenesClinicos.DoesNotExist:
+        otros_examenes = None
+    
     # 🔹 Convertir URLs relativas de imágenes en absolutas (solo si existen)
     if jugador_categoria_equipo and jugador_categoria_equipo.categoria_equipo.categoria.torneo.imagen:
         jugador_categoria_equipo.categoria_equipo.categoria.torneo.imagen_url = request.build_absolute_uri(
@@ -384,6 +394,17 @@ def ficha_medica_views(request, jugador_id):
 
     if registro_medico.medico and registro_medico.medico.firma:
         registro_medico.medico.firma = request.build_absolute_uri(registro_medico.medico.firma.url)
+
+    
+    print(f"Registro Médico ID: {registro_medico.id}")
+    print("ElectroBasal Datos:", electro_basal.__dict__ if electro_basal else "No encontrado")
+    print("ElectroEsfuerzo Datos:", electro_esfuerzo.__dict__ if electro_esfuerzo else "No encontrado")
+    print("Cardiovascular Datos:", cardiovascular.__dict__ if cardiovascular else "No encontrado")
+    print("Laboratorio Datos:", laboratorio.__dict__ if laboratorio else "No encontrado")
+    print("Oftalmológico Datos:", oftalmologico.__dict__ if oftalmologico else "No encontrado")
+    print("Tórax Datos:", torax.__dict__ if torax else "No encontrado")
+    print("Otros Exámenes Datos:", otros_examenes.__dict__ if otros_examenes else "No encontrado")
+
 
     # 🔹 Armar la información del jugador y su ficha médica
     jugador_info = {
@@ -443,13 +464,13 @@ def ficha_medica_views(request, jugador_id):
         ],
 
         # 🔹 Agregar los formularios de estudios médicos específicos de este registro
-        'electro_basal_form': ElectroBasalForm(instance=electro_basal),
-        'electro_esfuerzo_form': ElectroEsfuerzoForm(instance=electro_esfuerzo),
-        'cardiovascular_form': CardiovascularForm(instance=cardiovascular),
-        'laboratorio_form': LaboratorioForm(instance=laboratorio),
-        'oftalmologico_form': OftalmologicoForm(instance=oftalmologico),
-        'torax_form': ToraxForm(instance=torax),
-        'otros_examenes_form': OtrosExamenesClinicosForm(instance=otros_examenes),
+        'electro_basal_form': ElectroBasalForm(instance=electro_basal) if electro_basal else None,
+        'electro_esfuerzo_form': ElectroEsfuerzoForm(instance=electro_esfuerzo) if electro_esfuerzo else None,
+        'cardiovascular_form': CardiovascularForm(instance=cardiovascular) if cardiovascular else None,
+        'laboratorio_form': LaboratorioForm(instance=laboratorio) if laboratorio else None,
+        'oftalmologico_form': OftalmologicoForm(instance=oftalmologico) if oftalmologico else None,
+        'torax_form': ToraxForm(instance=torax) if torax else None,
+        'otros_examenes_form': OtrosExamenesClinicosForm(instance=otros_examenes) if otros_examenes else None,
         'registro_medico_form': registro_medico_form,
     }
 

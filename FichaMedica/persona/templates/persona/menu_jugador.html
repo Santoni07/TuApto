@@ -90,42 +90,41 @@
                 </ul>
               </li>
       
-              <!-- Estudios con submenú -->
-              <li class="nav-item dropdown" style="position: relative;">
-                <a
-                  class="nav-link dropdown-toggle fs-5"
-                  href="#"
-                  data-menu="link"
-                  id="estudios"
-                  style="color: white; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);"
-                >
-                  <i class="bi bi-book"></i> Estudios
-                </a>
-                <ul id="submenuEstudios" style="
-                  display: none;
-                  
-                  background-color: #00c4f6;
-                  
-                ">
-                  {% if ficha_medica %}
-                    <li style="margin-bottom: 5px;">
-                      <a href="{% url 'registroMedico:cargar_estudio' ficha_medica.id %}" style="color: white; text-decoration: none; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);">
-                        Cargar Estudios
-                      </a>
-                    </li>
-                    <li>
-                      <a href="{% url 'registroMedico:ver_estudios' ficha_medica.id %}" style="color: white; text-decoration: none; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);">
-                        Ver Estudios
-                      </a>
-                    </li>
-                  {% else %}
-                    <li>
-                      <p style="color: white;">No hay ficha médica disponible.</p>
-                    </li>
-                  {% endif %}
-                </ul>
-              </li>
-      
+                              <!-- Estudios con submenú -->
+                <li class="nav-item dropdown" style="position: relative;">
+                  <a
+                      class="nav-link dropdown-toggle fs-5"
+                      href="#"
+                      data-menu="link"
+                      id="estudios"
+                      style="color: white; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);"
+                  >
+                      <i class="bi bi-book"></i> Estudios
+                  </a>
+                  <ul id="submenuEstudios" style="
+                      display: none;
+                      background-color: #00c4f6;
+                  ">
+                      {% if jugador %}
+                          <li style="margin-bottom: 5px;">
+                              <a href="{% url 'registroMedico:cargar_estudio' jugador.id %}" 
+                                style="color: white; text-decoration: none; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);">
+                                  Cargar Estudios
+                              </a>
+                          </li>
+                          <li>
+                              <a href="{% url 'registroMedico:ver_estudios' jugador.id %}" 
+                                style="color: white; text-decoration: none; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);">
+                                  Ver Estudios
+                              </a>
+                          </li>
+                      {% else %}
+                          <li>
+                              <p style="color: white;">No hay jugador disponible.</p>
+                          </li>
+                      {% endif %}
+                  </ul>
+                </li>
               <!-- Datos Personales -->
               <li class="nav-item">
                 <a class="nav-link fs-5" href="#" id="datospersonales" data-menu="link" style="color: white; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);">

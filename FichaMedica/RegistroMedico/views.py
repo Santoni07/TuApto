@@ -165,75 +165,56 @@ class ActualizarConsentimientoView(UpdateView):
         return context
 
     
-    
-""" class CargarEstudioView(LoginRequiredMixin, CreateView):
-    model = EstudiosMedico
-    form_class = EstudioMedicoForm
-    template_name = 'registro_medico/cargar_estudios.html'
-    success_url = reverse_lazy('menu_jugador')  # Redirige a la lista de estudios tras cargar exitosamente
-
-    def form_valid(self, form):
-        # Obtener la ficha médica a partir de la URL o sesión
-        ficha_medica = RegistroMedico.objects.get(idfichaMedica=self.kwargs['ficha_id'])
-
-        form.instance.ficha_medica = ficha_medica  # Asocia el estudio a la ficha médica
-        return super().form_valid(form)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['ficha_medica'] = get_object_or_404(RegistroMedico, idfichaMedica=self.kwargs['ficha_id'])
 
 
-        return context 
-
- """
-
-
+# ✅ Cargar un estudio médico asociado a un JUGADOR (no ficha médica)
 class CargarEstudioView(LoginRequiredMixin, CreateView):
     model = EstudiosMedico
     form_class = EstudioMedicoForm
     template_name = 'registro_medico/cargar_estudios.html'
 
     def form_valid(self, form):
-        # Obtener la ficha médica a partir de la URL o sesión
-        ficha_medica = RegistroMedico.objects.get(id=self.kwargs['ficha_id'])
-
-        form.instance.ficha_medica = ficha_medica  # Asocia el estudio a la ficha médica
+        # Obtener el jugador desde la URL
+        jugador = get_object_or_404(Jugador, id=self.kwargs['jugador_id'])
+        
+        form.instance.jugador = jugador  # Asigna el estudio al jugador
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['ficha_medica'] = get_object_or_404(RegistroMedico, id=self.kwargs['ficha_id'])
+        context['jugador'] = get_object_or_404(Jugador, id=self.kwargs['jugador_id'])
         return context
 
     def get_success_url(self):
-        # Cambiar al nombre correcto del patrón de URL
-        return reverse_lazy('registroMedico:ver_estudios', kwargs={'ficha_medica_id': self.kwargs['ficha_id']})
+        return reverse_lazy('registroMedico:ver_estudios', kwargs={'jugador_id': self.kwargs['jugador_id']})
 
+# ✅ Listar estudios médicos filtrados por JUGADOR
 class EstudiosMedicoListView(ListView):
     model = EstudiosMedico
-    template_name = 'registro_medico/estudios_list.html'  # Ruta del template
+    template_name = 'registro_medico/estudios_list.html'
     context_object_name = 'estudios'
 
-    # Filtrar los estudios por ficha médica
     def get_queryset(self):
-        ficha_medica_id = self.kwargs.get('ficha_medica_id')
-        return EstudiosMedico.objects.filter(ficha_medica__id=ficha_medica_id)
+        jugador_id = self.kwargs.get('jugador_id')
+        return EstudiosMedico.objects.filter(jugador__id=jugador_id)
 
+# ✅ Eliminar un estudio médico
 class EliminarEstudioView(DeleteView):
-    model= EstudiosMedico
+    model = EstudiosMedico
     template_name = 'registro_medico/eliminar_estudio_confirm.html'
-    context_object_name = 'estudio' 
-    def get_success_url(self):
-       ficha_medica_id = self.object.ficha_medica.id
-       return reverse_lazy('registroMedico:ver_estudios', kwargs={'ficha_medica_id': ficha_medica_id})
+    context_object_name = 'estudio'
 
+    def get_success_url(self):
+        jugador_id = self.object.jugador.id  # Obtiene el ID del jugador asociado
+        return reverse_lazy('registroMedico:ver_estudios', kwargs={'jugador_id': jugador_id})
+
+# ✅ Otra vista para eliminar un estudio médico (redirige a home del médico)
 class EliminarEstudioMedicoView(DeleteView):
     model = EstudiosMedico
     template_name = 'registro_medico/eliminar_estudio_confirm.html'
-    success_url = reverse_lazy('medico_home')  # Redirige a la lista de estudios
+    success_url = reverse_lazy('medico_home')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['ficha_medica'] = self.object.ficha_medica  # Agrega la ficha médica al contexto
+        context['jugador'] = self.object.jugador  # Agrega el jugador al contexto
         return context
