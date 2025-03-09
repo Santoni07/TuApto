@@ -4,8 +4,14 @@ from django.contrib.auth.models import User
 from .models import Profile
 
 class LoginForm(forms.Form):
-    email = forms.EmailField(label='Email', widget=forms.EmailInput)
-    password = forms.CharField(label='Contraseña', widget=forms.PasswordInput)
+    email = forms.EmailField(
+        label="Email",
+        widget=forms.EmailInput(attrs={"class": "form-control"})
+    )
+    password = forms.CharField(
+        label="Contraseña",
+        widget=forms.PasswordInput(attrs={"class": "form-control"})
+    )
 
 class UserRegistrationForm(forms.ModelForm):
     password1 = forms.CharField(label='Contraseña', widget=forms.PasswordInput)

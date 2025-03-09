@@ -109,7 +109,8 @@ def logout_view(request):
     logout
     return redirect('core/home.html')
 
-
+def terminos_condiciones(request):
+    return render(request, 'account/terminos_condiciones.html')
 
 
 def recover_Password(request):

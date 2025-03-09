@@ -37,7 +37,7 @@
 </head>
 
 <body class="index-page">
-
+    {% if request.path != '/account/login/' and request.path != '/account/register/' %}
     <header id="header" class="header d-flex align-items-center sticky-top">
         <div class="container-fluid position-relative d-flex align-items-center justify-content-between">
               
@@ -92,7 +92,7 @@
 
         </div>
     </header>
-
+    {% endif %}
     {% block content %}{% endblock %}
     {% block publicidad %}{% endblock %}
     {% block landingPage %} {% endblock %}
