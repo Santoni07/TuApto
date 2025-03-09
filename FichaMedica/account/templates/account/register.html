@@ -13,12 +13,20 @@
             <div class="col-md-7 d-none d-md-flex align-items-center justify-content-center bg-light h-100">
                 <img src="{% static 'core/img/login.jpeg' %}" alt="Aptos médicos" class="img-fluid w-100 h-100 object-fit-cover opacity-75">
             </div>
+            <!-- Selección de Tipo de Registro -->
 
             <!-- Formulario de Registro -->
             <div class="col-12 col-md-5 d-flex flex-column align-items-center justify-content-center border-start bg-white h-100 p-3 p-md-4">
 
                 <!-- Contenedor del formulario con scroll en dispositivos pequeños -->
                 <div class="card p-3 p-md-4 shadow-lg w-100" style="max-height: 80vh; border-radius: 10px; border: none; max-width: 80%; overflow-y: auto;">
+                       <!-- Logo arriba sin enlace -->
+                        <div class="text-center mt-2 mt-md-3">
+                            <img src="{% static 'core/img/milogo.jpg' %}" alt="Logo" style="width: 90px; max-width: 100%;">
+                            <h1 class="mt-2">TU APTO</h1>    
+                        </div>
+                    
+                    
                     <div class="card-header text-center bg-white border-0">
                         <h4 class="fw-bold">¡Regístrate ahora!</h4>
                         <p class="text-muted small">Completa los datos para crear tu cuenta.</p>
@@ -30,7 +38,6 @@
                                 <p>Ocurrió un error al registrar. Por favor, verifica los campos.</p>
                             </div>
                         {% endif %}
-
                         <form method="post" class="d-flex flex-column gap-1 w-100" onsubmit="return validateForm()">
                             {% csrf_token %}
 
