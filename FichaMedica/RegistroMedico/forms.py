@@ -143,6 +143,8 @@ class ToraxForm(forms.ModelForm):
         widgets = {
             'observaciones': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
         }
+
+
 class ElectroEsfuerzoForm(forms.ModelForm):
     class Meta:
         model = ElectroEsfuerzo

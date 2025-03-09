@@ -35,7 +35,7 @@
             <!-- Columna derecha para el logo del torneo -->
         <div class="col-md-3 text-center">
             {% if jugador_info.imagen_torneo %}
-                <img src="{{ jugador_info.imagen_torneo }}" class="img-fluid" style="width: 300px;" alt="imagen">
+                <img src="{{ jugador_info.imagen_torneo }}" class="logo-torneo img-fluid" alt="imagen">
             {% else %}
                 <p>No hay logo disponible</p>
             {% endif %}
@@ -49,57 +49,7 @@
 
         <div class="container mt-5">
             <h1 class="text-center mb-4">Ficha Médica</h1>
-            <h3>ID del Registro Médico: {{ registro_medico.id }}</h3>
-<p>Jugador: {{ registro_medico.jugador }}</p>
-<p>Torneo: {{ registro_medico.torneo }}</p>
-<h3>Comprobación de IDs</h3>
-<p><strong>Registro Médico ID:</strong> {{ registro_medico.id }}</p>
-
-{% if jugador_info.electro_basal_form %}
-    <p><strong>ElectroBasal ID:</strong> {{ jugador_info.electro_basal_form.instance.idelectro_basal }}</p>
-{% else %}
-    <p>⚠ ElectroBasal no encontrado</p>
-{% endif %}
-
-{% if jugador_info.electro_esfuerzo_form %}
-    <p><strong>ElectroEsfuerzo ID:</strong> {{ jugador_info.electro_esfuerzo_form.instance.idelectro_esfuerzo }}</p>
-{% else %}
-    <p>⚠ ElectroEsfuerzo no encontrado</p>
-{% endif %}
-
-{% if jugador_info.cardiovascular_form %}
-    <p><strong>Cardiovascular ID:</strong> {{ jugador_info.cardiovascular_form.instance.idcardiovascular }}</p>
-{% else %}
-    <p>⚠ Cardiovascular no encontrado</p>
-{% endif %}
-
-{% if jugador_info.laboratorio_form %}
-    <p><strong>Laboratorio ID:</strong> {{ jugador_info.laboratorio_form.instance.idlaboratorio }}</p>
-{% else %}
-    <p>⚠ Laboratorio no encontrado</p>
-{% endif %}
-
-{% if jugador_info.oftalmologico_form %}
-    <p><strong>Oftalmológico ID:</strong> {{ jugador_info.oftalmologico_form.instance.idoftalmologico }}</p>
-{% else %}
-    <p>⚠ Oftalmológico no encontrado</p>
-{% endif %}
-
-{% if jugador_info.torax_form %}
-    <p><strong>Tórax ID:</strong> {{ jugador_info.torax_form.instance.idtorax }}</p>
-{% else %}
-    <p>⚠ Tórax no encontrado</p>
-{% endif %}
-
-{% if jugador_info.otros_examenes_form %}
-    <p><strong>Otros Exámenes ID:</strong> {{ jugador_info.otros_examenes_form.instance.id }}</p>
-{% else %}
-    <p>⚠ Otros Exámenes no encontrados</p>
-{% endif %}
-
-<p><strong>Ritmo:</strong> {{ jugador_info.electro_basal_form.ritmo.value }}</p>
-<p><strong>PQ:</strong> {{ jugador_info.electro_basal_form.instance.PQ }}</p>
-<p><strong>Frecuencia:</strong> {{ jugador_info.electro_basal_form.instance.frecuencia }}</p>
+            
 
 
             <!-- Información Personal -->
@@ -263,6 +213,16 @@
                                 </div>
                             </div>
                             <hr>
+                            
+                            <!-- Consentimiento con estilo -->
+                            <div class="consentimiento text-center p-3 mt-4" style="background-color: #f8f9fa; border-left: 5px solid #28a745; border-radius: 5px;">
+                                <h4 class="text-success">Consentimiento</h4>
+                                <p class="text-muted">
+                                    El que suscribe acepta formar parte del equipo que participará en el torneo seleccionado y declara, bajo carácter de declaración jurada, que todos los antecedentes médicos proporcionados son verídicos.
+                                    Asimismo, manifiesta su conformidad para actuar como jugador y participar en todas las actividades derivadas de dicha competencia, asumiendo plena responsabilidad por la veracidad de la información consignada en el presente documento.
+                                </p>
+                            </div>
+ 
                     {% endfor %}
 
                 </div>
@@ -456,7 +416,7 @@
             {% endif %}
             
         <!-- Botón Descargar -->
-        <form method="get" action="{% url 'ficha_medica' jugador_info.id %}">
+        <form method="get" action="{% url 'ficha_medica' registro_medico.id %}">
             <input type="hidden" name="descargar_pdf" value="true">
             <button type="submit" class="btn btn-primary">Descargar</button>
         </form>

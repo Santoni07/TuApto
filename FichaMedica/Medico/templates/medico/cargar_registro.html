@@ -759,12 +759,18 @@
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         let form = document.querySelector("form");
+        let successModal = new bootstrap.Modal(document.getElementById('successModal'));
+
         form.addEventListener("submit", function (event) {
-            event.preventDefault(); // Evitar la recarga inmediata
-            
+            event.preventDefault(); // Evita la recarga inmediata
+
             // Mostrar el modal de éxito
-            let successModal = new bootstrap.Modal(document.getElementById('successModal'));
             successModal.show();
+
+            // Esperar 2 segundos y luego enviar el formulario
+            setTimeout(function () {
+                form.submit(); // Ahora sí envía el formulario
+            }, 2000);
         });
     });
 </script>

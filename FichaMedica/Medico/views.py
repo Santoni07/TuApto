@@ -487,218 +487,126 @@ def ficha_medica_views(request, registro_id):
         content_start = html_content.find(start_tag)
         content_end = html_content.find(end_tag) + len(end_tag)
         content_to_pdf = html_content[content_start:content_end]
-
         html_string = f"""
-                            <!DOCTYPE html>
-                            <html lang="es">
-                            <head>
-                                <meta charset="UTF-8">
-                                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                                <title>Ficha Médica</title>
-                                <style>
-                                    body {{
-                                        font-family: 'Arial', sans-serif;
-                                        font-size: 8px;
-                                        color: #333;
-                                        margin: 0px 0px 0px 0px;
-                                        padding: 0px 0px 0px 0px;
-                                    }}
-                                    /* Estilos del header */
-                                    header {{
-                                        display: flex;
-                                        align-items: center; /* Alinea verticalmente el contenido */
-                                    }}
-                                  
-                                    /* Estilo para el contenedor del logo */
-                                    header .logo {{
-                                        display: flex;
-                                        align-items: center; /* Alinea verticalmente el logo y el texto */
-                                        margin-right: auto; /* Empuja el logo hacia la izquierda */
-                                    }}
+                <!DOCTYPE html>
+                <html lang="es">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Ficha Médica</title>
+                    <style>
+                        body {{
+                            font-family: 'Arial', sans-serif;
+                            font-size: 8px;
+                            color: #333;
+                            margin: 0;
+                            padding: 0;
+                        }}
 
-                                    /* Estilo para la imagen del logo */
-                                    header .logo img {{
-                                        width: 80px; /* Controla el tamaño del logo */
-                                    }}
+                        /* Estilos del header */
+                        header {{
+                            display: flex;
+                            align-items: center;
+                        }}
 
-                                    /* Estilo para el título del sitio */
-                                    header .sitename {{
-                                        margin-left: 10px; /* Espacio entre el logo y el texto */
-                                        font-weight: bold; /* Hace el texto en negrita */
-                                        color: black; /* Pone el texto en negro */
-                                        text-decoration: none; /* Elimina cualquier subrayado */
-                                    }}
-                                      /* Estilo para el enlace (elimina subrayado) */
-                                    header .logo a {{
-                                        text-decoration: none; /* Elimina el subrayado en el enlace */
-                                    }}
+                        /* Logo del torneo (MINIMIZADO) */
+                        .logo img {{
+                            max-width: 40px; /* ✅ Se redujo el tamaño al mínimo */
+                            height: auto;
+                            display: block;
+                            margin: 0;
+                            padding: 0;
+                        }}
 
-                                    /* Contenedor principal */
-                                    .container {{
-                                        
-                                       
-                                        
-                                    }}
+                        /* Títulos */
+                        h1, h2, h3, h4 {{
+                            color: #0056b3;
+                            text-align: center;
+                            font-weight: bold;
+                            font-size: 10px;
+                            margin: 0;
+                            padding: 0;
+                        }}
 
-                                    /* Tipografía */
-                                    h1, h2, h3, h4 {{
-                                        color: {{ header_color|default:"#0056b3" }};
-                                        text-align: center;
-                                         margin: 0px 0px 0px 0px;
-                                        padding: 0px 0px 0px 0px;
-                                        font-weight: bold;
-                                        font-size: 10px;
-                                    }}
+                        p {{
+                            margin: 0;
+                            line-height: 1.5;
+                        }}
 
-                                    p {{
-                                        margin: 0;
-                                        line-height: 1.5;
-                                    }}
+                        /* Tarjetas */
+                        .card {{
+                            border: 1px solid #ddd;
+                            border-radius: 4px;
+                            margin-bottom: 5px;
+                            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+                        }}
 
-                                    /* Tarjetas */
-                                    .card {{
-                                        border: 1px solid #ddd;
-                                        border-radius: 4px;
-                                        margin-bottom: 5px;
-                                        box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
-                                    }}
+                        .card-header {{
+                            background-color: #f7f7f7;
+                            text-align: center;
+                            font-size: 12px;
+                            font-weight: bold;
+                            padding: 5px;
+                        }}
 
-                                    .card-header {{
-                                        background-color: {{ card_header_bg|default:"#f7f7f7" }};
-                                        border-bottom: 1px solid #ddd;
-                                        text-align: center;
-                                        font-size: 12px;
-                                        font-weight: bold;
-                                  
-                                        
-                                    }}
+                        .card-body {{
+                            line-height: 1.4;
+                            font-size: 10px;
+                        }}
 
-                                      .card-body {{
-                                        
-                                        line-height: 1.4;
-                                        font-size: 10px;
-                                       
-                                        
-                                    }}
+                        /* Tablas - Espaciado mínimo */
+                        table {{
+                            border-collapse: collapse;
+                            width: 100%;
+                            margin: 0;
+                        }}
 
-                                    /* Filas y columnas */
-                                    .row {{
-                                        display: flex;
-                                        flex-wrap: wrap;
-                                        margin: 0 -8px;
-                                    }}
+                        table th, table td {{
+                            border: 1px solid #ddd;
+                            text-align: left;
+                            font-size: 9px;
+                            padding: 2px; /* Se redujo el padding */
+                            line-height: 1;
+                        }}
 
-                                    .col-md-6 {{
-                                        flex: 0 0 50%;
-                                        max-width: 50%;
-                                     
-                                        
-                                    }}
+                        table th {{
+                            background-color: #f1f1f1;
+                            font-weight: bold;
+                        }}
 
-                                    .col-md-4 {{
-                                        flex: 0 0 33.3333%;
-                                        max-width: 33.3333%;
-                                        
-                                    }}
+                        /* Botones */
+                        .btn {{
+                            font-size: 10px;
+                            font-weight: bold;
+                            text-align: center;
+                            color: white;
+                            background-color: #007bff;
+                            border: none;
+                            padding: 3px 8px;
+                            border-radius: 4px;
+                            text-decoration: none;
+                        }}
 
-                                    .col-md-9 {{
-                                        flex: 0 0 75%;
-                                        ali
-                                        max-width: 75%;
-                                       
-                                        text-align: justify;
-                                    }}
+                        .btn:hover {{
+                            background-color: #0056b3;
+                        }}
 
-                                    .col-md-3 {{
-                                        flex: 0 0 25%;
-                                        max-width: 25%;
-                                      
-                                        
-                                    }}
+                        /* Firma */
+                        .img-fluid {{
+                            display: block;
+                            margin: auto;
+                            max-width: 150px;
+                            height: auto;
+                        }}
+                    </style>
+                </head>
+                <body>
+                    {content_to_pdf}
+                </body>
+                </html>
+                """
 
-                                    /* Imágenes */
-                                    img {{
-                                        max-width: 80px;
-                                        height: auto;
-                                        display: block;
-                                        margin: 0 auto;
-                                    }}
-                                    .logo_header{{
-                                        max-width: 80px;
-                                        height: auto;
-                                        display: block;
-                                        margin: 0 auto; 
-                                    }}
-                                    /* Tablas */
-                                    table {{
-                                      
-                                        border-collapse: collapse;
-                                   
-                                        
-                                    }}
-
-                                    table th, table td {{
-                                        border: 1px solid #ddd;
-                                        
-                                        text-align: left;
-                                        font-size: 10px;
-                                    }}
-
-                                    table th {{
-                                        background-color: {{ table_header_bg|default:"#f1f1f1" }};
-                                        font-weight: bold;
-                                        padding: 0px;
-                                    }}
-
-                                    /* Botones */
-                                    .btn {{
-                                        display: inline-block;
-                                        font-size: 10px;
-                                        font-weight: bold;
-                                        text-align: center;
-                                        color: white;
-                                        background-color: {{ btn_bg_color|default:"#007bff" }};
-                                        border: none;
-                                        padding: 3px 8px;
-                                        border-radius: 4px;
-                                        text-decoration: none;
-                                    }}
-
-                                    .btn:hover {{
-                                        background-color: {{ btn_hover_bg|default:"#0056b3" }};
-                                    }}
-                                        .row {{
-                                            display: flex;
-                                            justify-content: center; /* Centra horizontalmente */
-                                            align-items: center; /* Centra verticalmente */
-                                             margin: 0px 0px 0px 0px;
-                                        padding: 0px 0px 0px 0px;
-                                        }}
-
-                                        .col-md-6 {{
-                                            text-align: center; /* Asegura que el contenido interno esté centrado */
-                                        }}
-
-                                        /* Opcional: Estilo para la imagen de la firma */
-                                        .img-fluid {{
-                                            display: block;
-                                            margin: 0 auto; /* Centra la imagen horizontalmente */
-                                            max-width: 150px;
-                                            height: auto;
-                                        }}
-
-                                        /* Opcional: Estilo para el texto */
-                                        p {{
-                                            margin: 0.5rem 0;
-                                        }}
-                                </style>
-                            </head>
-                            <body>
-                                {content_to_pdf}
-                            </body>
-                            </html>
-                        """
-        
+      
 
         # Crear PDF
         html = HTML(string=html_string, base_url=request.build_absolute_uri('/'))

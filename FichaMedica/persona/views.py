@@ -197,17 +197,15 @@ def menu_jugador(request):
     except Jugador.DoesNotExist:
         return redirect('registrar_jugador')
 
-    # Obtener la ficha médica del jugador
-    try:
-        ficha_medica = RegistroMedico.objects.get(jugador=jugador)
-    except RegistroMedico.DoesNotExist:
-        ficha_medica = None  
+    # Obtener todas las fichas médicas del jugador
+    fichas_medicas = RegistroMedico.objects.filter(jugador=jugador).select_related('torneo').values(
+    'id', 'estado', 'consentimiento_persona', 'torneo__nombre', 'fecha_caducidad'
+)
 
-    ficha_medica_data = {
-        'estado': ficha_medica.estado if ficha_medica else "No disponible",
-        'consentimiento_persona': ficha_medica.consentimiento_persona if ficha_medica else False
-    }
 
+# Convertir el QuerySet en una lista de diccionarios para enviarlo a la plantilla
+    fichas_medicas_data = list(fichas_medicas)  
+    print(f"Fichas médicas del jugador: {fichas_medicas_data}")
     # Obtener los antecedentes usando el jugador
     antecedentes = AntecedenteEnfermedades.objects.filter(jugador=jugador)
 
@@ -258,8 +256,8 @@ def menu_jugador(request):
         'jugador_id': jugador.id,
         'jugador_info': jugador_info,
         'antecedentes': antecedentes,
-        'ficha_medica': ficha_medica,
-        'ficha_medica_data': ficha_medica_data,
+        'ficha_medica': fichas_medicas,
+        'ficha_medica_data': fichas_medicas_data,
         'torneos': torneos,  # Se pasa la lista de torneos al contexto
     }
 
