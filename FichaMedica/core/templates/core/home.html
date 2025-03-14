@@ -9,7 +9,28 @@ Físicos{% endblock %}
     border: none; /* Sin bordes */
     opacity: 0.4; /* Transparencia opcional */
   }
-
+  .carousel-indicators button {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: #009fe3; /* Color azul, ajústalo a tu necesidad */
+    border: none;
+    margin: 0 5px;
+  }
+  
+  .carousel-indicators .active {
+    background-color: #0056b3; /* Color más oscuro para la bolita activa */
+  }
+  
+  .carousel-indicators {
+    bottom: 50px; /* Ajusta la posición de las bolitas si es necesario */
+    position: absolute;
+    bottom: 20px; /* Ajusta la posición vertical */
+    left: 50%;
+    transform: translateX(100%);
+    transform: translateY(-200%);
+    z-index: 10; /* Asegura que estén por encima de las imágenes */
+  }
   .black-controls:hover {
     opacity: 1; /* Sin transparencia */
   }
@@ -87,44 +108,104 @@ Físicos{% endblock %}
     }
   }
 </style>
-<!-- Hero Section -->
+<!-- Carrusel de Hero -->
+<section id="heroCarousel" class="carousel slide" data-bs-ride="carousel">
+  
+  <!-- Indicadores (Opcional) -->
+  <div class="carousel-indicators">
+    <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active"></button>
+    <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1"></button>
+    <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2"></button>
+  </div>
+
+  <!-- Contenido del Carrusel -->
+  <div class="carousel-inner">
+
+    <!-- Diapositiva 1 -->
+    <div class="carousel-item active">
+      <section class="hero section dark-background">
+        <img
+          src="{% static 'core/img/medico_home.jpg' %}"
+          alt="Medico Home"
+          class="hero-img"
+        />
+        <div class="container text-center">
+          <div class="row justify-content-start">
+            <div class="col-lg-8 col-md-8 col-sm-10 text-lg-start text-md-center">
+              <h2>Aptos Físicos Online</h2>
+              <p>
+                Gestiona de manera sencilla y rápida tus exámenes médicos para torneos
+                de fútbol. Los jugadores pueden cargar sus datos y antecedentes, y los
+                médicos realizarán la aprobación del apto físico de forma online.
+              </p>
+              <a href="{% url 'register' %}" class="btn-get-started">Regístrate</a>
+              <a href="{% url 'login' %}" class="btn-get-started">Inicia Sesión</a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Diapositiva 2 -->
+    <div class="carousel-item">
+      <section class="hero section dark-background">
+        <img
+          src="{% static 'core/img/alumnos.jpg' %}"
+          alt="alumnos"
+          class="hero-img"
+        />
+        <div class="container text-center">
+          <div class="row justify-content-start">
+            <div class="col-lg-8 col-md-8 col-sm-10 text-lg-start text-md-center">
+              <h2>¿Sos Estudiante? Realiza el Certificado Unico de Salud</h2>
+              <p>
+                Ingresa y llena el certificado con tus datos personales y antecedentes 
+              </p>
+              <a href="{% url 'register_almunos' %}" class="btn-get-started">Regístrate</a>
+              <a href="{% url 'login' %}" class="btn-get-started">Inicia Sesión</a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Diapositiva 3 -->
+    <div class="carousel-item">
+      <section class="hero section dark-background">
+        <img
+          src="{% static 'core/img/representante.jpg' %}"
+          alt="Representante del Torneo"
+          class="hero-img"
+        />
+        <div class="container text-center">
+          <div class="row justify-content-start">
+            <div class="col-lg-8 col-md-8 col-sm-10 text-lg-start text-md-center">
+              <h2>Control Total para Representantes</h2>
+              <p>
+                Organiza y supervisa los exámenes médicos de los jugadores y alumnos  sin complicaciones y a un solo click de distancia.
+              </p>
+           
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+  </div>
+
+  <!-- Controles de Navegación -->
+  <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon"></span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+    <span class="carousel-control-next-icon"></span>
+  </button>
+
+</section>
+
+{% comment %} <!-- Hero Section -->
 <section id="hero" class="hero section dark-background">
-  <!-- Menú en la sección Hero -->
-  <nav class="hero-menu">
-    <ul
-      style="
-        display: flex;
-        justify-content: center;
-        list-style: none;
-        margin: 0;
-        padding: 20px 0;
-        background: rgba(0, 0, 0, 0.5);
-      "
-    >
-      <li style="margin: 0 15px">
-        <a
-          href="#conocenos"
-          style="text-decoration: none; color: black; font-weight: bold"
-          >Conócenos</a
-        >
-      </li>
-      <li style="margin: 0 15px">
-        <a
-          href="#centros-medicos"
-          style="text-decoration: none; color: white; font-weight: bold"
-          >Centros Médicos</a
-        >
-      </li>
-      <li style="margin: 0 15px">
-        <a
-          href="#general"
-          style="text-decoration: none; color: white; font-weight: bold"
-          >General</a
-        >
-      </li>
-    </ul>
-  </nav>
-  <!-- Fin del menú -->
+
 
   <img
     src="{% static 'core/img/medico_home.jpg' %}"
@@ -146,7 +227,7 @@ Físicos{% endblock %}
       </div>
     </div>
   </div>
-</section>
+</section> {% endcomment %}
 <!-- End Hero Section -->
 <section id="options" class="options-section">
   <div class="options-container">

@@ -8,6 +8,9 @@ urlpatterns = [
     path('login/', user_login, name='login'),
     path('dashboard/', dashboard, name='dashboard'),
     path('register/', register, name='register'),
+    path('estudiante/register', register_almunos, name='register_almunos'),
+    
+    
     path('logout/', LogoutView.as_view(next_page='home'), name='logout'),  # Usar LogoutView
     path('password_reset/', 
          auth_views.PasswordResetView.as_view(template_name='registration/password_reset.html'), 

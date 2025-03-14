@@ -92,6 +92,19 @@ def check_session(request):
         return JsonResponse({'session_expired': True}, status=401)
 
 
+
+def logout_view(request):
+    logout
+    return redirect('core/home.html')
+
+def terminos_condiciones(request):
+    return render(request, 'account/terminos_condiciones.html')
+
+
+def recover_Password(request):
+    return render(request, 'account/password_change_form.html')
+
+
 def register(request):
     if request.method == 'POST':
         user_form = UserRegistrationForm(request.POST)
@@ -105,13 +118,14 @@ def register(request):
     # Mover este render fuera del bloque else, así se ejecuta tanto para GET como en caso de errores de validación
     return render(request, 'account/register.html', {'user_form': user_form})
 
-def logout_view(request):
-    logout
-    return redirect('core/home.html')
+def register_almunos(request):
+    if request.method == 'POST':
+        user_form = UserRegistrationForm(request.POST)
+        if user_form.is_valid():
+            # Guardar el usuario y su perfil
+            user_form.save()  # Guarda tanto el usuario como el perfil asociado
+            return render(request, 'account/register_done.html', {'new_user': user_form.cleaned_data['email']})
+    else:
+            user_form = UserRegistrationForm()
 
-def terminos_condiciones(request):
-    return render(request, 'account/terminos_condiciones.html')
-
-
-def recover_Password(request):
-    return render(request, 'account/password_change_form.html')
+    return render(request, 'account/estudiante/register.html', {'user_form': user_form})
