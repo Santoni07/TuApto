@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'persona',
     'Medico',
     'InfoNovedades',
+    'estudiante',
     
 
     'Representate',

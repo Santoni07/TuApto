@@ -1,0 +1,179 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block content %}
+
+
+
+
+    <div class="row" style="margin: 0; padding: 0;">
+        <div class="container-fluid ficha-medica-container" style="margin: 0; padding: 0;">
+        
+        <nav class="navbar navbar-expand-lg py-3" style="background-color: #00c4f6; color: white; margin: 0; padding: 0;">
+            <div class="container-fluid">
+                <button
+                class="navbar-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#menuItems"
+                aria-controls="menuItems"
+                aria-expanded="false"
+                aria-label="Toggle navigation"
+                >
+                <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="menuItems">
+                <ul class="navbar-nav w-100 gap-3">
+                    <!-- Consultar Apto -->
+                    <li class="nav-item">
+                    <a class="nav-link fs-5" href="#" id="consultarApto" data-menu="link" style="color: white; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);">
+                        <i class="bi bi-file-medical"></i> Consultar Apto
+                    </a>
+                    </li>
+            
+                    <!-- Datos Médicos con submenú -->
+                    <li class="nav-item dropdown" style="position: relative;">
+                    <a
+                        class="nav-link dropdown-toggle fs-5"
+                        href="#"
+                        data-menu="link"
+                        id="datomedico"
+                        style="color: white; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);"
+                    >
+                        <i class="bi bi-journal-text"></i> Datos Médicos
+                    </a>
+                    <ul id="submenuDatosMedicos" style="
+                        display: none;
+                        
+                        background-color: #00c4f6;
+                
+                    ">
+                    
+                        <li style="margin-bottom: 5px;">
+                        <a href="" style="color: white; text-decoration: none; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);">
+                            Ver Antecedentes
+                        </a>
+                        </li>
+                    
+                    <li style="margin-bottom: 5px;">
+                        <a href="" style="color: white; text-decoration: none; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);">
+                        Cargar Antecedentes
+                        </a>
+                    </li>
+                    
+                        <!-- Condicional para Consentimientos -->
+                    
+                        <li>
+                            <a href="" style="color: white; text-decoration: none; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);">
+                            Consentimientos
+                            </a>
+                        </li>
+                        
+                        <li>
+                            <p style="color: white;">No hay ficha médica disponible.</p>
+                        </li>
+                        
+                    </ul>
+                    </li>
+            
+                    <!-- Estudios con submenú -->
+                    <li class="nav-item dropdown" style="position: relative;">
+                    <a
+                        class="nav-link dropdown-toggle fs-5"
+                        href="#"
+                        data-menu="link"
+                        id="estudios"
+                        style="color: white; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);"
+                    >
+                        <i class="bi bi-book"></i> Estudios
+                    </a>
+                    <ul id="submenuEstudios" style="
+                        display: none;
+                        
+                        background-color: #00c4f6;
+                        
+                    ">
+                    
+                        <li style="margin-bottom: 5px;">
+                            <a href="" style="color: white; text-decoration: none; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);">
+                            Cargar Estudios
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'registroMedico:ver_estudios' ficha_medica.id %}" style="color: white; text-decoration: none; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);">
+                            Ver Estudios
+                            </a>
+                        </li>
+                    
+                        <li>
+                            <p style="color: white;">No hay ficha médica disponible.</p>
+                        </li>
+                    
+                    </ul>
+                    </li>
+            
+                    <!-- Datos Personales -->
+                    <li class="nav-item">
+                    <a class="nav-link fs-5" href="#" id="datospersonales" data-menu="link" style="color: white; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);">
+                        <i class="bi bi-person"></i> Datos Personales
+                    </a>
+                    </li>
+            
+                    <!-- Ver Torneo -->
+                    <li class="nav-item">
+                    <a class="nav-link fs-5" href="#" id="vertorneo" data-menu="link" style="color: white; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);">
+                        <i class="bi bi-trophy"></i> Ver Torneo
+                    </a>
+                    </li>
+            
+                    <!-- Notificaciones -->
+                    <li class="nav-item dropdown" style="position: relative;">
+                    <a
+                        class="nav-link dropdown-toggle fs-5"
+                        href="#"
+                        data-menu="link"
+                        id="notificaciones"
+                        style="color: white; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);"
+                    >
+                        <i class="bi bi-bell"></i> Notificaciones
+                    </a>
+                    <ul id="submenuNotificaciones" style="
+                        display: none;
+                        
+                        background-color: #00c4f6;
+                    
+                    ">
+                    
+                    </ul>
+                    </li>
+                </ul>
+                </div>
+            </div>
+        </nav> 
+    
+        
+        
+            
+            
+    
+                <!-- Main content with background image -->
+            <main class="px-3" style="position: relative; min-height: 100vh; width: 100%; margin: 0; padding: 0;">
+                    <style>
+                    main::before {
+                        content: '';
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        background: url('{% static "core/img/medico_home.jpg" %}') no-repeat center center;
+                        background-size: cover;
+                        opacity: 0.4; /* Controla la transparencia de la imagen */
+                        z-index: -1; /* Coloca la imagen detrás del contenido */
+                    }
+                    </style>
+            
+                
+            </main>
+        </div>
+    </div>
+{% endblock %}
