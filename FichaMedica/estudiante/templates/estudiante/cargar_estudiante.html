@@ -1,0 +1,116 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block content %}
+
+
+
+
+    <div class="row" style="margin: 0; padding: 0;">
+        <div class="container-fluid ficha-medica-container" style="margin: 0; padding: 0;">
+        
+        
+            
+            
+    
+                <!-- Main content with background image -->
+            <main class="px-3" style="position: relative; min-height: 100vh; width: 100%; margin: 0; padding: 0;">
+                    <style>
+                    main::before {
+                        content: '';
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        background: url('{% static "core/img/estudiante_home.jpeg" %}') no-repeat center center;
+                        background-size: cover;
+                        opacity: 0.4; /* Controla la transparencia de la imagen */
+                        z-index: -1; /* Coloca la imagen detrás del contenido */
+                    }
+                    </style>
+                    <div style="position: relative; z-index: 1;">
+                            
+                            
+<div class="container d-flex justify-content-center align-items-center vh-100 flex-column">
+    <div id="welcome-container" class="text-center">
+        <h2 class="text-primary fw-bold">Bienvenido</h2>
+        <p class="fs-5">Vamos a cargar los datos del alumno.</p>
+        <button class="btn btn-lg btn-primary mt-3" onclick="mostrarFormulario()">Continuar</button>
+    </div>
+
+    <div id="form-container" class="card shadow-lg p-5 bg-light rounded-4 mt-4" style="max-width: 900px; width: 100%; display: none;">
+        <h4 class="text-center text-primary fw-bold mb-4">Complete los datos del alumno</h4>
+        <form method="POST" action="">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="nombre" class="form-label">Nombre</label>
+                    <input type="text" class="form-control" id="nombre" name="nombre" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="apellido" class="form-label">Apellido</label>
+                    <input type="text" class="form-control" id="apellido" name="apellido" required>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="fecha_nacimiento" class="form-label">Fecha de Nacimiento</label>
+                    <input type="date" class="form-control" id="fecha_nacimiento" name="fecha_nacimiento" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="dni" class="form-label">DNI</label>
+                    <input type="text" class="form-control" id="dni" name="dni" required>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="domicilio" class="form-label">Domicilio</label>
+                    <input type="text" class="form-control" id="domicilio" name="domicilio" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="telefono" class="form-label">Teléfono</label>
+                    <input type="text" class="form-control" id="telefono" name="telefono" required>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="sexo" class="form-label">Sexo</label>
+                    <select class="form-select" id="sexo" name="sexo" required>
+                        <option value="">Seleccione...</option>
+                        <option value="M">Masculino</option>
+                        <option value="F">Femenino</option>
+                        <option value="O">Otro</option>
+                    </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="localidad" class="form-label">Localidad</label>
+                    <input type="text" class="form-control" id="localidad" name="localidad" required>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="lugar_nacimiento" class="form-label">Lugar de Nacimiento</label>
+                <input type="text" class="form-control" id="lugar_nacimiento" name="lugar_nacimiento" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100 btn-lg">Cargar</button>
+        </form>
+    </div>
+</div>
+
+                                            
+            
+                </main>
+        </div>
+    </div>
+
+<script>
+        function mostrarFormulario() {
+            document.getElementById('welcome-container').style.display = 'none';
+            document.getElementById('form-container').style.display = 'block';
+        }
+</script>
+{% endblock %}

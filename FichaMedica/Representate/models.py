@@ -1,7 +1,7 @@
 from django.db import models
 from account.models import Profile
 from persona.models import Torneo
-from estudiante.models import Colegio
+""" from estudiante.models import Colegio """
 
 
 class Representante(models.Model):
