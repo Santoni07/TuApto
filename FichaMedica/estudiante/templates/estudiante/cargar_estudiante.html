@@ -90,10 +90,24 @@
                     <input type="text" class="form-control" id="localidad" name="localidad" required>
                 </div>
             </div>
-
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                 
+                    <label for="lugar_nacimiento" class="form-label">Lugar de Nacimiento</label>
+                    <input type="text" class="form-control" id="lugar_nacimiento" name="lugar_nacimiento" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="colegio" class="form-label">Institucion Academica</label>
+                    <select class="form-select" id="colegio" name="colegio" required>
+                        <option value="" disabled selected>Seleccione un colegio</option>
+                        {% for colegio in colegios %}
+                            <option value="{{ colegio.id }}">{{ colegio.nombre }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
             <div class="mb-3">
-                <label for="lugar_nacimiento" class="form-label">Lugar de Nacimiento</label>
-                <input type="text" class="form-control" id="lugar_nacimiento" name="lugar_nacimiento" required>
+              
             </div>
 
             <button type="submit" class="btn btn-primary w-100 btn-lg">Cargar</button>

@@ -13,3 +13,6 @@ def listar_estudiantes(request):
 
 def ver_estudiante(request):
     return render(request, 'estudiante/ver_estudiante.html')
+
+def antecedentes(reuest):
+    return render(reuest, 'estudiante/antecedentes.html')

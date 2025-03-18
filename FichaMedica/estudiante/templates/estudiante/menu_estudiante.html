@@ -60,7 +60,7 @@
                         </li>
                     
                     <li style="margin-bottom: 5px;">
-                        <a href="" style="color: white; text-decoration: none; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);">
+                        <a href="{% url 'antecedentes' %}" style="color: white; text-decoration: none; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);">
                         Cargar Antecedentes
                         </a>
                     </li>
@@ -193,7 +193,7 @@
                                     </p>
                                     <p class="text-secondary fs-5" style="margin-bottom: 0;">
                                         Utiliza el menú de navegación para explorar las distintas opciones. 
-                                        Estamos aquí para ayudarte a mantener tu salud al día y asegurarte de que estés listo para dar lo mejor en cada competencia.
+                                        Estamos aquí para ayudarte a mantener la salud de tus hijos al día. 
                                     </p>
                                 </div>
                             </div>
@@ -210,4 +210,61 @@
                 </main>
         </div>
     </div>
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Función para alternar la visibilidad de los submenús
+            function toggleSubMenu(menuId) {
+                var submenu = document.getElementById(menuId);
+                if (submenu.style.display === "block") {
+                    submenu.style.display = "none";
+                } else {
+                    // Cierra otros submenús antes de abrir el seleccionado
+                    closeAllSubMenus();
+                    submenu.style.display = "block";
+                }
+            }
+        
+            // Cierra todos los submenús
+            function closeAllSubMenus() {
+                document.querySelectorAll("ul[id^='submenu']").forEach(function (submenu) {
+                    submenu.style.display = "none";
+                });
+            }
+        
+            // Agregar evento de clic a los enlaces con submenús
+            document.getElementById("datomedico").addEventListener("click", function (event) {
+                event.preventDefault(); // Evita la navegación por defecto
+                toggleSubMenu("submenuDatosMedicos");
+            });
+        
+            document.getElementById("estudios").addEventListener("click", function (event) {
+                event.preventDefault();
+                toggleSubMenu("submenuEstudios");
+            });
+        
+            document.getElementById("notificaciones").addEventListener("click", function (event) {
+                event.preventDefault();
+                toggleSubMenu("submenuNotificaciones");
+            });
+        
+            // Cierra los submenús al hacer clic fuera de ellos
+            document.addEventListener("click", function (event) {
+                var isClickInsideMenu = event.target.closest(".nav-item.dropdown");
+                if (!isClickInsideMenu) {
+                    closeAllSubMenus();
+                }
+            });
+        
+            // Evita el cierre del menú al hacer clic dentro del submenú
+            document.querySelectorAll("ul[id^='submenu']").forEach(function (submenu) {
+                submenu.addEventListener("click", function (event) {
+                    event.stopPropagation();
+                });
+            });
+        });
+        </script>
+        
+
 {% endblock %}
