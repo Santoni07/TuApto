@@ -18,6 +18,7 @@ class Profile(models.Model):
             ('jugador', 'Jugador'),  # Valor predeterminado actualizado a "jugador"
             ('medico', 'Médico'),
             ('representante', 'Representante'),
+             ('estudiante', 'estudiante'),
         ],
         default='jugador'
     )

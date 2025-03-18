@@ -7,11 +7,10 @@ from django.views.decorators.cache import never_cache
 from django.http import JsonResponse
 from django.contrib.auth import logout
 from django.utils.timezone import now
-
-from django.utils import timezone
 from django.contrib.sessions.models import Session
 from django.contrib import messages
 from persona.models import Persona, Jugador, JugadorCategoriaEquipo  
+
 
 @login_required
 def dashboard(request):
@@ -59,6 +58,8 @@ def user_login(request):
                         return redirect('representante_home')
                     elif profile.rol == 'jugador':
                         return redirect('menu_jugador')
+                    elif profile.rol == 'estudiante':
+                        return redirect('menu_estudiante')
                     else:
                         return redirect('home')
 
@@ -106,26 +107,37 @@ def recover_Password(request):
 
 
 def register(request):
+    print(f"📥 Request recibido: {request.method} en {request.path}")  # Depuración
+
+    user_role = "jugador"  # Valor predeterminado
+
+    if request.path == "/account/register_alumnos/":
+        user_role = "estudiante"
+
     if request.method == 'POST':
         user_form = UserRegistrationForm(request.POST)
         if user_form.is_valid():
-            # Guardar el usuario y su perfil
-            user_form.save()  # Guarda tanto el usuario como el perfil asociado
-            return render(request, 'account/register_done.html', {'new_user': user_form.cleaned_data['email']})
-    else:
-        user_form = UserRegistrationForm()
+            user, profile = user_form.save(commit=False)  # Guardar sin confirmar aún
 
-    # Mover este render fuera del bloque else, así se ejecuta tanto para GET como en caso de errores de validación
-    return render(request, 'account/register.html', {'user_form': user_form})
+            # Guardamos usuario y perfil en la base de datos
+            user.save()
+            profile.user = user
+            profile.rol = user_role  # Asignamos el rol dinámicamente
+            profile.email = user.email  # Aseguramos que el email en Profile sea igual al del User
+            profile.save()
 
-def register_almunos(request):
-    if request.method == 'POST':
-        user_form = UserRegistrationForm(request.POST)
-        if user_form.is_valid():
-            # Guardar el usuario y su perfil
-            user_form.save()  # Guarda tanto el usuario como el perfil asociado
-            return render(request, 'account/register_done.html', {'new_user': user_form.cleaned_data['email']})
-    else:
-            user_form = UserRegistrationForm()
+            print(f"✅ Usuario registrado: {user.email} con rol {profile.rol}")
 
-    return render(request, 'account/estudiante/register.html', {'user_form': user_form})
+            # Mensaje de éxito
+            messages.success(request, "Registro exitoso. Ahora puedes iniciar sesión.")
+
+            # 🔹 Redirección única a register_done.html
+            return render(request, 'account/register_done.html', {'new_user': user.email})
+
+        else:
+            messages.error(request, "Hubo un error en el formulario. Verifica los datos ingresados.")
+
+    # Si es GET o hay errores, renderiza el formulario correspondiente
+    template = "account/register.html" if user_role == "jugador" else "account/estudiante/register.html"
+    return render(request, template, {'user_form': UserRegistrationForm()})
+
