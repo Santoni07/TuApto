@@ -2,86 +2,77 @@
 {% load static %}
 {% block content %}
 
-
-
-
     <div class="row" style="margin: 0; padding: 0;">
         <div class="container-fluid ficha-medica-container" style="margin: 0; padding: 0;">
         
-        
-            
-            
-    
-                <!-- Main content with background image -->
+            <!-- Main content with background image -->
             <main class="px-3" style="position: relative; min-height: 100vh; width: 100%; margin: 0; padding: 0;">
-                    <style>
-                    main::before {
-                        content: '';
-                        position: absolute;
-                        top: 0;
-                        left: 0;
-                        width: 100%;
-                        height: 100%;
-                        background: url('{% static "core/img/estudiante_home.jpeg" %}') no-repeat center center;
-                        background-size: cover;
-                        opacity: 0.4; /* Controla la transparencia de la imagen */
-                        z-index: -1; /* Coloca la imagen detrás del contenido */
-                    }
-                    </style>
-                    <div style="position: relative; z-index: 1;">
-                            
-                        <div class="container mt-5">
+                <style>
+                main::before {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: url('{% static "core/img/estudiante_home.jpeg" %}') no-repeat center center;
+                    background-size: cover;
+                    opacity: 0.4; /* Controla la transparencia de la imagen */
+                    z-index: -1; /* Coloca la imagen detrás del contenido */
+                }
+                </style>
+
+                <div style="position: relative; z-index: 1;">
+                    <div class="container mt-5">
+                        <!-- Tarjeta Principal -->
+                        <div class="card shadow-lg p-5 bg-light rounded-4">
                             <h2 class="text-primary text-center fw-bold mb-4">Lista de Estudiantes</h2>
-                        
-                            <div class="card shadow-lg p-4 bg-light rounded-4">
-                                <div class="table-responsive">
-                                    <table class="table table-striped table-hover text-center">
-                                        <thead class="table-primary">
-                                            <tr>
-                                                <th>Apellido</th>
-                                                <th>Nombre</th>
-                                              
-                                                <th>DNI</th>
-                                                <th>Fecha de Nacimiento</th>
-                                                <th>Localidad</th>
-                                                <th>Acciones</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {% for estudiante in estudiantes %}
-                                            <tr>
-                                                <td>{{ estudiante.apellido }}</td>
-                                                <td>{{ estudiante.nombre }}</td>
-                                             
-                                                <td>{{ estudiante.dni }}</td>
-                                                <td>{{ estudiante.fecha_nacimiento }}</td>
-                                                <td>{{ estudiante.localidad }}</td>
-                                                <td>
-                                                    <a href="{% url 'editar_estudiante' estudiante.id %}" class="btn btn-warning btn-sm">Editar</a>
-                                                    <a href="{% url 'eliminar_estudiante' estudiante.id %}" class="btn btn-danger btn-sm">Eliminar</a>
-                                                </td>
-                                            </tr>
-                                            {% empty %}
-                                            <tr>
-                                                <td colspan="7" class="text-center text-muted">No hay estudiantes registrados</td>
-                                            </tr>
-                                            {% endfor %}
-                                        </tbody>
-                                    </table>
-                                </div>
+
+                            <!-- Tabla de Estudiantes -->
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover text-center">
+                                    <thead class="table-primary">
+                                        <tr>
+                                            <th>Apellido</th>
+                                            <th>Nombre</th>
+                                            <th>DNI</th>
+                                            <th>Fecha de Nacimiento</th>
+                                            <th>Localidad</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for estudiante in estudiantes %}
+                                        <tr>
+                                            <td>{{ estudiante.apellido }}</td>
+                                            <td>{{ estudiante.nombre }}</td>
+                                            <td>{{ estudiante.dni }}</td>
+                                            <td>{{ estudiante.fecha_nacimiento }}</td>
+                                            <td>{{ estudiante.localidad }}</td>
+                                            <td>
+                                                <a href="{% url 'editar_estudiante' estudiante.id %}" class="btn btn-warning btn-sm">Editar</a>
+                                                <a href="{% url 'eliminar_estudiante' estudiante.id %}" class="btn btn-danger btn-sm">Eliminar</a>
+                                            </td>
+                                        </tr>
+                                        {% empty %}
+                                        <tr>
+                                            <td colspan="7" class="text-center text-muted">No hay estudiantes registrados</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
                             </div>
-                        
+
+                            <!-- Botones de Acción -->
                             <div class="text-center mt-4">
-                                <a href="{% url 'cargar_estudiante' %}" class="btn btn-primary btn-lg">Agregar Nuevo Estudiante</a>
+                                <a href="{% url 'menu_estudiante' %}" class="btn btn-secondary btn-lg me-3">Volver</a>
+                                <button type="submit" class="btn btn-primary btn-lg">Guardar</button>
                             </div>
                         </div>
                     </div>
-
-                                            
-            
+                </div>
             </main>
         </div>
     </div>
-
 
 {% endblock %}

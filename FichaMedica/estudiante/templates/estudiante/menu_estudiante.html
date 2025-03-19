@@ -2,8 +2,32 @@
 {% load static %}
 {% block content %}
 
-
-
+<style>
+    ul[id^='submenu'] {
+        display: none;
+        background-color: #00c4f6;
+        position: absolute;
+        list-style: none;
+        padding: 20px;
+        border-radius: 5px;
+        z-index: 1000; /* Asegura que el submenú esté por encima de otros elementos */
+    }
+    
+    ul[id^='submenu'] li a {
+        color: white;
+        text-decoration: none;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        display: block;
+       
+        cursor: pointer; /* ✅ Hace que el cursor sea una manito */
+    }
+    
+    /* Cambio de color cuando se pasa el mouse sobre los enlaces */
+    ul[id^='submenu'] li a:hover {
+        background-color: rgba(255, 255, 255, 0.2);
+        border-radius: 5px;
+    }
+</style>
 
     <div class="row" style="margin: 0; padding: 0;">
         <div class="container-fluid ficha-medica-container" style="margin: 0; padding: 0;">
@@ -25,16 +49,42 @@
                 <ul class="navbar-nav w-100 gap-3">
                     <!-- Consultar Apto -->
                     <li class="nav-item">
-                    <a class="nav-link fs-5" href="#" id="consultarApto" data-menu="link" style="color: white; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);">
+                    <a class="nav-link fs-5" href="{% url 'consultar_apto' %}" id="consultarApto" data-menu="link" style="color: white; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);">
                         <i class="bi bi-file-medical"></i> Consultar Apto
                     </a>
                     </li>
-                      <!-- Cargar Familiar -->
-                      <li class="nav-item">
-                        <a class="nav-link fs-5" href="{% url 'cargar_estudiante' %}"  data-menu="link" style="color: white; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);">
-                            <i class="bi bi-file-medical"></i> Cargar Familiar
-                        </a>
-                        </li>
+                     <!-- Familiares con submenú -->
+                            <li class="nav-item dropdown" style="position: relative;">
+                                <a
+                                    class="nav-link dropdown-toggle fs-5"
+                                    href="#"
+                                    id="familiares"
+                                    data-menu="link"
+                                    style="color: white; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);"
+                                >
+                                    <i class="bi bi-people"></i> Familiares
+                                </a>
+                                <ul id="submenuFamiliares" style="
+                                    display: none;
+                                    background-color: #00c4f6;
+                                    position: absolute;
+                                    list-style: none;
+                                    padding: 10px;
+                                    border-radius: 5px;
+                                ">
+                                    <li style="margin-bottom: 5px;">
+                                        <a href="{% url 'cargar_estudiante' %}" style="color: white; text-decoration: none; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);">
+                                            <i class="bi bi-file-medical"></i> Cargar Familiar
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="{% url 'listar_estudiantes' %}" style="color: white; text-decoration: none; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);">
+                                            <i class="bi bi-eye"></i> Ver Familiar
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+
                     <!-- Datos Médicos con submenú -->
                     <li class="nav-item dropdown" style="position: relative;">
                     <a
@@ -123,13 +173,7 @@
                     </a>
                     </li>
             
-                    <!-- Ver Torneo -->
-                    <li class="nav-item">
-                    <a class="nav-link fs-5" href="#" id="vertorneo" data-menu="link" style="color: white; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);">
-                        <i class="bi bi-trophy"></i> Ver Torneo
-                    </a>
-                    </li>
-            
+
                     <!-- Notificaciones -->
                     <li class="nav-item dropdown" style="position: relative;">
                     <a
@@ -211,47 +255,51 @@
         </div>
     </div>
 
-
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            // Función para alternar la visibilidad de los submenús
+            // Función para alternar la visibilidad de un submenú
             function toggleSubMenu(menuId) {
-                var submenu = document.getElementById(menuId);
+                let submenu = document.getElementById(menuId);
+        
+                // Si el submenú está abierto, lo cierra
                 if (submenu.style.display === "block") {
                     submenu.style.display = "none";
                 } else {
-                    // Cierra otros submenús antes de abrir el seleccionado
                     closeAllSubMenus();
                     submenu.style.display = "block";
                 }
             }
         
-            // Cierra todos los submenús
+            // Cierra todos los submenús antes de abrir uno nuevo
             function closeAllSubMenus() {
                 document.querySelectorAll("ul[id^='submenu']").forEach(function (submenu) {
                     submenu.style.display = "none";
                 });
             }
         
-            // Agregar evento de clic a los enlaces con submenús
-            document.getElementById("datomedico").addEventListener("click", function (event) {
-                event.preventDefault(); // Evita la navegación por defecto
-                toggleSubMenu("submenuDatosMedicos");
-            });
+            // Agregar eventos de clic a los enlaces con submenús
+            const menuItems = [
+                { trigger: "datomedico", submenu: "submenuDatosMedicos" },
+                { trigger: "estudios", submenu: "submenuEstudios" },
+                { trigger: "notificaciones", submenu: "submenuNotificaciones" },
+                { trigger: "familiares", submenu: "submenuFamiliares" }
+            ];
         
-            document.getElementById("estudios").addEventListener("click", function (event) {
-                event.preventDefault();
-                toggleSubMenu("submenuEstudios");
-            });
+            menuItems.forEach(item => {
+                let triggerElement = document.getElementById(item.trigger);
+                let submenuElement = document.getElementById(item.submenu);
         
-            document.getElementById("notificaciones").addEventListener("click", function (event) {
-                event.preventDefault();
-                toggleSubMenu("submenuNotificaciones");
+                if (triggerElement && submenuElement) {
+                    triggerElement.addEventListener("click", function (event) {
+                        event.preventDefault();
+                        toggleSubMenu(item.submenu);
+                    });
+                }
             });
         
             // Cierra los submenús al hacer clic fuera de ellos
             document.addEventListener("click", function (event) {
-                var isClickInsideMenu = event.target.closest(".nav-item.dropdown");
+                let isClickInsideMenu = event.target.closest(".nav-item.dropdown");
                 if (!isClickInsideMenu) {
                     closeAllSubMenus();
                 }
@@ -265,6 +313,8 @@
             });
         });
         </script>
+        
+        
         
 
 {% endblock %}

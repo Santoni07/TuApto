@@ -16,3 +16,6 @@ def ver_estudiante(request):
 
 def antecedentes(reuest):
     return render(reuest, 'estudiante/antecedentes.html')
+
+def consultar_apto(request):
+    return render(request, 'estudiante/consultar_apto.html')
