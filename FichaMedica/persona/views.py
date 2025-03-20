@@ -186,7 +186,11 @@ def error_registro(request):
 @never_cache
 def menu_jugador(request):
     # Obtener el perfil del usuario logueado
-    profile = request.user.profile
+    try: 
+        profile= Profile.objects.get(user=request.user, rol='jugador')
+        print(f"Perfil del usuario: {profile}")
+    except Profile.DoesNotExist:
+        return redirect('select_role')
 
     # Intentar obtener la Persona asociada al profile del usuario
     try:
