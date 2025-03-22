@@ -1,0 +1,95 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block content %}
+
+<main class="px-3" style="position: relative; min-height: 100vh; width: 100%; margin: 0; padding: 0;">
+    <style>
+        main::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('{% static "core/img/medico_home.jpg" %}') no-repeat center center;
+            background-size: cover;
+            opacity: 0.4; /* Controla la transparencia de la imagen */
+            z-index: -1; /* Coloca la imagen detrás del contenido */
+        }
+    </style>
+
+    <div style="position: relative; z-index: 1;">
+        <div class="container mt-5">
+            <div class="row justify-content-center">
+                <div class="col-lg-6 col-md-8 col-sm-10">
+                    <div class="card border-info shadow-lg">
+                        <div class="card-header bg-info text-white text-center p-4">
+                            <h3 class="mb-0 fw-bold">Cargar Estudio Médico</h3>
+                        </div>
+                        <div class="card-body p-4">
+                            <form id="cargarEstudioForm" method="POST" enctype="multipart/form-data" action="{% url 'registroMedico:cargar_estudio' jugador.id %}">
+
+                                {% csrf_token %}
+
+                                <div class="mb-3">
+                                    <label for="tipo_estudio" class="form-label fw-bold text-info">Tipo de Estudio</label>
+                                    {{ form.tipo_estudio|add_class:"form-control" }}
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="observaciones" class="form-label fw-bold text-info">Observaciones</label>
+                                    {{ form.observaciones|add_class:"form-control" }}
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="archivo" class="form-label fw-bold text-info">Archivo (Imagen o PDF)</label>
+                                    {{ form.archivo|add_class:"form-control form-control-file" }}
+                                </div>
+
+                                <div class="d-flex justify-content-between align-items-center mt-4">
+                                    <a href="{% url 'menu_jugador' %}" class="btn btn-outline-info">Volver</a>
+                                    <button type="button" onclick="validarFormulario()" class="btn btn-success">Cargar Estudio</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</main>
+
+<!-- Modal de advertencia -->
+<div class="modal fade" id="alertaModal" tabindex="-1" aria-labelledby="alertaModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title" id="alertaModalLabel">Advertencia</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Debes seleccionar un archivo antes de cargar el estudio.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function validarFormulario() {
+        const archivoInput = document.getElementById("id_archivo");
+        if (!archivoInput.value) {
+            const alertaModal = new bootstrap.Modal(document.getElementById('alertaModal'));
+            alertaModal.show();
+        } else {
+            document.getElementById("cargarEstudioForm").submit();
+        }
+    }
+</script>
+
+{% endblock %}
