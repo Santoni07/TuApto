@@ -1,5 +1,60 @@
 {% extends 'core/base.html' %}
 {% load static %}
+
+{% block content %}
+
+<div class="row" style="margin: 0; padding: 0;">
+    <div class="container-fluid ficha-medica-container" style="margin: 0; padding: 0;">
+        <main class="px-3" style="position: relative; min-height: 100vh; width: 100%; margin: 0; padding: 0;">
+            <style>
+                main::before {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: url('{% static "core/img/estudiante_home.jpeg" %}') no-repeat center center;
+                    background-size: cover;
+                    opacity: 0.4;
+                    z-index: -1;
+                }
+            </style>
+
+            <div style="position: relative; z-index: 1;">
+                <div class="container mt-5 pt-5">
+                    <div class="card shadow-lg p-5 bg-light rounded-4 mx-auto" style="max-width: 1000px;">
+                        <h3 class="text-center text-primary fw-bold mb-4">Seleccionar Estudiante</h3>
+
+                        <form method="GET" action="{% url 'cargar_antecedente_estudiante' %}">
+                            <div class="mb-3">
+                                <label for="estudiante" class="form-label">Seleccione un estudiante sin antecedentes:</label>
+                                <select class="form-select" name="estudiante_id" id="estudiante" required>
+                                    <option value="" disabled selected>Seleccione un estudiante</option>
+                                    {% for estudiante in estudiantes_sin_antecedentes %}
+                                        <option value="{{ estudiante.id }}">{{ estudiante.nombre }} {{ estudiante.apellido }} - DNI: {{ estudiante.dni }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-primary btn-lg">Cargar Antecedentes</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+{% endblock %}
+
+
+
+
+
+{% comment %} {% extends 'core/base.html' %}
+{% load static %}
 {% block content %}
 
 <div class="row" style="margin: 0; padding: 0;">
@@ -197,4 +252,4 @@
         return true;
     }
 </script>
-{% endblock %}
+{% endblock %} {% endcomment %}

@@ -1,0 +1,83 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="container p-4 bg-white shadow rounded mt-5">
+    <h1 class="text-center text-primary fw-bold mb-4">Datos Personales</h1>
+
+    {% if profile %}
+    <div class="card border-info shadow-sm">
+        <div class="card-header bg-info text-white fw-bold text-center">
+            Información Personal y Tutor Asociado
+        </div>
+        <div class="card-body">
+            
+            <!-- Datos del usuario -->
+            <div class="row">
+                <div class="col-12 col-md-6 mb-3">
+                    <strong>Nombre:</strong>
+                    <p class="form-control">{{ profile.nombre }}</p>
+                </div>
+                <div class="col-12 col-md-6 mb-3">
+                    <strong>Apellido:</strong>
+                    <p class="form-control">{{ profile.apellido }}</p>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-12 col-md-6 mb-3">
+                    <strong>DNI:</strong>
+                    <p class="form-control">{{ profile.dni }}</p>
+                </div>
+                <div class="col-12 col-md-6 mb-3">
+                    <strong>Fecha de Nacimiento:</strong>
+                    <p class="form-control">{{ profile.fecha_nacimiento }}</p>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-12 mb-3">
+                    <strong>Email:</strong>
+                    <p class="form-control">{{ profile.email }}</p>
+                </div>
+            </div>
+
+            <!-- Datos del Tutor -->
+            {% if tutor %}
+            <h5 class="text-primary text-center fw-bold mt-4">Datos del Tutor</h5>
+            <div class="row">
+                <div class="col-12 col-md-6 mb-3">
+                    <strong>Domicilio:</strong>
+                    <p class="form-control">{{ tutor.domicilio }}</p>
+                </div>
+                <div class="col-12 col-md-6 mb-3">
+                    <strong>Teléfono:</strong>
+                    <p class="form-control">{{ tutor.telefono }}</p>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-12 mb-3">
+                    <strong>Localidad:</strong>
+                    <p class="form-control">{{ tutor.localidad }}</p>
+                </div>
+            </div>
+            {% else %}
+            <p class="text-center text-muted">No hay tutor asociado.</p>
+            {% endif %}
+
+            
+            <div class="d-flex justify-content-end mt-5">
+                <a href="{% url 'menu_estudiante' %}" class="btn btn-secondary btn-lg w-45 me-3">Volver</a>
+                <button type="submit" class="btn btn-primary btn-lg w-45">Guardar</button>
+            </div>
+
+        </div>
+    </div>
+    {% else %}
+    <p class="text-center text-muted">No tienes datos personales cargados.</p>
+    {% endif %}
+</div>
+
+{% endblock %}

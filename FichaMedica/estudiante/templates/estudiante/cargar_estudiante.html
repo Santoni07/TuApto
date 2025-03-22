@@ -19,8 +19,8 @@
                     height: 100%;
                     background: url('{% static "core/img/estudiante_home.jpeg" %}') no-repeat center center;
                     background-size: cover;
-                    opacity: 0.4; /* Controla la transparencia de la imagen */
-                    z-index: -1; /* Coloca la imagen detrás del contenido */
+                    opacity: 0.4;
+                    z-index: -1;
                 }
             </style>
 
@@ -28,23 +28,17 @@
                 
                 <div class="container d-flex flex-column align-items-center justify-content-start vh-100 pt-5">
 
-                    <!-- Mensaje de Bienvenida -->
-                   
-
-                    <!-- Formulario SIEMPRE visible -->
+                    <!-- Formulario -->
                     <div id="form-container" class="card shadow-lg p-4 bg-light rounded-4" style="max-width: 900px; width: 100%;">
-                       <!-- Título "Bienvenido" con más estilo -->
-                            <h2 class="text-primary fw-bold text-center mt-4" style="font-size: 3rem; letter-spacing: 1px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);">
-                                ¡Bienvenido!
-                            </h2>
+                        <h2 class="text-primary fw-bold text-center mt-4" style="font-size: 3rem; letter-spacing: 1px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);">
+                            ¡Bienvenido!
+                        </h2>
 
-                            <!-- Párrafo con más estilo y mejor presentación -->
-                            <p class="fs-5 text-center mb-4" style="color: #555; font-size: 1.3rem; font-weight: 500;">
-                                Vamos a cargar los datos del alumno.
-                            </p>
+                        <p class="fs-5 text-center mb-4" style="color: #555; font-size: 1.3rem; font-weight: 500;">
+                            Vamos a cargar los datos del alumno.
+                        </p>
 
-                        
-                        <form method="POST" action="">
+                        <form id="estudianteForm" method="POST" action="{% url 'cargar_estudiante' %}">
                             {% csrf_token %}
                             <div class="row">
                                 <div class="col-md-6 mb-3">
@@ -125,5 +119,43 @@
         </main>
     </div>
 </div>
+
+<!-- Modal de Éxito -->
+<div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title" id="successModalLabel">¡Éxito!</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body text-center">
+        <i class="bi bi-check-circle-fill text-success" style="font-size: 3rem;"></i>
+        <p class="fs-5 mt-3">El alumno ha sido cargado con éxito.</p>
+      </div>
+      <div class="modal-footer d-flex justify-content-center">
+        <button type="button" class="btn btn-primary" id="redirectButton">Aceptar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        let form = document.getElementById("estudianteForm");
+    
+        form.addEventListener("submit", function (event) {
+            event.preventDefault(); // Evita el envío automático
+    
+            // Muestra el modal de éxito
+            let successModal = new bootstrap.Modal(document.getElementById('successModal'));
+            successModal.show();
+    
+            // Cuando el usuario haga clic en "Aceptar", enviamos realmente el formulario
+            document.getElementById("redirectButton").addEventListener("click", function () {
+                form.submit();  // 🔥 Ahora sí enviamos el formulario a Django
+            });
+        });
+    });
+</script>
 
 {% endblock %}

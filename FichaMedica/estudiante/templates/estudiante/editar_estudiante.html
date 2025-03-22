@@ -1,0 +1,20 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5 pt-5">
+    <div class="card shadow-lg p-5 bg-light rounded-4 mx-auto" style="max-width: 700px;">
+        <h3 class="text-center text-primary fw-bold mb-4">Editar Estudiante</h3>
+
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+
+            <div class="text-center mt-4">
+                <a href="{% url 'listar_estudiantes' %}" class="btn btn-secondary">Cancelar</a>
+                <button type="submit" class="btn btn-success">Guardar Cambios</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

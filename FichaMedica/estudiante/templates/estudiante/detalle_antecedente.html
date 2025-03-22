@@ -1,0 +1,117 @@
+{% extends 'core/base.html' %}
+{% block content %}
+
+<div class="container mt-5">
+    <h2 class="text-primary text-center fw-bold">Antecedentes Médicos de {{ estudiante.nombre }} {{ estudiante.apellido }}</h2>
+
+    <!-- Sección 1: Vacunaciones -->
+    <div class="card p-4 border-primary shadow-lg mt-4">
+        <h2 class="text-primary fw-bold">1. Vacunaciones</h2>
+        <table class="table table-bordered text-center">
+            <thead class="table-primary">
+                <tr>
+                    <th>Concepto</th>
+                    <th>Detalle</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Carnet de Vacunación</strong></td>
+                    <td>{{ antecedente.carnet_vacunacion|yesno:"Sí,No" }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Esquema Completo</strong></td>
+                    <td>{{ antecedente.esquema_completo|yesno:"Sí,No" }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Debe completar esquema con</strong></td>
+                    <td>{{ antecedente.esquema_faltante|default:"N/A" }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Sección 2: Antecedentes Patológicos -->
+    <div class="card p-4 border-primary shadow-lg mt-4">
+        <h2 class="text-primary fw-bold">2. Antecedentes Patológicos</h2>
+        <table class="table table-bordered text-center">
+            <thead class="table-primary"2
+                <tr>
+                    <th>Concepto</th>
+                    <th>Detalle</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td><strong>Enfermedades Importantes</strong></td><td>{{ antecedente.enfermedades_importantes|default:"N/A" }}</td></tr>
+                <tr><td><strong>Cirugías</strong></td><td>{{ antecedente.cirugias|default:"N/A" }}</td></tr>
+                <tr><td><strong>Cardiovasculares</strong></td><td>{{ antecedente.cardiovasculares|default:"N/A" }}</td></tr>
+                <tr><td><strong>Trauma Funcional</strong></td><td>{{ antecedente.trauma_funcional|default:"N/A" }}</td></tr>
+                <tr><td><strong>Alergias</strong></td><td>{{ antecedente.alergias|default:"N/A" }}</td></tr>
+                <tr><td><strong>Oftalmológicos</strong></td><td>{{ antecedente.oftalmologicos|default:"N/A" }}</td></tr>
+                <tr><td><strong>Auditivos</strong></td><td>{{ antecedente.auditivos|default:"N/A" }}</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Sección 3: Condiciones de Riesgo -->
+    <div class="card p-4 border-primary shadow-lg mt-4">
+        <h2 class="text-primary fw-bold">3. Condiciones de Riesgo</h2>
+        <table class="table table-bordered text-center">
+            <thead class="table-primary">
+                <tr>
+                    <th>Concepto</th>
+                    <th>Detalle</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td><strong>Condiciones de Riesgo</strong></td><td>{{ antecedente.condiciones_riesgo|default:"N/A" }}</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Sección 4: Medicamentos Prescriptos -->
+    <div class="card p-4 border-primary shadow-lg mt-4">
+        <h2 class="text-primary fw-bold">4. Medicamentos Prescriptos</h2>
+        <table class="table table-bordered text-center">
+            <thead class="table-primary">
+                <tr>
+                    <th>Concepto</th>
+                    <th>Detalle</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td><strong>Medicamentos Prescriptos</strong></td><td>{{ antecedente.medicamentos_prescriptos|default:"N/A" }}</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Sección 5: Actividad Física -->
+    <div class="card p-4 border-primary shadow-lg mt-4">
+        <h2 class="text-primary fw-bold">5. Durante Actividad Física Previa Sufrió:</h2>
+        <table class="table table-bordered text-center">
+            <thead class="table-primary">
+                <tr>
+                    <th>Concepto</th>
+                    <th>Detalle</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td><strong>Cansancio Extremo</strong></td><td>{{ antecedente.cansancio_extremo|yesno:"Sí,No" }}</td></tr>
+                <tr><td><strong>Falta de Aire</strong></td><td>{{ antecedente.falta_aire|yesno:"Sí,No" }}</td></tr>
+                <tr><td><strong>Pérdida de Conocimiento</strong></td><td>{{ antecedente.perdida_conocimiento|yesno:"Sí,No" }}</td></tr>
+                <tr><td><strong>Palpitaciones</strong></td><td>{{ antecedente.palpitaciones|yesno:"Sí,No" }}</td></tr>
+                <tr><td><strong>Precordialgias</strong></td><td>{{ antecedente.precordialgias|yesno:"Sí,No" }}</td></tr>
+                <tr><td><strong>Cefaleas</strong></td><td>{{ antecedente.cefaleas|yesno:"Sí,No" }}</td></tr>
+                <tr><td><strong>Vómitos</strong></td><td>{{ antecedente.vomitos|yesno:"Sí,No" }}</td></tr>
+                <tr><td><strong>Otros</strong></td><td>{{ antecedente.otros|default:"N/A" }}</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Botón de Volver -->
+    <div class="mt-4 text-end">
+        <a href="{% url 'menu_estudiante' %}" class="btn btn-secondary btn-lg w-45 me-3">Volver</a>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,4 +1,6 @@
 from django.shortcuts import redirect, render
+
+from estudiante.models import Tutor
 from .forms import LoginForm, UserRegistrationForm
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
@@ -9,7 +11,7 @@ from django.contrib.auth import logout
 from django.utils.timezone import now
 from django.contrib.sessions.models import Session
 from django.contrib import messages
-from persona.models import Persona, Jugador, JugadorCategoriaEquipo  
+
 from django.contrib.auth.models import User
 from .models import Profile
 
@@ -115,7 +117,15 @@ def login_user_and_redirect(request, user):
     # 🛠 Si solo tiene un perfil, lo usamos directamente
     profile = profiles.first()
     print("Usuario autenticado con rol:", profile.rol)
-
+    
+    # 🔹 Si el usuario es estudiante, verificar si tiene un tutor asociado
+    if profile.rol == 'estudiante':
+        tutor_asociado = Tutor.objects.filter(profile=profile).exists()
+        
+        if not tutor_asociado:
+            return redirect('cargar_tutor')  # ❌ Si no tiene tutor, lo lleva a completar sus datos
+        
+        return redirect('menu_estudiante')  # ✅ Si tiene tutor, lo lleva al menú de estudiante
     # 🔄 Redirección condicional según el rol
     if profile.rol == 'medico':
         return redirect('medico_home')
@@ -150,16 +160,22 @@ def select_role(request):
             profile = profiles.get(rol=selected_role)
             print(f"✅ Redirigiendo a menú de {profile.rol}")
 
+            # 🔹 Guardar el perfil en la sesión antes de redirigir
+            request.session["user_profile_id"] = profile.id  
+            request.session["user_profile_rol"] = profile.rol  
+
+            # 🔄 Redirección según el rol seleccionado
             if profile.rol == "jugador":
                 return redirect("menu_jugador")
             elif profile.rol == "estudiante":
-                return redirect("menu_estudiante")
+                return redirect("menu_estudiante")  # Redirige a home_estudiante, no a menu_estudiante directamente
             elif profile.rol == "medico":
                 return redirect("medico_home")
             elif profile.rol == "representante":
                 return redirect("representante_home")
             else:
                 return redirect("home")
+
         except Profile.DoesNotExist:
             print("❌ Error: Perfil no encontrado para este rol.")
             return redirect("select_role")

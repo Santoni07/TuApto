@@ -50,7 +50,7 @@
                     <!-- Consultar Apto -->
                     <li class="nav-item">
                     <a class="nav-link fs-5" href="{% url 'consultar_apto' %}" id="consultarApto" data-menu="link" style="color: white; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);">
-                        <i class="bi bi-file-medical"></i> Consultar Apto
+                        <i class="bi bi-file-medical"></i> Consultar CUS
                     </a>
                     </li>
                      <!-- Familiares con submenú -->
@@ -104,28 +104,20 @@
                     ">
                     
                         <li style="margin-bottom: 5px;">
-                        <a href="" style="color: white; text-decoration: none; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);">
+                        <a href="{% url 'ver_antecedentes' %}" style="color: white; text-decoration: none; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);">
                             Ver Antecedentes
                         </a>
                         </li>
                     
                     <li style="margin-bottom: 5px;">
-                        <a href="{% url 'antecedentes' %}" style="color: white; text-decoration: none; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);">
+                        <a href="{% url 'seleccionar_estudiante' %}" style="color: white; text-decoration: none; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);">
                         Cargar Antecedentes
                         </a>
                     </li>
                     
-                        <!-- Condicional para Consentimientos -->
-                    
-                        <li>
-                            <a href="" style="color: white; text-decoration: none; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);">
-                            Consentimientos
-                            </a>
-                        </li>
+                       
                         
-                        <li>
-                            <p style="color: white;">No hay ficha médica disponible.</p>
-                        </li>
+                      
                         
                     </ul>
                     </li>
@@ -159,16 +151,14 @@
                             </a>
                         </li>
                     
-                        <li>
-                            <p style="color: white;">No hay ficha médica disponible.</p>
-                        </li>
+                       
                     
                     </ul>
                     </li>
             
                     <!-- Datos Personales -->
                     <li class="nav-item">
-                    <a class="nav-link fs-5" href="#" id="datospersonales" data-menu="link" style="color: white; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);">
+                    <a class="nav-link fs-5" href="{% url 'datos_personales' %}" id="datospersonales"  style="color: white; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);">
                         <i class="bi bi-person"></i> Datos Personales
                     </a>
                     </li>
@@ -233,7 +223,7 @@
                                     <h1 class="text-primary mb-4" style="font-size: 2.5rem; font-weight: bold;">¡Bienvenido a tu espacio de gestión médica!</h1>
                                     <p class="text-secondary fs-5" style="margin-bottom: 20px;">
                                         En esta sección podrás cargar la cantidad de hijos a tu cargo y registrar sus antecedentes de enfermedades. 
-                                        Una vez que hayas dado tu consentimiento, los médicos podrán llenar el Certificado Único Escolar para ser presentados a las autoridades pertinentes.
+                                        Una vez que hayas aceptado la declaracion jurada , los médicos podrán llenar el Certificado Único Escolar para ser presentados a las autoridades pertinentes.
                                     </p>
                                     <p class="text-secondary fs-5" style="margin-bottom: 0;">
                                         Utiliza el menú de navegación para explorar las distintas opciones. 
