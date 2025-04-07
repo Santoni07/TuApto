@@ -19,4 +19,13 @@ urlpatterns = [
 
     path('ficha_medica/<int:registro_id>/', views.ficha_medica_views, name='ficha_medica'),
     path('eliminar-ficha/<int:jugador_id>/', views.eliminar_ficha_medica, name='eliminar_ficha_medica'),
+    # Path para la vista de home de medico
+    path('cus_home/', CusHomeView.as_view(),   name='cus_home'),
+    path('cus/update/<int:cus_id>/', views.cus_update_view, name='cus_update_view'),
+    path('cus/vista/<int:cus_id>/', views.cus_views, name='cus_views'),
+    path('seleccionar_apto/', views.seleccionar_apto, name='seleccionar_apto'),
+    path('cus/form/<int:estudiante_id>/', cus_form_view, name='cus_form_view'),
+    
+
+
 ]

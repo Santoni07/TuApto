@@ -1,9 +1,7 @@
 {% extends 'core/base.html' %}
 {% load static %}
-{% load widget_tweaks %}
 
 {% block content %}
-
 <main class="px-3" style="position: relative; min-height: 100vh; width: 100%; margin: 0; padding: 0;">
     <style>
         main::before {
@@ -18,97 +16,252 @@
             opacity: 0.4;
             z-index: -1;
         }
-
-        @media (max-width: 768px) {
-            .table-responsive {
-                overflow-x: auto;
-            }
-            .card-header {
-                padding: 1rem;
-                font-size: 1.2rem;
-            }
-            .table {
-                display: block;
-            }
-            .table thead {
-                display: none;
-            }
-            .table tbody, .table tr, .table td {
-                display: block;
-                width: 100%;
-            }
-            .table tr {
-                margin-bottom: 1rem;
-                border: 1px solid #dee2e6;
-                padding: 0.5rem;
-                background: white;
-                border-radius: 5px;
-            }
-            .table td {
-                text-align: left;
-                padding: 0.5rem;
-                border-bottom: none;
-            }
-            .table td::before {
-                content: attr(data-label);
-                font-weight: bold;
-                display: block;
-                text-transform: uppercase;
-                color: #17a2b8;
-            }
-        }
     </style>
 
     <div style="position: relative; z-index: 1;">
         <div class="container mt-5">
-            <div class="table-responsive bg-white p-3 rounded shadow">
-                <div class="card-header bg-info text-white text-center p-4 w-100">
-                    <h2 class="mb-0 fw-bold">Estudios Cargados</h2>
+            <div class="card shadow-lg p-4 bg-light rounded-4">
+                <h2 class="text-center text-primary fw-bold mb-4">Estudios Cargados de {{ estudiante.nombre }} {{ estudiante.apellido }}</h2>
+
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped text-center">
+                        <thead class="table-info">
+                            <tr>
+                                <th>Tipo de Estudio</th>
+                                <th>Observaciones</th>
+                                <th>Fecha de Carga</th>
+                                <th>Fecha de Caducidad</th>
+                                <th>Archivo</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for estudio in estudios %}
+                            <tr>
+                                <td>{{ estudio.get_tipo_estudio_display }}</td>
+                                <td>{{ estudio.observaciones|default:"-" }}</td>
+                                <td>{{ estudio.fecha_creacion|date:"d/m/Y" }}</td>
+                                <td>{{ estudio.fecha_caducidad|date:"d/m/Y" }}</td>
+                                <td>
+                                    {% if estudio.archivo %}
+                                        <a href="{{ estudio.archivo.url }}" target="_blank" class="btn btn-outline-primary btn-sm">Ver Archivo</a>
+                                    {% else %}
+                                        <span class="text-muted">No disponible</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <button type="button"
+                                        class="btn btn-danger btn-sm"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#modalEliminarGlobal"
+                                        data-estudio-id="{{ estudio.id }}"
+                                        data-estudio-nombre="{{ estudio.get_tipo_estudio_display }}">
+                                            Eliminar
+                                    </button>
+                                
+                                  
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-muted">No hay estudios registrados.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
-                <table class="table table-bordered align-middle">
-                    <thead style="color: #00CFFF;">
-                        <tr class="text-center">
-                            <th scope="col">Tipo de Estudio</th>
-                            <th scope="col">Observaciones</th>
-                            <th scope="col">Archivo</th>
-                            <th scope="col">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for estudio in estudios %}
-                        <tr class="text-center">
-                            <td data-label="Tipo de Estudio" class="fw-bold">{{ estudio.get_tipo_estudio_display }}</td>
-                            <td data-label="Observaciones">{{ estudio.observaciones|default_if_none:"S/D" }}</td>
-                            <td data-label="Archivo">
-                                {% if estudio.archivo %}
-                                    <a href="{{ estudio.archivo.url }}" target="_blank" class="btn btn-primary btn-sm">
-                                        <i class="bi bi-file-earmark-text"></i> Ver Archivo
-                                    </a>
-                                {% else %}
-                                    <span class="text-muted">No disponible</span>
-                                {% endif %}
-                            </td>
-                            <td data-label="Acciones">
-                                <a href="{% url 'registroMedico:eliminar_estudio' estudio.pk %}" class="btn btn-danger btn-sm">
-                                    <i class="bi bi-trash"></i> Eliminar
-                                </a>
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="4" class="text-center text-muted">No hay estudios cargados.</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-                <div class="d-flex justify-content-between align-items-center mt-4">
-                    <a href="{% url 'menu_jugador' %}" class="btn btn-outline-info">
-                        <i class="bi bi-arrow-left"></i> Volver
-                    </a>
+
+                <div class="d-flex justify-content-end mt-4">
+                    <a href="{% url 'menu_estudiante' %}" class="btn btn-secondary">Volver al Menú</a>
                 </div>
             </div>
         </div>
     </div>
 </main>
+<!-- Modal Global -->
+<div class="modal fade" id="modalEliminarGlobal" tabindex="-1" aria-labelledby="modalEliminarLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-danger">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="modalEliminarLabel">Eliminar Estudio</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                ¿Estás seguro de que deseas eliminar el estudio <strong id="nombreEstudioEnModal">este estudio</strong>?
+            </div>
+            <div class="modal-footer">
+                <form method="post" id="formEliminarEstudio" action="">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Sí, eliminar</button>
+                </form>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const modalEliminar = document.getElementById('modalEliminarGlobal');
+        modalEliminar.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const estudioId = button.getAttribute('data-estudio-id');
+            const estudioNombre = button.getAttribute('data-estudio-nombre');
+    
+            // Actualizar el texto dentro del modal
+            document.getElementById('nombreEstudioEnModal').textContent = estudioNombre;
+    
+            // Actualizar la URL del form
+            const form = document.getElementById('formEliminarEstudio');
+            form.action = `/cus/eliminar/${estudioId}/`;  // Ruta definida en tu urls.py
+        });
+    });
+    </script>
+    
+{% if request.GET.exito %}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const modal = new bootstrap.Modal(document.getElementById('modalExito'));
+        modal.show();
+    });
+</script>
 
+<!-- Modal -->
+<div class="modal fade" id="modalExito" tabindex="-1" aria-labelledby="modalExitoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-success">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="modalExitoLabel">✅ Estudio cargado con éxito</h5>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" data-bs-dismiss="modal">Aceptar</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
 {% endblock %}
+
+
+
+{% comment %} {% extends 'core/base.html' %}
+{% load static %}
+
+{% block content %}
+<main class="px-3" style="position: relative; min-height: 100vh; width: 100%; margin: 0; padding: 0;">
+    <style>
+        main::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('{% static "core/img/medico_home.jpg" %}') no-repeat center center;
+            background-size: cover;
+            opacity: 0.4;
+            z-index: -1;
+        }
+    </style>
+
+    <div style="position: relative; z-index: 1;">
+        <div class="container mt-5">
+            <div class="card shadow-lg p-4 bg-light rounded-4">
+              
+                <h2 class="text-center text-primary fw-bold mb-4">Estudios Cargados de {{ estudiante.nombre }} {{ estudiante.apellido }}</h2>
+           
+              
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped text-center">
+                        <thead class="table-info">
+                            <tr>
+                                <th>Tipo de Estudio</th>
+                                <th>Observaciones</th>
+                                <th>Fecha de Carga</th>
+                                <th>Fecha de Caducidad</th>
+                                <th>Archivo</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for estudio in estudios %}
+                            <tr>
+                                <td>{{ estudio.get_tipo_estudio_display }}</td>
+                                <td>{{ estudio.observaciones|default:"-" }}</td>
+                                <td>{{ estudio.fecha_creacion|date:"d/m/Y" }}</td>
+                                <td>{{ estudio.fecha_caducidad|date:"d/m/Y" }}</td>
+                                <td>
+                                    {% if estudio.archivo %}
+                                        <a href="{{ estudio.archivo.url }}" target="_blank" class="btn btn-outline-primary btn-sm">Ver Archivo</a>
+                                    {% else %}
+                                        <span class="text-muted">No disponible</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <!-- Botón para abrir el modal -->
+                                    <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#modalEliminar{{ estudio.id }}">
+                                        Eliminar
+                                    </button>
+                                
+                                    <!-- Modal de confirmación por cada estudio -->
+                                    <div class="modal fade" id="modalEliminar{{ estudio.id }}" tabindex="-1" aria-labelledby="modalLabel{{ estudio.id }}" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content">
+                                                <div class="modal-header bg-danger text-white">
+                                                    <h5 class="modal-title" id="modalLabel{{ estudio.id }}">Confirmar Eliminación</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    ¿Estás seguro de que querés eliminar el estudio <strong>{{ estudio.get_tipo_estudio_display }}</strong>?
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <form method="post" action="{% url 'eliminar_estudio' estudio.id %}">
+                                                        {% csrf_token %}
+                                                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-muted">No hay estudios registrados.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="d-flex justify-content-end mt-4">
+                    <a href="{% url 'menu_estudiante' %}" class="btn btn-secondary">Volver al Menú</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+{% if request.GET.exito %}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const modal = new bootstrap.Modal(document.getElementById('modalExito'));
+        modal.show();
+    });
+</script>
+
+<!-- Modal -->
+<div class="modal fade" id="modalExito" tabindex="-1" aria-labelledby="modalExitoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-success">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="modalExitoLabel">✅ Estudio cargado con éxito</h5>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" data-bs-dismiss="modal">Aceptar</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %} {% endcomment %}

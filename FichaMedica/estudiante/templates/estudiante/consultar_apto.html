@@ -33,16 +33,9 @@
                              <div class="container mt-5">
                               <!-- Tarjeta Principal -->
                               <div class="card shadow-lg p-5 bg-light rounded-4">
-                                  <h2 class="text-primary text-center fw-bold mb-4">Estudiantes con Certificado Unico Escolar Aprobado</h2>
+                                  <h2 class="text-primary text-center fw-bold mb-4">Estado del Certificado Unico Escolar</h2>
                           
-                                  <!-- Mensajes de éxito/error -->
-                                  {% if messages %}
-                                      <div class="alert alert-info">
-                                          {% for message in messages %}
-                                              {{ message }}
-                                          {% endfor %}
-                                      </div>
-                                  {% endif %}
+                                 
                           
                                   <!-- Tabla de Estudiantes -->
                                   <div class="table-responsive">
@@ -56,7 +49,7 @@
                                                   <th>Localidad</th>
                                                   <th>Colegio</th>
                                                   
-                                                  <th>CUS</th>
+                                                  <th>Estado</th>
                                               </tr>
                                           </thead>
                                           <tbody>
@@ -69,10 +62,19 @@
                                                   <td>{{ estudiante.localidad }}</td>
                                                   <td>{{ estudiante.colegio_activo }}</td>
                                                   <td>
-                                                      <a href="{% url 'editar_estudiante' estudiante.id %}" class="btn btn-warning btn-sm">Ver</a>
-                                                     
-                                                    {% comment %}   <a href="{% url 'eliminar_estudiante' estudiante.id %}" class="btn btn-danger btn-sm">Eliminar</a> {% endcomment %}
+                                                    {% if estudiante.cus.last %}
+                                                        <span class="badge bg-info text-dark">{{ estudiante.cus.last.estado }}</span>
+                                                
+                                                        {% if estudiante.cus.last.estado == 'APROBADA' or estudiante.cus.last.estado == 'RECHAZADA' %}
+                                                            <a href="{% url 'ver_pdf_cus' estudiante.cus.last.id %}" class="btn btn-primary btn-sm mt-1">Ver</a>
+                                                        {% endif %}
+                                                    {% else %}
+                                                        <span class="text-muted">Sin CUS</span>
+                                                    {% endif %}
                                                   </td>
+                                                
+                                                    {% comment %}   <a href="{% url 'eliminar_estudiante' estudiante.id %}" class="btn btn-danger btn-sm">Eliminar</a> {% endcomment %}
+                                                  
                                               </tr>
                                               {% empty %}
                                               <tr>
@@ -86,7 +88,7 @@
                                   <!-- Botones de Acción -->
                                   <div class="d-flex justify-content-end mt-5">
                                       <a href="{% url 'menu_estudiante' %}" class="btn btn-secondary btn-lg w-45 me-3">Volver</a>
-                                      <a href="{% url 'cargar_estudiante' %}" class="btn btn-primary btn-lg w-45">Agregar Nuevo Estudiante</a>
+                                      
                                   </div>
                                   
                               </div>

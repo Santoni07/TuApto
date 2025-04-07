@@ -140,16 +140,18 @@
                         
                     ">
                     
-                        <li style="margin-bottom: 5px;">
-                            <a href="" style="color: white; text-decoration: none; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);">
+                    <li style="margin-bottom: 5px;">
+                        <a href="{% url 'seleccionar_estudiante_para_estudio' %}?accion=cargar"
+                           style="color: white; text-decoration: none; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);">
                             Cargar Estudios
-                            </a>
-                        </li>
-                        <li>
-                            <a href="" style="color: white; text-decoration: none; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);">
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'seleccionar_estudiante_para_estudio' %}?accion=listar"
+                           style="color: white; text-decoration: none; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);">
                             Ver Estudios
-                            </a>
-                        </li>
+                        </a>
+                    </li>
                     
                        
                     
@@ -164,25 +166,41 @@
                     </li>
             
 
-                    <!-- Notificaciones -->
+                <!-- Notificaciones -->
                     <li class="nav-item dropdown" style="position: relative;">
-                    <a
-                        class="nav-link dropdown-toggle fs-5"
-                        href="#"
-                        data-menu="link"
-                        id="notificaciones"
-                        style="color: white; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);"
-                    >
-                        <i class="bi bi-bell"></i> Notificaciones
-                    </a>
-                    <ul id="submenuNotificaciones" style="
-                        display: none;
-                        
-                        background-color: #00c4f6;
-                    
-                    ">
-                    
-                    </ul>
+                        <a class="nav-link fs-5"
+                        href="#" id="notificaciones"
+                        style="color: white; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);">
+                            <i class="bi bi-bell"></i> Notificaciones
+                        </a>
+
+                        <ul id="submenuNotificaciones" style="
+                            display: none;
+                            background-color: #00c4f6;
+                            position: absolute;
+                            list-style: none;
+                            padding: 10px;
+                            border-radius: 5px;
+                            z-index: 1000;
+                            min-width: 300px;">
+                            
+                            {% if notificaciones_cus %}
+                                {% for cus in notificaciones_cus %}
+                                    <li style="margin-bottom: 5px;">
+                                        <a href="#" style="color: white; text-decoration: none; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2); display: block;">
+                                            <strong>{{ cus.estudiante.nombre }} {{ cus.estudiante.apellido }}</strong><br>
+                                            <small>Vence: {{ cus.fecha_caducidad|date:"d/m/Y" }} - Estado: {{ cus.estado }}</small>
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                            {% else %}
+                                <li>
+                                    <a href="#" style="color: white; text-decoration: none; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);">
+                                        No hay estudiantes con CUS aprobados.
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
                     </li>
                 </ul>
                 </div>
@@ -305,6 +323,6 @@
         </script>
         
         
-        
+       
 
 {% endblock %}

@@ -77,16 +77,18 @@
                 {% endif %}  
                   <!-- Condicional para Consentimientos -->
                   {% if ficha_medica %}
+                  {% for ficha in ficha_medica %}
                     <li>
-                      {% comment %} <a href="{% url 'registroMedico:consentimiento' ficha_medica.id %}" style="color: white; text-decoration: none; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);"> {% endcomment %}
-                        Consentimientos
+                      <a href="{% url 'registroMedico:consentimiento' ficha.id %}" style="color: white; text-decoration: none; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);"> 
+                        Consentimiento - {{ ficha.torneo__nombre }}
                       </a>
                     </li>
-                  {% else %}
-                    <li>
-                      <p style="color: white;">No hay ficha médica disponible.</p>
-                    </li>
-                  {% endif %}
+                  {% endfor %}
+                {% else %}
+                  <li>
+                    <p style="color: white;">No hay ficha médica disponible.</p>
+                  </li>
+                {% endif %}
                 </ul>
               </li>
       
@@ -413,17 +415,12 @@
 
                           <!-- Lógica para mostrar la alerta -->
                           {% if not antecedentes %}
-                          {{antecedentes}}
+                          
                           <div class="mt-4 d-flex justify-content-between align-items-center alert" 
                               style="background-color: #e3f7fc; color: #084c61; border: 1px solid #c8e6ef; padding: 20px; border-radius: 8px;">
                             <!-- Texto a la izquierda -->
                             <span class="fs-5" style="font-family: 'Nunito Sans', sans-serif;">
-                              {% comment %} {% if ficha_medica.antecedenteenfermedades %}
-                              <strong>Recuerda:</strong> Carga tu consentimiento.
-                              <a href="{% url 'registroMedico:consentimiento' ficha_medica.id %}" 
-                              class="btn btn-primary btn-lg" 
-                              style="font-family: 'Nunito Sans', sans-serif; font-weight: 600;">Cargar</a>
-                              {% else %} {% endcomment %}
+                              
                               <strong>Recuerda:</strong> Carga tus antecedentes de enfermedades.
                               <a href="{% url 'registroMedico:cargar_antecedente' jugador_id %}" 
                               class="btn btn-primary btn-lg" 

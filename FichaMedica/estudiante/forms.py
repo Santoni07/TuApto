@@ -99,11 +99,22 @@ class AntecedentesCUSForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(AntecedentesCUSForm, self).__init__(*args, **kwargs)
 
-        # Campos tipo Checkbox
-        checkbox_fields = [
+        # Campos tipo Select (Sí/No) para valores booleanos
+        boolean_fields = [
             'diabetes', 'asma', 'chagas', 'hipertension', 'neurologico',
             'cansancio_extremo', 'falta_aire', 'perdida_conocimiento', 'palpitaciones',
             'precordialgias', 'cefaleas', 'vomitos'
         ]
-        for field in checkbox_fields:
-            self.fields[field].widget = forms.CheckboxInput(attrs={'class': 'form-check-input'})
+        for field in boolean_fields:
+            self.fields[field].widget = forms.Select(
+    choices=[(True, 'Sí'), (False, 'No')],
+    attrs={
+        'class': 'form-select form-select-sm mx-auto d-block',
+        'style': 'width: 100px;'  # o menos si querés más compacto
+    }
+)
+
+        # Estilo especial para el checkbox de declaración jurada
+        self.fields['declaracion_jurada'].widget.attrs.update({
+            'class': 'form-check-input fs-4 border border-3 border-secondary shadow-sm'
+        })

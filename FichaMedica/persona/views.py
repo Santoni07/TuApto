@@ -16,12 +16,21 @@ from .models import *
 
 
 
-
+@login_required
 def registrar_persona(request):
-    profile = request.user.profile
+    profile_id = request.session.get("user_profile_id")
+    profile = Profile.objects.filter(id=profile_id).first()
 
-    # Obtener o crear la Persona asociada al perfil
-    persona, created = Persona.objects.get_or_create(profile=profile)
+    if not profile:
+        messages.error(request, "No se pudo identificar tu perfil.")
+        return redirect('select_role')  # O a donde quieras redirigir si no hay perfil
+
+    # Buscar o crear persona asociada al perfil
+    persona = Persona.objects.filter(profile=profile).first()
+    if not persona:
+        persona = Persona(profile=profile)
+        persona.save()
+
     jugador = Jugador.objects.filter(persona=persona).first()
 
     if request.method == 'POST':
@@ -29,25 +38,18 @@ def registrar_persona(request):
         form_jugador = JugadorForm(request.POST, instance=jugador) if jugador else JugadorForm(request.POST)
 
         if form_persona.is_valid() and form_jugador.is_valid():
-            # Guardar Persona
             persona_guardada = form_persona.save(commit=False)
             persona_guardada.profile = profile
             persona_guardada.save()
 
-            # Guardar Jugador
             jugador_guardado = form_jugador.save(commit=False)
             jugador_guardado.persona = persona_guardada
             jugador_guardado.save()
 
             messages.success(request, "¡Datos guardados correctamente!")
-
-            # Redirigir al siguiente paso
             return redirect('seleccionar_categoria_equipo')
-
         else:
-            # Si hay errores en el formulario
             messages.error(request, "Por favor, corrige los errores en el formulario.")
-
     else:
         form_persona = PersonaForm(instance=persona)
         form_jugador = JugadorForm(instance=jugador) if jugador else JugadorForm()
@@ -71,8 +73,6 @@ def registrar_persona(request):
         'jugador': jugador,
     }
     return render(request, 'persona/registrar_persona.html', context)
-
-
 def fetch_categorias(request, torneo_id):
     try:
         print(f"Torneo seleccionado: {torneo_id}")
@@ -127,57 +127,34 @@ def fetch_equipos(request, categoria_id):
         return render(request, 'persona/seleccionar_categoria_equipo.html', {'torneos': torneos})
 
 
+@login_required
 def seleccionar_categoria_equipo(request):
     if request.method == 'POST':
-        # Solicitud POST: Procesar el formulario
-        print("Solicitud POST recibida")
-        print(request.POST)
-
         torneo_id = request.POST.get('torneo')
-        print(f"Torneo seleccionado: {torneo_id}")
         categoria_id = request.POST.get('categoria')
         equipo_id = request.POST.get('equipo')
 
         try:
-            # Obtener la persona asociada al perfil del usuario
-            persona = get_object_or_404(Persona, profile=request.user.profile)
-            
-            # Obtener el jugador asociado a esa persona
+            profile_id = request.session.get("user_profile_id")
+            profile = get_object_or_404(Profile, id=profile_id)
+
+            persona = get_object_or_404(Persona, profile=profile)
             jugador = get_object_or_404(Jugador, persona=persona)
-            print(f"Jugador encontrado: {jugador.id}")
-            
-            # Obtener la instancia de CategoriaEquipo
             categoria_equipo = get_object_or_404(CategoriaEquipo, categoria_id=categoria_id, equipo_id=equipo_id)
-            print(f"Categoría-Equipo encontrada: {categoria_equipo.id}")
-            # Crear la asociación en el modelo JugadorCategoriaEquipo
-            JugadorCategoriaEquipo.objects.create(
-                jugador=jugador,
-                categoria_equipo=categoria_equipo
-            )
 
-            # Redirigir o mostrar un mensaje de éxito
-            return redirect('menu_jugador')  # O la URL a la que quieras redirigir
+            # Verificar si ya existe la relación para evitar IntegrityError duplicado
+            if not JugadorCategoriaEquipo.objects.filter(jugador=jugador, categoria_equipo=categoria_equipo).exists():
+                JugadorCategoriaEquipo.objects.create(jugador=jugador, categoria_equipo=categoria_equipo)
 
-        except Jugador.DoesNotExist:
-            print("Error: El jugador no existe para la persona.")
-            return redirect('home')  # Redirige a una página de error o mostrar un mensaje adecuado
-        except CategoriaEquipo.DoesNotExist:
-            print("Error: La categoría o equipo no existe.")
-            return redirect('home')  # Redirige a una página de error o mostrar un mensaje adecuado
-        except IntegrityError as e:
-            print(f"Error de integridad (clave foránea fallida): {e}")
-            return redirect('home')  # Redirige a una página de error o mostrar un mensaje adecuado
+            return redirect('menu_jugador')
+
         except Exception as e:
-            print(f"Otro error ocurrió: {e}")
-            return redirect('home')  # Redirige a una página de error o mostrar un mensaje adecuado
+            print(f"[ERROR selección equipo] {e}")
+            return redirect('home')
 
     else:
-        # Solicitud GET: Cargar torneos y renderizar el formulario
         torneos = Torneo.objects.all()
-        print("Torneos disponibles:", torneos)
         return render(request, 'persona/seleccionar_categoria_equipo.html', {'torneos': torneos})
-
-
 def error_registro(request):
     return render(request, 'persona/error_registro.html')
 

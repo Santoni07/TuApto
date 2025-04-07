@@ -24,15 +24,20 @@ class CusForm(forms.ModelForm):
         }
 
 class ExamenFisicoForm(forms.ModelForm):
+    imc = forms.DecimalField(
+        label='IMC',
+        required=False,
+        widget=forms.NumberInput(attrs={'class': 'form-control', 'readonly': 'readonly'})
+    )
+
     class Meta:
         model = ExamenFisico
-        fields = ['peso', 'talla', 'diagnostico_antropometrico']
+        fields = ['peso', 'talla', 'imc', 'diagnostico_antropometrico']
         widgets = {
-            'peso': forms.NumberInput(attrs={'class': 'form-control'}),
-            'talla': forms.NumberInput(attrs={'class': 'form-control'}),
+            'peso': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'id': 'id_peso'}),
+            'talla': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'id': 'id_talla'}),
             'diagnostico_antropometrico': widget_input(),
         }
-
 class AlimentacionNutricionForm(forms.ModelForm):
     class Meta:
         model = AlimentacionNutricion
@@ -131,7 +136,7 @@ class ExamenNeurologicoForm(forms.ModelForm):
 class EstudioCusForm(forms.ModelForm):
     class Meta:
         model = EstudioCus
-        fields = ['tipo_estudio', 'archivo', 'observaciones', 'fecha_caducidad']
+        fields = ['tipo_estudio', 'archivo', 'observaciones']
         widgets = {
             'tipo_estudio': widget_select(),
             'archivo': forms.ClearableFileInput(attrs={'class': 'form-control'}),
@@ -153,3 +158,6 @@ class RecomendacionesForm(forms.ModelForm):
         model = Recomendaciones
         fields = ['detalles']
         widgets = {'detalles': widget_textarea(3)}
+
+        
+ 

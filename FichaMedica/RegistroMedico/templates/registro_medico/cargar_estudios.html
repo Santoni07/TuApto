@@ -48,6 +48,8 @@
                                     {{ form.archivo|add_class:"form-control form-control-file" }}
                                 </div>
 
+                                <!-- ✅ Campo oculto para mantener vínculo con la ficha médica -->
+                                <input type="hidden" name="registro_id" value="{{ registro_medico.id }}">
                                 <div class="d-flex justify-content-between align-items-center mt-4">
                                     <a href="{% url 'menu_jugador' %}" class="btn btn-outline-info">Volver</a>
                                     <button type="button" onclick="validarFormulario()" class="btn btn-success">Cargar Estudio</button>

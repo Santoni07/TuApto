@@ -32,52 +32,45 @@
                             {% csrf_token %}
 
                             <div class="row">
-                                <!-- Lado Izquierdo -->
+                                <!-- Columna Izquierda -->
                                 <div class="col-md-6">
-                                    <!-- Sección 1: Vacunaciones -->
+                                    <!-- Vacunaciones -->
                                     <div class="card border-primary p-3 mb-4 rounded-3">
                                         <h4 class="fw-bold text-primary">1. VACUNACIONES</h4>
-                                        <table class="table table-bordered text-center">
-                                            <thead class="table-primary">
-                                                <tr>
-                                                    <th></th>
-                                                    <th class="fw-bold">SI</th>
-                                                    <th class="fw-bold">NO</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td class="text-start">Carnet</td>
-                                                    <td><input type="checkbox" name="carnet_vacunacion"></td>
-                                                    <td><input type="checkbox" name="carnet_vacunacion_no"></td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="text-start">Completo</td>
-                                                    <td><input type="checkbox" name="esquema_completo"></td>
-                                                    <td><input type="checkbox" name="esquema_completo_no"></td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                                    
+                                        <label class="fw-bold">Carnet:</label>
+                                        <select class="form-select mb-2" name="carnet_vacunacion">
+                                            <option value="">Seleccione</option>
+                                            <option value="True">Sí</option>
+                                            <option value="False">No</option>
+                                        </select>
+                                    
+                                        <label class="fw-bold">Completo:</label>
+                                        <select class="form-select mb-2" name="esquema_completo">
+                                            <option value="">Seleccione</option>
+                                            <option value="True">Sí</option>
+                                            <option value="False">No</option>
+                                        </select>
+                                    
                                         <label class="fw-bold">Debe completar esquema con:</label>
                                         <input type="text" class="form-control mb-3" name="esquema_faltante">
                                     </div>
 
-                                    <!-- Sección 3: Condiciones de Riesgo -->
+                                    <!-- Condiciones de Riesgo -->
                                     <div class="card border-primary p-3 mb-4 rounded-3">
                                         <h4 class="fw-bold text-primary">3. CONDICIONES DE RIESGO</h4>
                                         <input type="text" class="form-control mb-3" name="condiciones_riesgo">
                                     </div>
 
-                                    <!-- Sección 4: Medicamentos Prescriptos -->
+                                    <!-- Medicamentos -->
                                     <div class="card border-primary p-3 mb-4 rounded-3">
                                         <h4 class="fw-bold text-primary">4. MEDICAMENTOS PRESCRIPTOS</h4>
                                         <input type="text" class="form-control mb-3" name="medicamentos_prescriptos">
                                     </div>
                                 </div>
 
-                                <!-- Lado Derecho (Final) -->
+                                <!-- Columna Derecha -->
                                 <div class="col-md-6 d-flex flex-column justify-content-end">
-                                    <!-- Sección 2: Antecedentes Patológicos -->
                                     <div class="card border-primary p-3 mb-4 rounded-3">
                                         <h4 class="fw-bold text-primary">2. ANTECEDENTES PATOLÓGICOS</h4>
                                         <label>Enfermedades Importantes:</label>
@@ -95,7 +88,7 @@
                                         <label>Alergias/Especificar:</label>
                                         <input type="text" class="form-control mb-2" name="alergias">
 
-                                        <label>Oftalmologicos:</label>
+                                        <label>Oftalmológicos:</label>
                                         <input type="text" class="form-control mb-2" name="oftalmologicos">
 
                                         <label>Auditivos:</label>
@@ -104,301 +97,93 @@
                                 </div>
                             </div>
 
-                               <!-- Sección 5: Actividad Física -->
-                               <div class="card border-primary p-3 mb-4 rounded-3">
-                                <h4 class="fw-bold text-primary">5. DURANTE ACTIVIDAD FÍSICA PREVIA SUFRIÓ:</h4>
-                                <table class="table table-bordered text-center">
-                                    <thead class="table-primary">
-                                        <tr>
-                                            <th class="text-start"></th>
-                                            <th class="fw-bold">SI</th>
-                                            <th class="fw-bold">NO</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td class="text-start">Cansancio extremo</td>
-                                            <td><input type="checkbox" name="cansancio" value="si"></td>
-                                            <td><input type="checkbox" name="cansancio" value="no"></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-start">Falta de aire</td>
-                                            <td><input type="checkbox" name="falta_aire" value="si"></td>
-                                            <td><input type="checkbox" name="falta_aire" value="no"></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-start">Pérdida de conocimiento</td>
-                                            <td><input type="checkbox" name="perdida_conocimiento" value="si"></td>
-                                            <td><input type="checkbox" name="perdida_conocimiento" value="no"></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-start">Palpitaciones</td>
-                                            <td><input type="checkbox" name="palpitaciones" value="si"></td>
-                                            <td><input type="checkbox" name="palpitaciones" value="no"></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-start">Precordalgias</td>
-                                            <td><input type="checkbox" name="precordialgias" value="si"></td>
-                                            <td><input type="checkbox" name="precordialgias" value="no"></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-start">Cefaleas</td>
-                                            <td><input type="checkbox" name="cefaleas" value="si"></td>
-                                            <td><input type="checkbox" name="cefaleas" value="no"></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-start">Vomitos</td>
-                                            <td><input type="checkbox" name="vomitos" value="si"></td>
-                                            <td><input type="checkbox" name="vomitos" value="no"></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                                <label>Otros:</label>
-                                <input type="text" class="form-control mb-3" name="otros">
-                            </div>
-                         
-                            <!-- Sección de Declaración Jurada -->
-                            <div class="card border-danger p-3 mb-4 rounded-3">
-                                <h4 class="fw-bold text-danger">⚠️ DECLARACIÓN JURADA</h4>
-                                <p class="fw-bold">
-                                    Declaro bajo juramento que toda la información proporcionada en este formulario es verídica
-                                    y asumo plena responsabilidad por su exactitud.
-                                </p>
-                                <div class="form-check">
-                                    {{ form.declaracion_jurada }}  <!-- ✅ Este checkbox ahora viene desde Django Forms -->
-                                    <label class="form-check-label fw-bold text-danger" for="{{ form.declaracion_jurada.id_for_label }}">
-                                        Acepto y confirmo la veracidad de la información proporcionada.
-                                    </label>
-                                </div>
-                            </div>
-
-                            <!-- Botón de envío -->
-                            <div class="d-flex justify-content-end mt-5">
-                                <a href="{% url 'menu_estudiante' %}" class="btn btn-secondary btn-lg w-45 me-3">Volver</a>
-                                <button type="submit" class="btn btn-primary btn-lg w-45">Guardar</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </main>
-    </div>
-</div>
-
-<!-- JavaScript para validar el consentimiento -->
-<script>
-    function validarConsentimiento() {
-        let checkBox = document.getElementById("consentimiento");
-        if (!checkBox.checked) {
-            alert("Debe aceptar la Declaración Jurada antes de enviar el formulario.");
-            return false;
-        }
-        return true;
-    }
-</script>
-
-{% endblock %}
-
-
-
-
-
-
-{% comment %} {% extends 'core/base.html' %}
-{% load static %}
-
-{% block content %}
-
-<div class="row" style="margin: 0; padding: 0;">
-    <div class="container-fluid ficha-medica-container" style="margin: 0; padding: 0;">
-        <main class="px-3" style="position: relative; min-height: 100vh; width: 100%; margin: 0; padding: 0;">
-            <style>
-                main::before {
-                    content: '';
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    background: url('{% static "core/img/estudiante_home.jpeg" %}') no-repeat center center;
-                    background-size: cover;
-                    opacity: 0.4;
-                    z-index: -1;
-                }
-            </style>
-
-            <div style="position: relative; z-index: 1;">
-                <div class="container mt-5 pt-5">
-                    <div class="card shadow-lg p-5 bg-light rounded-4 mx-auto" style="max-width: 1000px;">
-                        <h3 class="text-center text-primary fw-bold mb-4">
-                            Cargar Antecedentes Médicos para {{ estudiante.nombre }} {{ estudiante.apellido }}
-                        </h3>
-
-                        <form method="POST" action="" onsubmit="return validarConsentimiento()">
-                            {% csrf_token %}
-
-                            <div class="row">
-                                <!-- Sección 1: Vacunaciones -->
-                                <div class="col-md-6">
-                                    <div class="card border-primary p-3 mb-4 rounded-3">
-                                        <h4 class="fw-bold text-primary">1. VACUNACIONES</h4>
-                                        <table class="table table-bordered text-center">
-                                            <thead class="table-primary">
-                                                <tr>
-                                                    <th></th>
-                                                    <th class="fw-bold">SI</th>
-                                                    <th class="fw-bold">NO</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td class="text-start">Carnet</td>
-                                                    <td><input type="checkbox" name="carnet" value="si"></td>
-                                                    <td><input type="checkbox" name="carnet" value="no"></td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="text-start">Completo</td>
-                                                    <td><input type="checkbox" name="completo" value="si"></td>
-                                                    <td><input type="checkbox" name="completo" value="no"></td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                        <label class="fw-bold">Debe completar esquema con:</label>
-                                        <input type="text" class="form-control mb-3" name="completarEsquema">
-                                    </div>
-                                </div>
-
-                                <!-- Sección 2: Antecedentes Patológicos -->
-                                <div class="col-md-6">
-                                    <div class="card border-primary p-3 mb-4 rounded-3">
-                                        <h4 class="fw-bold text-primary">2. ANTECEDENTES PATOLÓGICOS</h4>
-                                        <label>Enfermedades Importantes:</label>
-                                        <textarea class="form-control mb-2" name="enfermedades_importantes" rows="2"></textarea>
-
-                                        <label>Cirugías:</label>
-                                        <input type="text" class="form-control mb-2" name="cirugias">
-
-                                        <label>Cardiovasculares:</label>
-                                        <input type="text" class="form-control mb-2" name="cardiovasculares">
-
-                                        <label>Trauma c/alt. funcional:</label>
-                                        <input type="text" class="form-control mb-2" name="trauma_funcional">
-
-                                        <label>Alergias/Especificar:</label>
-                                        <input type="text" class="form-control mb-2" name="alergias">
-
-                                        <label>Oftalmologicos:</label>
-                                        <input type="text" class="form-control mb-2" name="oftalmologicos">
-
-                                        <label>Auditivos:</label>
-                                        <input type="text" class="form-control mb-2" name="auditivos">
-
-                                        <div class="row mt-3">
-                                            <div class="col-md-6">
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="diabetes" id="diabetes">
-                                                    <label class="form-check-label" for="diabetes">Diabetes</label>
-                                                </div>
-                                                
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="chagas" id="chagas">
-                                                    <label class="form-check-label" for="chagas">Chagas</label>
-                                                </div>
-                                    
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="neurologico" id="neurologico">
-                                                    <label class="form-check-label" for="neurologico">Neurológico</label>
-                                                </div>
-                                            </div>
-                                    
-                                            <div class="col-md-6">
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="asma" id="asma">
-                                                    <label class="form-check-label" for="asma">Asma</label>
-                                                </div>
-                                    
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" name="hipertension" id="hipertension">
-                                                    <label class="form-check-label" for="hipertension">Hipertensión</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <!-- Sección 3: Condiciones de Riesgo -->
-                                <div class="col-md-6">
-                                    <div class="card border-primary p-3 mb-4 rounded-3">
-                                        <h4 class="fw-bold text-primary">3. CONDICIONES DE RIESGO</h4>
-                                        <input type="text" class="form-control mb-3" name="condiciones_riesgo">
-                                    </div>
-                                </div>
-
-                                <!-- Sección 4: Medicamentos Prescriptos -->
-                                <div class="col-md-6">
-                                    <div class="card border-primary p-3 mb-4 rounded-3">
-                                        <h4 class="fw-bold text-primary">4. MEDICAMENTOS PRESCRIPTOS</h4>
-                                        <input type="text" class="form-control mb-3" name="medicamentos_prescriptos">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Sección 5: Actividad Física -->
+                            <!-- Actividad Física -->
                             <div class="card border-primary p-3 mb-4 rounded-3">
                                 <h4 class="fw-bold text-primary">5. DURANTE ACTIVIDAD FÍSICA PREVIA SUFRIÓ:</h4>
-                                <table class="table table-bordered text-center">
-                                    <thead class="table-primary">
-                                        <tr>
-                                            <th class="text-start"></th>
-                                            <th class="fw-bold">SI</th>
-                                            <th class="fw-bold">NO</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td class="text-start">Cansancio extremo</td>
-                                            <td><input type="checkbox" name="cansancio" value="si"></td>
-                                            <td><input type="checkbox" name="cansancio" value="no"></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-start">Falta de aire</td>
-                                            <td><input type="checkbox" name="falta_aire" value="si"></td>
-                                            <td><input type="checkbox" name="falta_aire" value="no"></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-start">Pérdida de conocimiento</td>
-                                            <td><input type="checkbox" name="perdida_conocimiento" value="si"></td>
-                                            <td><input type="checkbox" name="perdida_conocimiento" value="no"></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-start">Palpitaciones</td>
-                                            <td><input type="checkbox" name="palpitaciones" value="si"></td>
-                                            <td><input type="checkbox" name="palpitaciones" value="no"></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-start">Precordalgias</td>
-                                            <td><input type="checkbox" name="precordialgias" value="si"></td>
-                                            <td><input type="checkbox" name="precordialgias" value="no"></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-start">Cefaleas</td>
-                                            <td><input type="checkbox" name="cefaleas" value="si"></td>
-                                            <td><input type="checkbox" name="cefaleas" value="no"></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-start">Vomitos</td>
-                                            <td><input type="checkbox" name="vomitos" value="si"></td>
-                                            <td><input type="checkbox" name="vomitos" value="no"></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                                <label>Otros:</label>
+                            
+                                <div class="row align-items-center mb-2">
+                                    <div class="col-8"><label class="fw-bold">Cansancio extremo:</label></div>
+                                    <div class="col-4">
+                                        <select class="form-select form-select-sm" name="cansancio_extremo">
+                                            <option value="">Seleccione</option>
+                                            <option value="True">Sí</option>
+                                            <option value="False">No</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            
+                                <div class="row align-items-center mb-2">
+                                    <div class="col-8"><label class="fw-bold">Falta de aire:</label></div>
+                                    <div class="col-4">
+                                        <select class="form-select form-select-sm" name="falta_aire">
+                                            <option value="">Seleccione</option>
+                                            <option value="True">Sí</option>
+                                            <option value="False">No</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            
+                                <div class="row align-items-center mb-2">
+                                    <div class="col-8"><label class="fw-bold">Pérdida de conocimiento:</label></div>
+                                    <div class="col-4">
+                                        <select class="form-select form-select-sm" name="perdida_conocimiento">
+                                            <option value="">Seleccione</option>
+                                            <option value="True">Sí</option>
+                                            <option value="False">No</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            
+                                <div class="row align-items-center mb-2">
+                                    <div class="col-8"><label class="fw-bold">Palpitaciones:</label></div>
+                                    <div class="col-4">
+                                        <select class="form-select form-select-sm" name="palpitaciones">
+                                            <option value="">Seleccione</option>
+                                            <option value="True">Sí</option>
+                                            <option value="False">No</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            
+                                <div class="row align-items-center mb-2">
+                                    <div class="col-8"><label class="fw-bold">Precordialgias:</label></div>
+                                    <div class="col-4">
+                                        <select class="form-select form-select-sm" name="precordialgias">
+                                            <option value="">Seleccione</option>
+                                            <option value="True">Sí</option>
+                                            <option value="False">No</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            
+                                <div class="row align-items-center mb-2">
+                                    <div class="col-8"><label class="fw-bold">Cefaleas:</label></div>
+                                    <div class="col-4">
+                                        <select class="form-select form-select-sm" name="cefaleas">
+                                            <option value="">Seleccione</option>
+                                            <option value="True">Sí</option>
+                                            <option value="False">No</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            
+                                <div class="row align-items-center mb-2">
+                                    <div class="col-8"><label class="fw-bold">Vómitos:</label></div>
+                                    <div class="col-4">
+                                        <select class="form-select form-select-sm" name="vomitos">
+                                            <option value="">Seleccione</option>
+                                            <option value="True">Sí</option>
+                                            <option value="False">No</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            
+                                <label class="fw-bold mt-3">Otros:</label>
                                 <input type="text" class="form-control mb-3" name="otros">
                             </div>
+                            
 
-                            <!-- Sección de Declaración Jurada -->
+                            <!-- Declaración Jurada -->
                             <div class="card border-danger p-3 mb-4 rounded-3">
                                 <h4 class="fw-bold text-danger">⚠️ DECLARACIÓN JURADA</h4>
                                 <p class="fw-bold">
@@ -406,19 +191,20 @@
                                     y asumo plena responsabilidad por su exactitud.
                                 </p>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="consentimiento" name="consentimiento">
-                                    <label class="form-check-label fw-bold text-danger" for="consentimiento">
+                                    {{ form.declaracion_jurada }}
+                                    <label id="labelConsentimiento" class="form-check-label fw-bold text-danger" for="{{ form.declaracion_jurada.id_for_label }}">
                                         Acepto y confirmo la veracidad de la información proporcionada.
                                     </label>
                                 </div>
                             </div>
 
-                            <!-- Botón de envío -->
+                            <!-- Botones -->
                             <div class="d-flex justify-content-end mt-5">
                                 <a href="{% url 'menu_estudiante' %}" class="btn btn-secondary btn-lg w-45 me-3">Volver</a>
                                 <button type="submit" class="btn btn-primary btn-lg w-45">Guardar</button>
                             </div>
                         </form>
+
                     </div>
                 </div>
             </div>
@@ -426,10 +212,47 @@
     </div>
 </div>
 
-<!-- JavaScript para validar el consentimiento -->
+                        <!-- Modal de éxito -->
+                        <div class="modal fade" id="modalExito" tabindex="-1" aria-labelledby="modalExitoLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content shadow-lg border-success">
+                                    <div class="modal-header bg-success text-white">
+                                        <h5 class="modal-title" id="modalExitoLabel">✅ Antecedentes Guardados</h5>
+                                    </div>
+                                    <div class="modal-body text-center">
+                                        <p class="fs-5">Los antecedentes médicos fueron cargados con éxito.</p>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-success" id="btnAceptarModal">Aceptar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Script para redirigir al cerrar el modal -->
+                        <script>
+                            document.addEventListener("DOMContentLoaded", function () {
+                              {% if messages %}
+                                const modalElement = document.getElementById('modalExito');
+                                const modal = new bootstrap.Modal(modalElement);
+                                modal.show();
+                          
+                                const btnAceptar = document.getElementById("btnAceptarModal");
+                                if (btnAceptar) {
+                                  btnAceptar.addEventListener("click", function () {
+                                    modal.hide();
+                                    setTimeout(() => {
+                                      window.location.href = "{% url 'menu_estudiante' %}";
+                                    }, 200);
+                                  });
+                                }
+                              {% endif %}
+                            });
+                          </script>
+<!-- Validación de consentimiento -->
 <script>
     function validarConsentimiento() {
-        let checkBox = document.getElementById("consentimiento");
+        let checkBox = document.getElementById("{{ form.declaracion_jurada.id_for_label }}");
         if (!checkBox.checked) {
             alert("Debe aceptar la Declaración Jurada antes de enviar el formulario.");
             return false;
@@ -438,5 +261,6 @@
     }
 </script>
 
+
+
 {% endblock %}
- {% endcomment %}

@@ -1,0 +1,164 @@
+{% extends 'core/base.html' %}
+{% load widget_tweaks %}
+{% load static %}
+<style>
+    body{
+        background-color: #ecf0f1; 
+    }
+    .card-header {
+        width:100%;
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #ced4da;
+        text-align: center;
+    }
+    .align-left {
+        text-align: left;
+    }
+
+    .table {
+        border-collapse: collapse;
+        background-color: beige;
+    }
+
+    .table-bordered td,
+    .table-bordered th {
+        border: 2px solid black; /* Color de las líneas */
+    }
+
+    .thead-dark {
+        background-color: #343a40; /* Color de fondo para el encabezado */
+        color: white; /* Color del texto del encabezado */
+    }
+
+    @media (max-width: 680px) {
+        .table-responsive {
+            overflow-x: auto; /* Permite el desplazamiento en dispositivos pequeños */
+        }
+    }
+    
+</style>
+{% block content %}
+<main class="px-3" style="position: relative; min-height: 100vh; width: 100%; margin: 0; padding: 0;">
+    <style>
+        main::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('{% static "core/img/medico_home.jpg" %}') no-repeat center center;
+            background-size: cover;
+            opacity: 0.2;
+            z-index: -1;
+        }
+
+        @media (max-width: 768px) {
+            .table-responsive {
+                overflow-x: auto;
+            }
+            .card-header {
+                padding: 1rem;
+                font-size: 1.2rem;
+            }
+            .table {
+                display: block;
+            }
+            .table thead {
+                display: none;
+            }
+            .table tbody, .table tr, .table td {
+                display: block;
+                width: 100%;
+            }
+            .table tr {
+                margin-bottom: 1rem;
+                border: 1px solid #dee2e6;
+                padding: 0.5rem;
+                background: white;
+                border-radius: 5px;
+            }
+            .table td {
+                text-align: left;
+                padding: 0.5rem;
+                border-bottom: none;
+            }
+            .table td::before {
+                content: attr(data-label);
+                font-weight: bold;
+                display: block;
+                text-transform: uppercase;
+                color: #17a2b8;
+            }
+        }
+    </style>
+
+    <div style="position: relative; z-index: 1;">
+        <div class="container mt-5" style="background-color:transparencia; padding: 2rem; border-radius: 10px;">
+
+            <h1 class="text-center fw-bold py-4">
+                <span class="text-primary">Bienvenido,</span> 
+                <span class="text-dark">Dr. {{ profile.nombre }} {{ profile.apellido }}</span> 
+                {% if medico %}
+                    <span class="text-dark">- Matrícula N°: {{ medico.matricula }}</span>
+                {% else %}
+                    <span class="text-dark">- Matrícula no disponible</span>
+                {% endif %}
+            </h1> 
+
+            <div class="container py-5">
+                <div class="row justify-content-center gap-5">
+            
+                    <!-- 🏋️‍♂️ Aptos Físicos -->
+                    <div class="col-md-5">
+                        <div class="card shadow-lg border-0 h-100">
+                            <div class="card-header bg-primary text-white text-center rounded-top">
+                                <h3 class="fw-bold mb-0">🏋️ Aptos Físicos</h3>
+                            </div>
+                            <div class="card-body">
+                                <p class="text-dark fs-5">
+                                    Gestioná los <strong>certificados médicos</strong> de jugadores que participan en torneos deportivos. 
+                                    Cargá, visualizá y aprobá sus aptos físicos con total control y seguridad.
+                                </p>
+                                <div class="text-center mt-4">
+                                    <a href="{% url 'medico_home' %}" class="btn btn-primary btn-lg px-4 fw-bold">Ingresar</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+            
+                    <!-- 🎓 Certificado Único Escolar -->
+                    <div class="col-md-5">
+                        <div class="card shadow-lg border-0 h-100">
+                            <div class="card-header bg-success text-white text-center rounded-top">
+                                <h3 class="fw-bold mb-0">🎓 CUS Escolar</h3>
+                            </div>
+                            <div class="card-body">
+                                <p class="text-dark fs-5">
+                                    Accedé a los <strong>Certificados Únicos Escolares (CUS)</strong> para realizar controles médicos de estudiantes.
+                                    Cargá los estudios, revisalos y completá los formularios necesarios.
+                                </p>
+                                <div class="text-center mt-4">
+                                    <a href="{% url 'cus_home' %}" class="btn btn-success btn-lg px-4 fw-bold">Ingresar</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+            
+                </div>
+            </div>
+                
+                    
+                    
+              
+        </div>
+            
+
+
+                          
+
+           
+    </div>
+</main>
+
+{% endblock %}

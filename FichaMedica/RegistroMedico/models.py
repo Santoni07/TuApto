@@ -91,6 +91,7 @@ class RegistroMedico(models.Model):
 
 def default_fecha_caducidad():
     return datetime.now().date() + timedelta(days=365)  # ✅ Sumar 1 año desde hoy
+
 class EstudiosMedico(models.Model):
     TIPO_ESTUDIO = [
         ('ORINA', 'Análisis de Orina'),

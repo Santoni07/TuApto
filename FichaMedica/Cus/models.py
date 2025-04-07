@@ -285,6 +285,13 @@ class EstudioCus(models.Model):
 
     def __str__(self):
         return f'{self.get_tipo_estudio_display()} - {self.cus.estudiante.nombre} {self.cus.estudiante.apellido}'    
+    
+    def save(self, *args, **kwargs):
+        if not self.fecha_caducidad:
+            # Si no se ha establecido fecha de caducidad, agregar 330 días a la fecha de creación
+            base_date = self.fecha_creacion.date() if self.fecha_creacion else now().date()
+            self.fecha_caducidad = base_date + timedelta(days=330)
+        super().save(*args, **kwargs)
 
 
 #COMENTARIOS Y DERIVACIONES

@@ -19,45 +19,31 @@ from .models import Profile
 def dashboard(request):
     return redirect('persona/registrar')
 
-
 @never_cache
 def user_login(request):
     if request.method == 'POST':
         form = LoginForm(request.POST)
         if form.is_valid():
-            cd = form.cleaned_data
-            email = cd['email']
-            password = cd['password']
+            email = form.cleaned_data['email']
+            password = form.cleaned_data['password']
 
-            # 🔍 Buscar todos los usuarios con este email (puede haber más de uno)
-            users = User.objects.filter(email=email)
-            print(f"El usuario es : ", users)
-            if not users.exists():
-                messages.error(request, 'Usuario o contraseña incorrectos. Intente nuevamente.')
-                
+            try:
+                user = User.objects.get(email=email)
+            except User.DoesNotExist:
+                messages.error(request, 'Usuario o contraseña incorrectos.')
                 return redirect('login')
 
-            # 👥 Si hay más de un usuario con el mismo email, pedir que elija el rol
-            if users.count() > 1:
-                roles = Profile.objects.filter(user__in=users).values_list('rol', flat=True)
-                return render(request, 'account/select_role.html', {'email': email, 'roles': roles})
-
-            # 🔐 Si solo hay un usuario, autenticamos normalmente
-            user = authenticate(request, username=users[0].username, password=password)
+            user = authenticate(request, username=user.username, password=password)
 
             if user:
-                if user.is_active:
-                    return login_user_and_redirect(request, user)
-                else:
-                    return HttpResponse('El usuario no está activo')
-
-            messages.error(request, 'Usuario o contraseña incorrectos. Intente nuevamente.')
-            return redirect('login')
-    
+                return login_user_and_redirect(request, user)
+            else:
+                messages.error(request, 'Usuario o contraseña incorrectos.')
+                return redirect('login')
     else:
         form = LoginForm()
-    return render(request, 'account/login.html', {'form': form})
 
+    return render(request, 'account/login.html', {'form': form})
 
 
 @login_required
@@ -118,6 +104,10 @@ def login_user_and_redirect(request, user):
     profile = profiles.first()
     print("Usuario autenticado con rol:", profile.rol)
     
+    
+    # 🔐 Guardamos el ID del perfil en la sesión
+    request.session['user_profile_id'] = profile.id
+    
     # 🔹 Si el usuario es estudiante, verificar si tiene un tutor asociado
     if profile.rol == 'estudiante':
         tutor_asociado = Tutor.objects.filter(profile=profile).exists()
@@ -128,7 +118,7 @@ def login_user_and_redirect(request, user):
         return redirect('menu_estudiante')  # ✅ Si tiene tutor, lo lleva al menú de estudiante
     # 🔄 Redirección condicional según el rol
     if profile.rol == 'medico':
-        return redirect('medico_home')
+        return redirect('seleccionar_apto')
     elif profile.rol == 'general':
         return redirect('menu_jugador')
     elif profile.rol == 'representante':

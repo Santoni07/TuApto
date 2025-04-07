@@ -5,6 +5,8 @@ from .models import AntecedentesCUS, Estudiante, EstudianteColegio, Tutor, Coleg
 from .forms import AntecedentesCUSForm, EstudianteForm, TutorForm
 from account.models import Profile
 from django.contrib.auth.decorators import login_required
+from Cus.models import Cus
+from django.utils.timezone import now
 # Create your views here.
 @login_required
 def home_estudiante(request):
@@ -19,15 +21,23 @@ def home_estudiante(request):
         return redirect('home')
 
     # 🔎 Verificar si el perfil tiene un tutor asociado
-    tutor_asociado = Tutor.objects.filter(profile=profile).exists()
+    tutor = Tutor.objects.filter(profile=profile).first()
 
-    if not tutor_asociado:
+    if not tutor:
         messages.warning(request, "Debes completar la información del tutor antes de continuar.")
         return redirect('cargar_tutor')  # ❌ Si no tiene tutor, redirigir a cargar tutor
 
-    # ✅ Si tiene tutor, mostrar el menú del estudiante
-    return render(request, 'estudiante/menu_estudiante.html')
+    # 🔔 Obtener estudiantes a cargo del tutor
+    estudiantes = Estudiante.objects.filter(tutor=tutor)
 
+    # ✅ Obtener CUS con estado APROBADO
+    notificaciones_cus = Cus.objects.filter(estudiante__in=estudiantes, estado="APROBADA")
+
+    return render(request, 'estudiante/menu_estudiante.html', {
+        "notificaciones_cus": notificaciones_cus,
+        "profile": profile,
+        "tutor": tutor
+    })
 
 def cargar_estudiante(request):
     # 📌 Verificar que el usuario tiene un tutor asociado
@@ -100,9 +110,12 @@ def listar_estudiantes(request):
 def ver_estudiante(request):
     return render(request, 'estudiante/ver_estudiante.html')
 
-
 def consultar_apto(request):
-    return render(request, 'estudiante/consultar_apto.html')
+    estudiantes = Estudiante.objects.filter(cus__isnull=False).distinct()
+
+    return render(request, 'estudiante/consultar_apto.html', {
+        'estudiantes': estudiantes
+    })
 
 @login_required
 def editar_estudiante(request, estudiante_id):
@@ -167,18 +180,27 @@ def eliminar_estudiante(request, estudiante_id):
 
 
 
+
 @login_required
 def datos_personales(request):
-    profile = Profile.objects.filter(user=request.user).first()  # Obtener el perfil del usuario autenticado
-
+    profile = Profile.objects.filter(user=request.user).first()
+    
     if not profile:
         return render(request, "error.html", {"mensaje": "No tienes un perfil asociado."})
 
-    tutor = Tutor.objects.filter(profile=profile).first()  # Buscar tutor asociado
+    tutor = Tutor.objects.filter(profile=profile).first()
+
+    estudiantes = Estudiante.objects.filter(tutor=tutor) if tutor else []
+
+    # Añadir el colegio a cada estudiante
+    for est in estudiantes:
+        relacion = EstudianteColegio.objects.filter(estudiante=est, activo=True).select_related('colegio').first()
+        est.colegio = relacion.colegio if relacion else None
 
     context = {
         "profile": profile,
         "tutor": tutor,
+        "estudiantes": estudiantes,
     }
     return render(request, "estudiante/datos_personales.html", context)
 
@@ -193,6 +215,7 @@ def seleccionar_estudiante(request):
     }
 
     return render(request, 'estudiante/cargar_antecedentes.html', context)
+
 @login_required
 def cargar_antecedente_estudiante(request):
     estudiante_id = request.GET.get('estudiante_id')
@@ -202,14 +225,29 @@ def cargar_antecedente_estudiante(request):
         form = AntecedentesCUSForm(request.POST)
         if form.is_valid():
             antecedente = form.save(commit=False)
-            antecedente.estudiante = estudiante  # Asociar el estudiante al antecedente
+            antecedente.estudiante = estudiante
             antecedente.save()
-            return redirect('menu_estudiante')  # Redirigir a la página principal del estudiante
+
+            # 🆕 Crear automáticamente un CUS asociado
+            Cus.objects.create(
+                estudiante=estudiante,
+                estado='PROCESO',
+                fecha_creacion=now(),
+                consentimiento_persona=True
+            )
+
+             # ✅ Mensaje para mostrar modal
+            messages.success(request, "Antecedentes guardados con éxito.")
+
+            # Volvemos al mismo form para activar el modal
+            return redirect(request.path + f"?estudiante_id={estudiante.id}")
     else:
         form = AntecedentesCUSForm()
 
-    return render(request, 'estudiante/cargar_antecedente_form.html', {'form': form, 'estudiante': estudiante})
-
+    return render(request, 'estudiante/cargar_antecedente_form.html', {
+        'form': form,
+        'estudiante': estudiante
+    })
 @login_required
 def ver_antecedentes(request):
     # Obtener estudiantes que tienen antecedentes cargados

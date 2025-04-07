@@ -10,6 +10,7 @@ from .models import RegistroMedico,AntecedenteEnfermedades,EstudiosMedico
 from persona.models import JugadorCategoriaEquipo, Jugador
 from .forms import AntecedenteEnfermedadesForm,EstudioMedicoForm
 from django.contrib.auth.mixins import LoginRequiredMixin
+from account.models import Profile
 
 class CargarAntecedenteView(FormView):
     template_name = 'registro_medico/cargar_antecedentes.html'
@@ -145,7 +146,7 @@ class ActualizarConsentimientoView(UpdateView):
         context = super().get_context_data(**kwargs)
 
         # Obtener el perfil del usuario logueado
-        profile = self.request.user.profile
+        profile = Profile.objects.get(user=self.request.user, rol='jugador')
         context['profile'] = profile  # Pasar el perfil al contexto
         
         # Obtener la ficha médica asociada
@@ -174,19 +175,48 @@ class CargarEstudioView(LoginRequiredMixin, CreateView):
     template_name = 'registro_medico/cargar_estudios.html'
 
     def form_valid(self, form):
-        # Obtener el jugador desde la URL
         jugador = get_object_or_404(Jugador, id=self.kwargs['jugador_id'])
-        
-        form.instance.jugador = jugador  # Asigna el estudio al jugador
+        print("🔍 Profile ID:", self.request.session.get("user_profile_id"))
+
+        form.instance.jugador = jugador
+        print("📦 Registro ID desde el POST:", self.request.POST.get('registro_id'))
+
+
+        registro_id = self.request.POST.get('registro_id')
+        if registro_id:
+            form.instance.ficha_medica_id = registro_id
+            print("✅ Estudio guardado:", form.instance)
+
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['jugador'] = get_object_or_404(Jugador, id=self.kwargs['jugador_id'])
+        jugador = get_object_or_404(Jugador, id=self.kwargs['jugador_id'])
+        context['jugador'] = jugador
+
+        registro_id = self.request.GET.get('registro_id')
+        if registro_id:
+            registro_medico = RegistroMedico.objects.filter(id=registro_id, jugador=jugador).first()
+        else:
+            registro_medico = RegistroMedico.objects.filter(jugador=jugador).order_by('-fecha_creacion').first()
+
+        context['registro_medico'] = registro_medico
         return context
 
     def get_success_url(self):
-        return reverse_lazy('registroMedico:ver_estudios', kwargs={'jugador_id': self.kwargs['jugador_id']})
+        profile_id = self.request.session.get("user_profile_id")
+        profile = Profile.objects.filter(id=profile_id).first()
+
+        jugador_id = self.kwargs.get('jugador_id')
+        registro_id = self.request.POST.get('registro_id')
+
+        if profile:
+            if profile.rol == 'jugador':
+                return reverse_lazy('registroMedico:ver_estudios', kwargs={'jugador_id': jugador_id})
+            elif profile.rol == 'medico' and registro_id:
+                return reverse_lazy('registroMedico:registro_medico_update', kwargs={'registro_id': registro_id})
+
+        return reverse_lazy('medico_home')  # Fallback en caso de problemas
 
 # ✅ Listar estudios médicos filtrados por JUGADOR
 class EstudiosMedicoListView(ListView):

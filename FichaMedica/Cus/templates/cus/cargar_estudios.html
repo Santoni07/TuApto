@@ -3,7 +3,6 @@
 {% load widget_tweaks %}
 
 {% block content %}
-
 <main class="px-3" style="position: relative; min-height: 100vh; width: 100%; margin: 0; padding: 0;">
     <style>
         main::before {
@@ -15,8 +14,8 @@
             height: 100%;
             background: url('{% static "core/img/medico_home.jpg" %}') no-repeat center center;
             background-size: cover;
-            opacity: 0.4; /* Controla la transparencia de la imagen */
-            z-index: -1; /* Coloca la imagen detrás del contenido */
+            opacity: 0.4;
+            z-index: -1;
         }
     </style>
 
@@ -26,11 +25,26 @@
                 <div class="col-lg-6 col-md-8 col-sm-10">
                     <div class="card border-info shadow-lg">
                         <div class="card-header bg-info text-white text-center p-4">
-                            <h3 class="mb-0 fw-bold">Cargar Estudio Médico</h3>
+                            <h3 class="mb-0 fw-bold">Cargar Estudio CUS</h3>
                         </div>
                         <div class="card-body p-4">
-                            <form id="cargarEstudioForm" method="POST" enctype="multipart/form-data" action="{% url 'registroMedico:cargar_estudio' jugador.id %}">
 
+                            {% if form.errors %}
+                                <div class="alert alert-danger">
+                                    <ul>
+                                        {% for field in form %}
+                                            {% for error in field.errors %}
+                                                <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+                                            {% endfor %}
+                                        {% endfor %}
+                                        {% for error in form.non_field_errors %}
+                                            <li>{{ error }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            {% endif %}
+
+                            <form id="cargarEstudioForm" method="POST" enctype="multipart/form-data" action="{% url 'cargar_estudio' estudiante.id %}">
                                 {% csrf_token %}
 
                                 <div class="mb-3">
@@ -49,7 +63,7 @@
                                 </div>
 
                                 <div class="d-flex justify-content-between align-items-center mt-4">
-                                    <a href="{% url 'menu_jugador' %}" class="btn btn-outline-info">Volver</a>
+                                    <a href="{% url 'menu_estudiante' %}" class="btn btn-outline-info">Volver</a>
                                     <button type="button" onclick="validarFormulario()" class="btn btn-success">Cargar Estudio</button>
                                 </div>
                             </form>
@@ -59,8 +73,24 @@
             </div>
         </div>
     </div>
-
 </main>
+
+<!-- ✅ Modal de éxito -->
+<div class="modal fade" id="modalExito" tabindex="-1" aria-labelledby="modalExitoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-success shadow-lg">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="modalExitoLabel">✅ Estudio Cargado</h5>
+            </div>
+            <div class="modal-body text-center">
+                <p class="fs-5">El estudio fue cargado correctamente.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" onclick="redirigirListado()">Aceptar</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- Modal de advertencia -->
 <div class="modal fade" id="alertaModal" tabindex="-1" aria-labelledby="alertaModalLabel" aria-hidden="true">
@@ -80,6 +110,7 @@
     </div>
 </div>
 
+<!-- Validación antes de enviar -->
 <script>
     function validarFormulario() {
         const archivoInput = document.getElementById("id_archivo");
@@ -90,6 +121,29 @@
             document.getElementById("cargarEstudioForm").submit();
         }
     }
+
+  
 </script>
+
+<!-- ✅ Mostrar modal solo si hay mensajes -->
+{% if messages %}
+  {% for message in messages %}
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const modalElement = document.getElementById('modalExito');
+        const modal = new bootstrap.Modal(modalElement);
+        modal.show();
+
+        const btnAceptar = document.getElementById("btnAceptarModal");
+        btnAceptar.addEventListener("click", function () {
+          modal.hide(); // Oculta el modal
+          setTimeout(() => {
+            window.location.href = "{% url 'listar_estudios' estudiante.id %}";
+          }, 100); // Espera 100ms para dar tiempo a cerrar el modal
+        });
+      });
+    </script>
+  {% endfor %}
+{% endif %}
 
 {% endblock %}

@@ -12,7 +12,6 @@
             Información Personal y Tutor Asociado
         </div>
         <div class="card-body">
-            
             <!-- Datos del usuario -->
             <div class="row">
                 <div class="col-12 col-md-6 mb-3">
@@ -63,11 +62,35 @@
                     <p class="form-control">{{ tutor.localidad }}</p>
                 </div>
             </div>
+
+            <!-- Estudiantes a cargo -->
+            {% if estudiantes %}
+            <h5 class="text-primary text-center fw-bold mt-4">Estudiantes a Cargo</h5>
+            <div class="table-responsive">
+                <table class="table table-bordered text-center">
+                    <thead class="table-info">
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Apellido</th>
+                            <th>Colegio</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for estudiante in estudiantes %}
+                        <tr>
+                            <td>{{ estudiante.nombre }}</td>
+                            <td>{{ estudiante.apellido }}</td>
+                            <td>{{ estudiante.colegio.nombre }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% endif %}
             {% else %}
             <p class="text-center text-muted">No hay tutor asociado.</p>
             {% endif %}
 
-            
             <div class="d-flex justify-content-end mt-5">
                 <a href="{% url 'menu_estudiante' %}" class="btn btn-secondary btn-lg w-45 me-3">Volver</a>
                 <button type="submit" class="btn btn-primary btn-lg w-45">Guardar</button>

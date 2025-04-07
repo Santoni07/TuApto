@@ -94,7 +94,9 @@ class ElectroBasalForm(forms.ModelForm):
     
     trazadoNormal = forms.ChoiceField(choices=TRAZADO_CHOICES, widget=forms.Select(attrs={'class': 'form-control'}))
 
-
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['trazadoNormal'].required = False
 
 
 

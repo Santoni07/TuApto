@@ -1,5 +1,6 @@
 from django.db import models
 from account.models import Profile
+from datetime import date
 
 
 class Tutor(models.Model):
@@ -22,7 +23,7 @@ class Estudiante(models.Model):
     nombre= models.CharField(max_length=30, blank=True, null=True)
     apellido= models.CharField(max_length=30, blank=True, null=True)
     fecha_nacimiento= models.DateField(blank=True, null=True)
-    tutor= models.OneToOneField(Tutor, on_delete=models.CASCADE)
+    tutor = models.ForeignKey(Tutor, on_delete=models.CASCADE, related_name='estudiantes')
     dni=  models.CharField(max_length=15, blank=True, null=True)
     domicilio = models.CharField(max_length=255, blank=True, null=True)
     telefono = models.CharField(max_length=15, blank=True, null=True)
@@ -34,6 +35,15 @@ class Estudiante(models.Model):
     def colegio_activo(self):
         relacion = self.estudiantecolegio_set.filter(activo=True).first()
         return relacion.colegio.nombre if relacion else "Sin colegio"
+    
+    @property
+    def edad(self):
+        if self.fecha_nacimiento:
+            today = date.today()
+            return today.year - self.fecha_nacimiento.year - (
+                (today.month, today.day) < (self.fecha_nacimiento.month, self.fecha_nacimiento.day)
+            )
+        return "-"
     def __str__(self):
         return f"{self.nombre} {self.apellido}" if self.tutor and self.tutor.profile else "Estudiante sin perfil"
 
@@ -54,7 +64,7 @@ class EstudianteColegio(models.Model):
     activo= models.BooleanField(default=True)
 
     def __str__(self):
-        return f"{self.estudiante.profile.nombre} {self.estudiante.profile.apellido} - {self.colegio.nombre}"   
+        return f"{self.estudiante.nombre} {self.estudiante.apellido} - {self.colegio.nombre}"   
     
     
 class AntecedentesCUS(models.Model):

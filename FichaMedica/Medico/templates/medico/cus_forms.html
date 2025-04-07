@@ -1,0 +1,484 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    body{
+        background-color: #ecf0f1; 
+    }
+    .card-header {
+        width:100%;
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #ced4da;
+        text-align: center;
+    }
+    .align-left {
+        text-align: left;
+    }
+
+    .table {
+        border-collapse: collapse;
+        background-color: beige;
+    }
+
+    .table-bordered td,
+    .table-bordered th {
+        border: 2px solid black;
+    }
+
+    .thead-dark {
+        background-color: #343a40;
+        color: white;
+    }
+
+    @media (max-width: 680px) {
+        .table-responsive {
+            overflow-x: auto;
+        }
+    }
+</style> 
+
+<div class="col-lg-6 col-md-8 mx-auto">
+    <h2 class="text-center mb-4">Certificado Unico Escolar</h2>
+
+    <!-- DATOS DEL ESTUDIANTE -->
+    <div class="card mb-3  player-forms">
+        <div class="card-header">
+            <button class="btn btn-secondary w-100 toggle-section" data-target="#datosPersonales">Datos Personales</button>
+        </div>
+        <div id="datosPersonales" class="collapse show">
+            <div class="card-body">
+                <table class="table table-bordered">
+                    <tr><th>Nombre</th><td>{{ nombre }}</td></tr>
+                    <tr><th>Apellido</th><td>{{ apellido }}</td></tr>
+                    <tr><th>DNI</th><td>{{ dni }}</td></tr>
+                    <tr><th>Fecha de nacimiento</th><td>{{ edad }}</td></tr>
+                    <tr><th>Tutor</th><td>{{ tutor }}</td></tr>
+                    <tr><th>Colegio</th><td>{{ colegio }}</td></tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+        <!-- ANTECEDENTES -->
+    <div class="card mb-3 player-forms">
+        <div class="card-header">
+            <button class="btn btn-secondary w-100 toggle-section" data-target="#antecedentes">Antecedentes</button>
+        </div>
+        <div id="antecedentes" class="collapse show">
+            <div class="card-body">
+                {% if antecedentes %}
+                    <table class="table table-bordered table-striped">
+                        <!-- 1. VACUNACIONES -->
+                        <tr><th colspan="2" class="text-center">Vacunaciones</th></tr>
+                        <tr><td>Carnet de Vacunación:</td><td>{{ antecedentes.carnet_vacunacion|yesno:"Sí,No" }}</td></tr>
+                        <tr><td>Esquema Completo:</td><td>{{ antecedentes.esquema_completo|yesno:"Sí,No" }}</td></tr>
+                        <tr><td>Esquema Faltante:</td><td>{{ antecedentes.esquema_faltante|default:"-" }}</td></tr>
+
+                        <!-- 2. ANTECEDENTES PATOLÓGICOS -->
+                        <tr><th colspan="2" class="text-center">Antecedentes Patológicos</th></tr>
+                        <tr><td>Enfermedades importantes:</td><td>{{ antecedentes.enfermedades_importantes }}</td></tr>
+                        <tr><td>Cirugías:</td><td>{{ antecedentes.cirugias }}</td></tr>
+                        <tr><td>Cardiovasculares:</td><td>{{ antecedentes.cardiovasculares }}</td></tr>
+                        <tr><td>Trauma funcional:</td><td>{{ antecedentes.trauma_funcional }}</td></tr>
+                        <tr><td>Alergias:</td><td>{{ antecedentes.alergias }}</td></tr>
+                        <tr><td>Oftalmológicos:</td><td>{{ antecedentes.oftalmologicos }}</td></tr>
+                        <tr><td>Auditivos:</td><td>{{ antecedentes.auditivos }}</td></tr>
+                        <tr><td>Diabetes:</td><td>{{ antecedentes.diabetes|yesno:"Sí,No" }}</td></tr>
+                        <tr><td>Asma:</td><td>{{ antecedentes.asma|yesno:"Sí,No" }}</td></tr>
+                        <tr><td>Chagas:</td><td>{{ antecedentes.chagas|yesno:"Sí,No" }}</td></tr>
+                        <tr><td>Hipertensión:</td><td>{{ antecedentes.hipertension|yesno:"Sí,No" }}</td></tr>
+                        <tr><td>Neurológico:</td><td>{{ antecedentes.neurologico|yesno:"Sí,No" }}</td></tr>
+                        <tr><td>Otras:</td><td>{{ antecedentes.otras }}</td></tr>
+
+                        <!-- 3. CONDICIONES DE RIESGO -->
+                        <tr><th colspan="2" class="text-center">Condiciones de Riesgo</th></tr>
+                        <tr><td>Condiciones de riesgo:</td><td>{{ antecedentes.condiciones_riesgo }}</td></tr>
+
+                        <!-- 4. MEDICAMENTOS -->
+                        <tr><th colspan="2" class="text-center">Medicamentos Prescriptos</th></tr>
+                        <tr><td>Medicamentos prescriptos:</td><td>{{ antecedentes.medicamentos_prescriptos }}</td></tr>
+
+                        <!-- 5. DURANTE ACTIVIDAD FÍSICA PREVIA SUFRIÓ: -->
+                        <tr><th colspan="2" class="text-center">Síntomas durante actividad física</th></tr>
+                        <tr><td>Cansancio extremo:</td><td>{{ antecedentes.cansancio_extremo|yesno:"Sí,No" }}</td></tr>
+                        <tr><td>Falta de aire:</td><td>{{ antecedentes.falta_aire|yesno:"Sí,No" }}</td></tr>
+                        <tr><td>Pérdida de conocimiento:</td><td>{{ antecedentes.perdida_conocimiento|yesno:"Sí,No" }}</td></tr>
+                        <tr><td>Palpitaciones:</td><td>{{ antecedentes.palpitaciones|yesno:"Sí,No" }}</td></tr>
+                        <tr><td>Precordialgias:</td><td>{{ antecedentes.precordialgias|yesno:"Sí,No" }}</td></tr>
+                        <tr><td>Cefaleas:</td><td>{{ antecedentes.cefaleas|yesno:"Sí,No" }}</td></tr>
+                        <tr><td>Vómitos:</td><td>{{ antecedentes.vomitos|yesno:"Sí,No" }}</td></tr>
+                        <tr><td>Otros:</td><td>{{ antecedentes.otros }}</td></tr>
+
+                        <!-- 6. Declaración jurada -->
+                        <tr><th colspan="2" class="text-center">Declaración Jurada</th></tr>
+                        <tr><td>Firmó declaración jurada:</td><td>{{ antecedentes.declaracion_jurada|yesno:"Sí,No" }}</td></tr>
+                    </table>
+                {% else %}
+                    <p>No se encontraron antecedentes.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+
+      <!-- ESTUDIOS -->
+      <div class="card mb-3">
+        <div class="card-header">
+            <button class="btn btn-secondary w-100 toggle-section" data-target="#estudiosCus">Estudios</button>
+        </div>
+        <div id="estudiosCus" class="collapse">
+            <div class="card-body">
+                {% for estudio in cus.estudios.all %}
+                    <div class="mb-2">
+                        <strong>Tipo:</strong> {{ estudio.get_tipo_estudio_display }}<br>
+                        {% if estudio.archivo %}
+                            <a href="{{ estudio.archivo.url }}" target="_blank" class="btn btn-link">Ver archivo</a>
+                        {% else %}
+                            <span class="text-danger">No cargado</span>
+                        {% endif %}
+                        <p><strong>Observaciones:</strong> {{ estudio.observaciones|default:"Sin observaciones" }}</p>
+                    </div>
+                {% endfor %}
+
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {{ estudio_cus_form.as_p }}
+                    <div class="text-end">
+                        <button type="submit" name="cargar_estudio" class="btn btn-primary">Cargar Estudio</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <!-- Examen Físico -->
+            <div class="card mb-3">
+                <div class="card-header">
+                    <button class="btn btn-secondary w-100" onclick="toggleForm('examen-fisico')">Examen Físico</button>
+                </div>
+                <div id="examen-fisico" class="collapse">
+                    <div class="card-body">
+                        <form method="POST" class="ajax-form">
+                            {% csrf_token %}
+                            {{ examen_fisico_form.as_p }}
+                            <div class="d-flex justify-content-end">
+                                <button type="submit" class="btn btn-primary w-20">Guardar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        
+            <!-- Alimentación y Nutrición -->
+            <div class="card mb-3">
+                <div class="card-header">
+                    <button class="btn btn-secondary w-100" onclick="toggleForm('alimentacion')">Alimentación y Nutrición</button>
+                </div>
+                <div id="alimentacion" class="collapse">
+                    <div class="card-body">
+                        <form method="POST" class="ajax-form">
+                            {% csrf_token %}
+                            {{ alimentacion_form.as_p }}
+                            <div class="d-flex justify-content-end">
+                                <button type="submit" class="btn btn-primary w-20">Guardar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Oftalmológico -->
+            <div class="card mb-3">
+                <div class="card-header">
+                    <button class="btn btn-secondary w-100" onclick="toggleForm('oftalmologico')">Examen Oftalmológico</button>
+                </div>
+                <div id="oftalmologico" class="collapse">
+                    <div class="card-body">
+                        <form method="POST" class="ajax-form">
+                            {% csrf_token %}
+                            {{ oftalmologico_form.as_p }}
+                            <div class="d-flex justify-content-end">
+                                <button type="submit" class="btn btn-primary w-20">Guardar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fonoaudiológico -->
+            <div class="card mb-3">
+                <div class="card-header">
+                    <button class="btn btn-secondary w-100" onclick="toggleForm('fono')">Examen Fonoaudiológico</button>
+                </div>
+                <div id="fono" class="collapse">
+                    <div class="card-body">
+                        <form method="POST" class="ajax-form">
+                            {% csrf_token %}
+                            {{ fono_form.as_p }}
+                            <div class="d-flex justify-content-end">
+                                <button type="submit" class="btn btn-primary w-20">Guardar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+                <!-- Piel -->
+            <div class="card mb-3">
+                <div class="card-header">
+                    <button class="btn btn-secondary w-100" onclick="toggleForm('piel')">Examen de Piel</button>
+                </div>
+                <div id="piel" class="collapse">
+                    <div class="card-body">
+                        <form method="POST" class="ajax-form">
+                            {% csrf_token %}
+                            {{ piel_form.as_p }}
+                            <div class="d-flex justify-content-end">
+                                <button type="submit" class="btn btn-primary w-20">Guardar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Odontológico -->
+            <div class="card mb-3">
+                <div class="card-header">
+                    <button class="btn btn-secondary w-100" onclick="toggleForm('odonto')">Examen Odontológico</button>
+                </div>
+                <div id="odonto" class="collapse">
+                    <div class="card-body">
+                        <form method="POST" class="ajax-form">
+                            {% csrf_token %}
+                            {{ odonto_form.as_p }}
+                            <div class="d-flex justify-content-end">
+                                <button type="submit" class="btn btn-primary w-20">Guardar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+              <!-- Cardiovascular -->
+              <div class="card mb-3">
+                <div class="card-header">
+                    <button class="btn btn-secondary w-100" onclick="toggleForm('cardio')">Examen Cardiovascular</button>
+                </div>
+                <div id="cardio" class="collapse">
+                    <div class="card-body">
+                        <form method="POST" class="ajax-form">
+                            {% csrf_token %}
+                            {{ cardio_form.as_p }}
+                            <div class="d-flex justify-content-end">
+                                <button type="submit" class="btn btn-primary w-20">Guardar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+          
+
+            <!-- Respiratorio -->
+            <div class="card mb-3">
+                <div class="card-header">
+                    <button class="btn btn-secondary w-100" onclick="toggleForm('respiratorio')">Examen Respiratorio</button>
+                </div>
+                <div id="respiratorio" class="collapse">
+                    <div class="card-body">
+                        <form method="POST" class="ajax-form">
+                            {% csrf_token %}
+                            {{ respiratorio_form.as_p }}
+                            <div class="d-flex justify-content-end">
+                                <button type="submit" class="btn btn-primary w-20">Guardar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <!-- Abdomen -->
+            <div class="card mb-3">
+                <div class="card-header">
+                    <button class="btn btn-secondary w-100" onclick="toggleForm('abdomen')">Examen de Abdomen</button>
+                </div>
+                <div id="abdomen" class="collapse">
+                    <div class="card-body">
+                        <form method="POST" class="ajax-form">
+                            {% csrf_token %}
+                            {{ abdomen_form.as_p }}
+                            <div class="d-flex justify-content-end">
+                                <button type="submit" class="btn btn-primary w-20">Guardar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <!-- Genitourinario -->
+            <div class="card mb-3">
+                <div class="card-header">
+                    <button class="btn btn-secondary w-100" onclick="toggleForm('genito')">Examen Genitourinario</button>
+                </div>
+                <div id="genito" class="collapse">
+                    <div class="card-body">
+                        <form method="POST" class="ajax-form">
+                            {% csrf_token %}
+                            {{ genito_form.as_p }}
+                            <div class="d-flex justify-content-end">
+                                <button type="submit" class="btn btn-primary w-20">Guardar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <!-- Endocrinológico -->
+            <div class="card mb-3">
+                <div class="card-header">
+                    <button class="btn btn-secondary w-100" onclick="toggleForm('endocrino')">Examen Endocrinológico</button>
+                </div>
+                <div id="endocrino" class="collapse">
+                    <div class="card-body">
+                        <form method="POST" class="ajax-form">
+                            {% csrf_token %}
+                            {{ endocrino_form.as_p }}
+                            <div class="d-flex justify-content-end">
+                                <button type="submit" class="btn btn-primary w-20">Guardar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <!-- Osteoarticular -->
+            <div class="card mb-3">
+                <div class="card-header">
+                    <button class="btn btn-secondary w-100" onclick="toggleForm('osteo')">Examen Osteoarticular</button>
+                </div>
+                <div id="osteo" class="collapse">
+                    <div class="card-body">
+                        <form method="POST" class="ajax-form">
+                            {% csrf_token %}
+                            {{ osteo_form.as_p }}
+                            <div class="d-flex justify-content-end">
+                                <button type="submit" class="btn btn-primary w-20">Guardar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <!-- Neurológico -->
+            <div class="card mb-3">
+                <div class="card-header">
+                    <button class="btn btn-secondary w-100" onclick="toggleForm('neuro')">Examen Neurológico</button>
+                </div>
+                <div id="neuro" class="collapse">
+                    <div class="card-body">
+                        <form method="POST" class="ajax-form">
+                            {% csrf_token %}
+                            {{ neuro_form.as_p }}
+                            <div class="d-flex justify-content-end">
+                                <button type="submit" class="btn btn-primary w-20">Guardar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <!-- Comentarios / Derivaciones -->
+            <div class="card mb-3">
+                <div class="card-header">
+                    <button class="btn btn-secondary w-100" onclick="toggleForm('comentario')">Comentarios / Derivación</button>
+                </div>
+                <div id="comentario" class="collapse">
+                    <div class="card-body">
+                        <form method="POST" class="ajax-form">
+                            {% csrf_token %}
+                            {{ comentario_form.as_p }}
+                            <div class="d-flex justify-content-end">
+                                <button type="submit" class="btn btn-primary w-20">Guardar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+           
+        </div>  
+         <!-- Recomendaciones -->
+         <div class="card mb-3">
+            <div class="card-header">
+                <button class="btn btn-secondary w-75" onclick="toggleForm('recomendaciones')">Recomendaciones</button>
+            </div>
+            <div id="recomendaciones" class="collapse">
+                <div class="card-body">
+                    <form method="POST" class="ajax-form">
+                        {% csrf_token %}
+                        {{ recomendaciones_form.as_p }}
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-primary w-20">Guardar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>  
+    </div>
+
+            <!-- FORMULARIO PRINCIPAL CUS -->
+            <div class="card mb-3">
+                <div class="card-header">
+                    <button class="btn btn-secondary w-100 toggle-section" data-target="#cusForm">Certificado Medico</button>
+                </div>
+                <div id="cusForm" class="collapse">
+                    <div class="card-body">
+                        <form method="POST">
+                            {% csrf_token %}
+                            {{ cus_form.as_p }}
+                            <div class="text-end">
+                                <button type="submit" name="guardar_ficha_completa" class="btn btn-success">Guardar Ficha Completa</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+  
+   
+    <div class="text-center mt-4">
+        <a href="{% url 'cus_home' %}" class="btn btn-secondary">Volver</a>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll('.toggle-section').forEach(button => {
+            button.addEventListener('click', function () {
+                const target = document.querySelector(this.getAttribute('data-target'));
+                if (target.classList.contains('show')) {
+                    new bootstrap.Collapse(target, { toggle: false }).hide();
+                } else {
+                    new bootstrap.Collapse(target, { toggle: false }).show();
+                }
+            });
+        });
+    });
+</script>
+<script>
+    function calcularIMC() {
+        const peso = parseFloat(document.getElementById("id_peso").value);
+        const talla = parseFloat(document.getElementById("id_talla").value);
+
+        if (!isNaN(peso) && !isNaN(talla) && talla > 0) {
+            const tallaMetros = talla / 100;
+            const imc = peso / (tallaMetros * tallaMetros);
+            document.getElementById("id_imc").value = imc.toFixed(2);
+        } else {
+            document.getElementById("id_imc").value = "";
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        document.getElementById("id_peso").addEventListener("input", calcularIMC);
+        document.getElementById("id_talla").addEventListener("input", calcularIMC);
+    });
+</script>
+{% endblock %}

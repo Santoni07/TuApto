@@ -206,31 +206,12 @@
                             {% endif %}
                             <h3 class="text-center">Cargar Estudios</h3>
                             <!-- Formulario para Cargar Nuevos Estudios -->
-                            <form ="cargarEstudioForm_{{ jugador.id }}" method="POST" enctype="multipart/form-data" >
+                            <form method="POST" enctype="multipart/form-data">
                                 {% csrf_token %}
-                                <!-- Campo oculto para el ID del Jugador -->
-                                <input type="hidden" name="jugador_id" value="{{ jugador.id }}">
-                                <div class="mb-3">
-                                    <label for="tipo_{{ jugador.id }}" class="form-label">Tipo de Estudio</label>
-                                    <select id="tipo_{{ jugador.id }}" name="tipo_estudio" class="form-select" required>
-                                        <option value="" disabled selected>Seleccionar Tipo</option>
-                                        <option value="ORINA">Análisis de Orina</option>
-                                        <option value="ELECTRO">Electrocardiograma</option>
-                                        <option value="ERGOMETRIA">Ergometría</option>
-                                    </select>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="archivo_{{ jugador.id }}" class="form-label">Archivo</label>
-                                    <input type="file" id="archivo_{{ jugador.id }}" name="archivo" class="form-control" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="observaciones_{{ jugador.id }}" class="form-label">Observaciones</label>
-                                    <textarea id="observaciones_{{ jugador.id }}" name="observaciones" class="form-control"></textarea>
-                                </div>
+                                {{ estudio_medico_form.as_p }}
                                 <div class="d-flex justify-content-end">
-                                    <button type="submit" class="btn btn-primary w-20">Cargar Estudio Médico</button>
+                                    <button type="submit" name="cargar_estudio" class="btn btn-primary w-20">Cargar Estudio Médico</button>
                                 </div>
-                            
                             </form>
                         </div>
                     </div>
@@ -713,7 +694,7 @@
                                     {% endif %}
                                 {% else %}
                                     <div class="d-flex justify-content-center mt-3">
-                                        <button type="submit" id="guardarFichaBtn" class="btn btn-primary w-50">Guardar</button>
+                                        <button type="submit" name="guardar_ficha_completa" id="guardarFichaBtn" class="btn btn-primary w-50">Guardar</button>
                                     </div>
                                 {% endif %}
                                 {% else %}

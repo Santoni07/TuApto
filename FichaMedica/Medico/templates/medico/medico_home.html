@@ -96,16 +96,15 @@
     <div style="position: relative; z-index: 1;">
         <div class="container mt-5" style="background-color:transparencia; padding: 2rem; border-radius: 10px;">
 
-            <h1 class="text-center fw-bold py-4" 
+            <h1 class="text-center fw-bold py-4">
                 <span class="text-primary">Bienvenido,</span> 
-                <span class="text-dark">Dr. {{ user.profile.nombre }} {{ user.profile.apellido }}</span> 
+                <span class="text-dark">Dr. {{ profile.nombre }} {{ profile.apellido }}</span> 
                 {% if medico %}
-                    <span class="text-dark">- Matrícula N°: {{ user.profile.medico.matricula }}</span>
+                    <span class="text-dark">- Matrícula N°: {{ medico.matricula }}</span>
                 {% else %}
                     <span class="text-dark">- Matrícula no disponible</span>
                 {% endif %}
-            </h1>
-            
+            </h1> 
 
             
                     <div id="search-container" class="bg-white p-4 rounded shadow">
