@@ -2,6 +2,7 @@
 Físicos{% endblock %} 
 
 {% block content %}
+
 <style>
   /* Estilos para los botones del carrusel */
   .black-controls {
@@ -200,31 +201,7 @@ Físicos{% endblock %}
 
 </section>
 
-{% comment %} <!-- Hero Section -->
-<section id="hero" class="hero section dark-background">
 
-
-  <img
-    src="{% static 'core/img/medico_home.jpg' %}"
-    alt="Medico Home"
-    class="hero-img"
-  />
-
-  <div class="container text-center">
-    <div class="row justify-content-start">
-      <div class="col-lg-8 col-md-8 col-sm-10 text-lg-start text-md-center">
-        <h2>Aptos Físicos Online</h2>
-        <p>
-          Gestiona de manera sencilla y rápida tus exámenes médicos para torneos
-          de fútbol. Los jugadores pueden cargar sus datos y antecedentes, y los
-          médicos realizarán la aprobación del apto físico de forma online.
-        </p>
-        <a href="" class="btn-get-started">Regístrate</a>
-        <a href="{% url 'login' %}" class="btn-get-started">Inicia Sesión</a>
-      </div>
-    </div>
-  </div>
-</section> {% endcomment %}
 <!-- End Hero Section -->
 <section id="options" class="options-section">
   <div class="options-container">
@@ -398,7 +375,9 @@ Físicos{% endblock %}
 
       <!-- Columna de Formulario -->
       <div class="col-lg-6">
-          <form action="#" method="POST" class="bg-white p-4 rounded shadow-sm">
+          <form action="{% url 'home' %}" method="POST" class="bg-white p-4 rounded shadow-sm">
+            {% csrf_token %}
+            <input type="hidden" name="tipo_formulario" value="quiero_prestador">
               <h3 class="text-primary text-center mb-4" style="font-family: Nunito Sans; color: #00a2d3;">¿Quieres ser Prestador?</h3>
               <p class="text-center mb-4" style="font-family: Nunito Sans; font-size: 1rem; color: #333;">Rellena el siguiente formulario para contactarnos y formar parte de nuestra red de prestadores médicos. Nos pondremos en contacto contigo lo antes posible.</p>
 
@@ -425,11 +404,22 @@ Físicos{% endblock %}
                   <button type="submit" class="btn btn-primary w-100" style="background-color: #00a2d3; color: white; border: none; padding: 10px 20px; border-radius: 4px; font-size: 1rem; cursor: pointer;">Enviar Consulta</button>
               </div>
           </form>
+          
+     
       </div>
   </div>
 </section>
 
-
+{% if messages %}
+<div class="container mt-3">
+  {% for message in messages %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  {% endfor %}
+</div>
+{% endif %}
 
 {% endblock %} 
 {% block footer %}
@@ -450,8 +440,11 @@ Físicos{% endblock %}
     <!-- Sección Derecha: Formulario -->
     <div style="flex: 1; padding: 8px; background-color: #fff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); max-width: 400px; margin: 0 auto;">
       <h4 style="color: #00a2d3; text-align: center; margin-bottom: 6px; font-size: 1rem;">Contáctanos</h4>
-      <form action="#" method="POST" style="display: flex; flex-direction: column; gap: 4px;">
-          <input type="text" name="nombre" placeholder="Tu nombre" required 
+      <form action="{% url 'home' %}" method="POST" style="display: flex; flex-direction: column; gap: 4px;">
+        {% csrf_token %}
+        <input type="hidden" name="tipo_formulario" value="footer_contacto"> 
+        
+        <input type="text" name="nombre" placeholder="Tu nombre" required 
               style="padding: 6px; font-size: 0.9rem; border: 1px solid #ddd; border-radius: 4px;">
           <input type="email" name="email" placeholder="Tu correo" required 
               style="padding: 6px; font-size: 0.9rem; border: 1px solid #ddd; border-radius: 4px;">
