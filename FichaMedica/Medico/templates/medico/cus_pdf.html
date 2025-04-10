@@ -1,0 +1,363 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Certificado Único de Salud</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            margin: 0 6px;
+            padding: 0;
+            font-size: 8px;
+            font-family: Arial, sans-serif;
+            line-height: 0.8;
+        }
+        .fila-datos {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 2px;
+            
+        }
+        hr{
+            margin:0;
+            padding:0;
+        }
+        .fila-datos .item {
+            flex: 1 1 24%;
+            min-width: 140px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .contenedor-dos-columnas {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            gap: 0px;
+            margin-top: 0px;
+            page-break-inside: avoid;
+            page-break-before: avoid;
+            page-break-after: avoid;
+            margin-top: 0;
+            padding: 0;
+        }
+        @page {
+            size: A4;
+            margin: 10mm;
+        }
+    
+        .columna {
+            width: 49%;
+            box-sizing: border-box;
+            page-break-inside: avoid;
+        }
+        .section-title {
+            font-weight: bold;
+            text-align: center;
+            text-decoration: underline;
+            margin: 6px 0;
+        }
+        table {
+            font-size: 9px;
+            margin-bottom: 6px;
+        }
+    
+        th, td {
+            padding: 2px 4px;
+        }
+    
+        .mt-3 { margin-top: 6px; }
+        .mt-4 { margin-top: 8px; }
+        .text-center { text-align: center; }
+        .d-block { display: block; }
+        .d-inline-block { display: inline-block; }
+        .form-label-line {
+            border-bottom: 1px dotted #000;
+            display: inline-block;
+            min-width: 40px; /* antes era 120px */
+            padding: 0 2px;
+        }
+        .row-line {
+            margin-bottom: 2px;
+        }
+        .label-bold {
+            font-weight: bold;
+        }
+        /* También aseguramos que el bloque de datos personales no genere salto */
+        .datos-personales {
+            margin-bottom: px;
+            page-break-after: avoid;
+            page-break-inside: avoid;
+        }
+        .bloque-principal {
+            page-break-inside: avoid;
+            page-break-before: auto;
+            page-break-after: auto;
+        }
+        p, span {
+            margin: 2px 0;
+        }
+        .contenido-pdf {
+            width: 80%;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+<div class="container-pdf">
+    <div class="bloque-principal">
+        <div class="datos-personales">
+            <div class="encabezado-logo text-center">
+                {% load static %}
+                <img src="{% static 'core/img/cus.png' %}" alt="Ministerios Córdoba" style="max-width: 70%; height: 30px;">
+
+            </div>
+            <p class="section-title text-center">CERTIFICADO ÚNICO DE SALUD (C.U.S.)</p>
+            <p class="text-center"><em>A llenar por profesional médico matriculado a nivel provincial - Validez por 1 año.Para ingreso escolar, actividades de educación física curriculares y extracurriculares.</em></p>
+           
+        
+            <!-- Fila: FECHA y DNI -->
+            <div class="fila-datos">
+                <div class="item">
+                    <span class="label-bold">FECHA:</span>
+                    <span class="form-label-line">{{ cus.fecha_de_llenado|date:"d/m/Y" }}</span>
+                </div>
+                <div class="item">
+                    <span class="label-bold">D.N.I. Nº:</span>
+                    <span class="form-label-line">{{ estudiante.dni }}</span>
+                </div>
+            </div>
+        
+            <!-- Fila: Nombre -->
+            <div class="fila-datos">
+                <div class="item" style="flex: 1 1 100%;">
+                    <span class="label-bold">Apellido y Nombre:</span>
+                    <span class="form-label-line" style="min-width: 200px;">{{ estudiante.apellido }} {{ estudiante.nombre }}</span>
+                </div>
+            </div>
+        
+            <!-- Fila: Fecha Nacimiento, Edad, Sexo, Lugar -->
+            <div class="fila-datos">
+                <div class="item">
+                    <span class="label-bold">Fecha Nacimiento:</span>
+                    <span class="form-label-line">{{ estudiante.fecha_nacimiento|date:"d/m/Y" }}</span>
+                </div>
+                <div class="item">
+                    <span class="label-bold">Edad:</span>
+                    <span class="form-label-line">{{ estudiante.edad }}</span>
+                </div>
+                <div class="item">
+                    <span class="label-bold">Sexo:</span>
+                    <span class="form-label-line">{{ estudiante.sexo|default:"-" }}</span>
+                </div>
+                <div class="item">
+                    <span class="label-bold">Lugar de nacimiento:</span>
+                    <span class="form-label-line">{{ estudiante.lugar_nacimiento|default:"-" }}</span>
+                </div>
+            </div>
+        
+            <!-- Fila: Domicilio, Localidad, Tel -->
+            <div class="fila-datos">
+                <div class="item">
+                    <span class="label-bold">Domicilio:</span>
+                    <span class="form-label-line">{{ estudiante.domicilio }}</span>
+                </div>
+                <div class="item">
+                    <span class="label-bold">Localidad:</span>
+                    <span class="form-label-line">{{ estudiante.localidad }}</span>
+                </div>
+                <div class="item">
+                    <span class="label-bold">Tel:</span>
+                    <span class="form-label-line">{{ estudiante.telefono|default:"-" }}</span>
+                </div>
+            </div>
+        <hr>
+
+
+        </div>
+        
+
+
+        <!-- CUERPO PRINCIPAL EN DOS COLUMNAS -->
+        <div class="contenedor-dos-columnas">
+            <!-- ANTECEDENTES -->
+            <div class="columna">
+                <p class="section-title text-center">ANTECEDENTES</p>
+        
+                <p><strong>1. VACUNACIONES</strong></p>
+                <table class="table table-bordered text-center table-sm w-75">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>SI</th>
+                            <th>NO</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Carnet</td>
+                            <td>{% if antecedentes.carnet_vacunacion %}✔️{% endif %}</td>
+                            <td>{% if not antecedentes.carnet_vacunacion %}✔️{% endif %}</td>
+                        </tr>
+                        <tr>
+                            <td>Completo</td>
+                            <td>{% if antecedentes.esquema_completo %}✔️{% endif %}</td>
+                            <td>{% if not antecedentes.esquema_completo %}✔️{% endif %}</td>
+                        </tr>
+                    </tbody>
+                </table>
+        
+                <p>DEBE COMPLETAR ESQUEMA CON:</p>
+                <p class="form-label-line d-block" style="min-width:100%; height: 20px;">{{ antecedentes.esquema_faltante|default:"........................................................................" }}</p>
+        
+                <p class="mt-3"><strong>2. ANTECEDENTES PATOLÓGICOS</strong></p>
+                <p>Enfermedades Importantes:</p>
+                <p class="form-label-line d-block" style="min-width:100%; height: 40px;">{{ antecedentes.enfermedades_importantes }}</p>
+                <p>Cirugías: {{ antecedentes.cirugias }}</p>
+                <p>Cardiovasculares: {{ antecedentes.cardiovasculares }}</p>
+                <p>Trauma c/alt. funcional: {{ antecedentes.trauma_funcional }}</p>
+                <p>Alergias (especificar): {{ antecedentes.alergias }}</p>
+                <p>Oftalmológicos: {{ antecedentes.oftalmologicos }}</p>
+                <p>Auditivos: {{ antecedentes.auditivos }}</p>
+        
+                <div class="row">
+                    <div class="col-6">
+                        <p>Diabetes: {% if antecedentes.diabetes %}✔️{% else %}▢{% endif %}</p>
+                        <p>Chagas: {% if antecedentes.chagas %}✔️{% else %}▢{% endif %}</p>
+                        <p>Neurológico: {% if antecedentes.neurologico %}✔️{% else %}▢{% endif %}</p>
+                    </div>
+                    <div class="col-6">
+                        <p>Asma: {% if antecedentes.asma %}✔️{% else %}▢{% endif %}</p>
+                        <p>Hipertensión: {% if antecedentes.hipertension %}✔️{% else %}▢{% endif %}</p>
+                        <p>Otras: {{ antecedentes.otras }}</p>
+                    </div>
+                </div>
+        
+                <p class="mt-3"><strong>3. CONDICIONES DE RIESGO:</strong> {{ antecedentes.condiciones_riesgo }}</p>
+                <p><strong>4. MEDICAMENTOS PRESCRIPTOS:</strong> {{ antecedentes.medicamentos_prescriptos }}</p>
+        
+                <p class="mt-3"><strong>5. DURANTE ACTIVIDAD FÍSICA PREVIA SUFRIÓ</strong></p>
+                <p>
+                    Cansancio extremo: {% if antecedentes.cansancio_extremo %}✔️{% else %}▢{% endif %} &nbsp;&nbsp;
+                    Falta de aire: {% if antecedentes.falta_aire %}✔️{% else %}▢{% endif %} &nbsp;&nbsp;
+                    Pérdida de conocimiento: {% if antecedentes.perdida_conocimiento %}✔️{% else %}▢{% endif %}
+                </p>
+                <p>
+                    Palpitaciones: {% if antecedentes.palpitaciones %}✔️{% else %}▢{% endif %} &nbsp;&nbsp;
+                    Precordialgias: {% if antecedentes.precordialgias %}✔️{% else %}▢{% endif %} &nbsp;&nbsp;
+                    Cefaleas: {% if antecedentes.cefaleas %}✔️{% else %}▢{% endif %} &nbsp;&nbsp;
+                    Vómitos: {% if antecedentes.vomitos %}✔️{% else %}▢{% endif %}
+                </p>
+                <p>Otros síntomas: {{ antecedentes.otros }}</p>
+            </div>
+        
+            <!-- EXÁMENES MÉDICOS -->
+            <div class="columna">
+                <p class="section-title text-center">EXÁMENES MÉDICOS</p>
+        
+                <p><strong>EXAMEN FÍSICO</strong></p>
+                <p>
+                    Peso: <span class="form-label-line" style="min-width: 60px;">{{ examen_fisico_form.instance.peso }}</span>
+                    Talla: <span class="form-label-line" style="min-width: 60px;">{{ examen_fisico_form.instance.talla }}</span>
+                    IMC: <span class="form-label-line" style="min-width: 60px;">{{ examen_fisico_form.instance.imc }}</span>
+                </p>
+                <p>Diagnóstico Antropométrico:
+                    <span class="form-label-line d-inline-block" style="min-width: 200px;">
+                        {{ examen_fisico_form.instance.diagnostico_antropometrico }}
+                    </span>
+                </p>
+        
+                <p class="mt-3"><strong>ALIMENTACIÓN Y NUTRICIÓN</strong></p>
+                <p>¿Solicita Plan Alimentario Especial para Comedor Escolar?</p>
+                <p>
+                    SI {% if alimentacion_form.instance.solicita_plan_especial %}✔️{% else %}▢{% endif %}
+                    &nbsp;&nbsp; NO {% if not alimentacion_form.instance.solicita_plan_especial %}✔️{% else %}▢{% endif %}
+                </p>
+                <p>¿Cuál?</p>
+                <p class="form-label-line d-block" style="min-width:100%; height: 20px;">{{ alimentacion_form.instance.tipo_plan }}</p>
+        
+                <p class="mt-3"><strong>EXÁMEN OFTALMOLÓGICO</strong></p>
+                <p>Agudeza Visual</p>
+                <p>
+                    Der: <span class="form-label-line" style="min-width: 60px;">{{ oftalmologico_form.instance.agudeza_visual_der }}</span>
+                    Izq: <span class="form-label-line" style="min-width: 60px;">{{ oftalmologico_form.instance.agudeza_visual_izq }}</span>
+                </p>
+                <p>Usa anteojos: {% if oftalmologico_form.instance.usa_anteojos %}✔️{% else %}▢{% endif %}</p>
+                <p>Otros: <span class="form-label-line d-block" style="min-width:100%; height: 20px;">{{ oftalmologico_form.instance.otros }}</span></p>
+        
+                <p class="mt-3"><strong>EXAMEN FONOAUDIOLÓGICO</strong></p>
+                <p class="form-label-line d-block" style="min-width:100%; height: 20px;">{{ fono_form.instance.detalles }}</p>
+        
+                <p class="mt-3"><strong>EXAMEN PIEL Y T.C.S.C.</strong></p>
+                <p class="form-label-line d-block" style="min-width:100%; height: 20px;">{{ piel_form.instance.detalles }}</p>
+        
+                <p class="mt-3"><strong>EXAMEN ODONTOLÓGICO</strong></p>
+                <p class="form-label-line d-block" style="min-width:100%; height: 20px;">{{ odonto_form.instance.detalles }}</p>
+        
+                <p class="mt-3"><strong>EXAMEN CARDIOVASCULAR</strong></p>
+                <p>Auscultación: <span class="form-label-line">{{ cardio_form.instance.auscultacion }}</span></p>
+                <p>Arritmia: <span class="form-label-line">{{ cardio_form.instance.arritmia }}</span></p>
+                <p>Soplos: <span class="form-label-line">{{ cardio_form.instance.soplos }}</span></p>
+                <p>Tensión Art: <span class="form-label-line">{{ cardio_form.instance.tension_arterial }}</span></p>
+        
+                <p class="mt-3"><strong>EXAMEN RESPIRATORIO</strong></p>
+                <p class="form-label-line d-block" style="min-width:100%; height: 20px;">{{ respiratorio_form.instance.detalles }}</p>
+        
+                <p class="mt-3"><strong>EXAMEN ABDOMEN</strong></p>
+                <p class="form-label-line d-block" style="min-width:100%; height: 20px;">{{ abdomen_form.instance.detalles }}</p>
+        
+                <p class="mt-3"><strong>EXAMEN GENITOURINARIO</strong></p>
+                <p>
+                    Menarca: {% if genito_form.instance.menarca %}✔️{% else %}▢{% endif %} &nbsp;&nbsp;
+                    Turner: {% if genito_form.instance.turner %}✔️{% else %}▢{% endif %}
+                </p>
+        
+                <p class="mt-3"><strong>EXAMEN ENDOCRINOLÓGICO</strong></p>
+                <p class="form-label-line d-block" style="min-width:100%; height: 20px;">{{ endocrino_form.instance.detalles }}</p>
+        
+                <p class="mt-3"><strong>EXAMEN OSTEOARTICULAR</strong></p>
+                <p>
+                    Columna:
+                    {% if osteo_form.instance.columna_normal %}Normal✔️{% else %}▢{% endif %}
+                    &nbsp; Cif: {% if osteo_form.instance.cifosis %}✔️{% else %}▢{% endif %}
+                    &nbsp; Lord: {% if osteo_form.instance.lordosis %}✔️{% else %}▢{% endif %}
+                    &nbsp; Esc: {% if osteo_form.instance.escoliosis %}✔️{% else %}▢{% endif %}
+                </p>
+                <p>Miembros superiores: {{ osteo_form.instance.miembros_superiores }}</p>
+                <p>Miembros inferiores: {{ osteo_form.instance.miembros_inferiores }}</p>
+        
+                <p class="mt-3"><strong>EXAMEN NEUROLÓGICO</strong></p>
+                <p class="form-label-line d-block" style="min-width:100%; height: 20px;">{{ neuro_form.instance.detalles }}</p>
+        
+                <p class="mt-3"><strong>COMENTARIOS Y/O DERIVACIONES</strong></p>
+                <p class="form-label-line d-block" style="min-width:50%; height: 20px;">{{ comentario_form.instance.comentarios }}</p>
+                <p>Se recomienda:</p>
+                <p class="form-label-line d-block" style="min-width:50%; height: 20px;">{{ comentario_form.instance.recomendaciones }}</p>
+        
+                <p class="mt-3"><strong>RECOMENDACIONES</strong></p>
+                <p class="form-label-line d-block" style="min-width:50%; height: 20px;">{{ recomendaciones_form.instance.detalles }}</p>
+            </div>
+        </div>
+    </div>
+    <!-- BLOQUE FINAL -->
+    <div class="bloque-inferior">
+       
+
+        <p class="mt-3">
+            Hago constar que <strong>{{ estudiante.apellido }} {{ estudiante.nombre }}</strong> se encuentra en condiciones para el ingreso escolar, la realización de actividades físicas curriculares y lo establecido en la Resolución M.E. 57 de acuerdo al examen clínico actual y en reposo practicado en la fecha.
+        </p>
+
+        <p class="fw-bold mt-2">
+            ESTA DOCUMENTACIÓN ORIGINAL DEBE PERMANECER EN CUSTODIA Y CONSERVACIÓN LEGAL DE LA DIRECCIÓN DEL CENTRO EDUCATIVO, Y LA COPIA EN PODER DEL RESPONSABLE LEGAL DEL ALUMNO.
+        </p>
+
+        <p class="mt-4"><strong>Médico responsable:</strong> {{ cus.medico.profile.nombre }} {{ cus.medico.profile.apellido }}  <img src="{{ cus.medico.firma.url }}" alt="Firma del médico" class="img-fluid" style="max-width: 100px;"></p>
+       
+    </div>
+</div>
+</body>
+</html>

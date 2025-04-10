@@ -1,5 +1,6 @@
 from django import forms
 from .models import *
+from datetime import date
 
 # Reutilizables
 def widget_input(): return forms.TextInput(attrs={'class': 'form-control'})
@@ -16,12 +17,18 @@ class CusForm(forms.ModelForm):
         widgets = {
             'estudiante': widget_select(),
             'estado': widget_select(),
-            'fecha_caducidad': widget_date(),
+            'fecha_caducidad': forms.HiddenInput(),
             'fecha_de_llenado': widget_date(),
             'observacion': widget_input(),
             'consentimiento_persona': widget_checkbox(),
             'medico': widget_select(),
         }
+    def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+
+            # Solo si no hay instancia con valor ya cargado
+            if not self.instance.pk or not self.instance.fecha_de_llenado:
+                self.fields['fecha_de_llenado'].initial = date.today()
 
 class ExamenFisicoForm(forms.ModelForm):
     imc = forms.DecimalField(

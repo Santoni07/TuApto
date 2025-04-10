@@ -38,52 +38,55 @@
                                  
                           
                                   <!-- Tabla de Estudiantes -->
-                                  <div class="table-responsive">
-                                      <table class="table table-striped table-hover text-center">
-                                          <thead class="table-primary">
-                                              <tr>
-                                                  <th>Apellido</th>
-                                                  <th>Nombre</th>
-                                                  <th>DNI</th>
-                                                  <th>Fecha de Nacimiento</th>
-                                                  <th>Localidad</th>
-                                                  <th>Colegio</th>
-                                                  
-                                                  <th>Estado</th>
-                                              </tr>
-                                          </thead>
-                                          <tbody>
-                                              {% for estudiante in estudiantes %}
-                                              <tr>
-                                                  <td>{{ estudiante.apellido }}</td>
-                                                  <td>{{ estudiante.nombre }}</td>
-                                                  <td>{{ estudiante.dni }}</td>
-                                                  <td>{{ estudiante.fecha_nacimiento }}</td>
-                                                  <td>{{ estudiante.localidad }}</td>
-                                                  <td>{{ estudiante.colegio_activo }}</td>
-                                                  <td>
-                                                    {% if estudiante.cus.last %}
-                                                        <span class="badge bg-info text-dark">{{ estudiante.cus.last.estado }}</span>
-                                                
-                                                        {% if estudiante.cus.last.estado == 'APROBADA' or estudiante.cus.last.estado == 'RECHAZADA' %}
-                                                            <a href="{% url 'ver_pdf_cus' estudiante.cus.last.id %}" class="btn btn-primary btn-sm mt-1">Ver</a>
-                                                        {% endif %}
-                                                    {% else %}
-                                                        <span class="text-muted">Sin CUS</span>
-                                                    {% endif %}
-                                                  </td>
-                                                
-                                                    {% comment %}   <a href="{% url 'eliminar_estudiante' estudiante.id %}" class="btn btn-danger btn-sm">Eliminar</a> {% endcomment %}
-                                                  
-                                              </tr>
-                                              {% empty %}
-                                              <tr>
-                                                  <td colspan="6" class="text-center text-muted">No hay estudiantes registrados</td>
-                                              </tr>
-                                              {% endfor %}
-                                          </tbody>
-                                      </table>
-                                  </div>
+<div class="table-responsive">
+    <table class="table table-striped table-hover text-center">
+        <thead class="table-primary">
+            <tr>
+                <th>Apellido</th>
+                <th>Nombre</th>
+                <th>DNI</th>
+                <th>Fecha de Nacimiento</th>
+                <th>Localidad</th>
+                <th>Colegio</th>
+                <th>Estado</th>
+                <th>Acción</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for estudiante in estudiantes %}
+            <tr>
+                <td>{{ estudiante.apellido }}</td>
+                <td>{{ estudiante.nombre }}</td>
+                <td>{{ estudiante.dni }}</td>
+                <td>{{ estudiante.fecha_nacimiento }}</td>
+                <td>{{ estudiante.localidad }}</td>
+                <td>{{ estudiante.colegio_activo }}</td>
+
+                <!-- Estado (solo texto) -->
+                <td>
+                    {% if estudiante.cus.last %}
+                        {{ estudiante.cus.last.estado }}
+                    {% else %}
+                        Sin CUS
+                    {% endif %}
+                </td>
+
+                <!-- Acción (botón solo si está APROBADA) -->
+                <td>
+                    {% if estudiante.cus.last and estudiante.cus.last.estado == 'APROBADA' %}
+                    <a href="{% url 'cus_views' estudiante.cus.last.id %}" class="btn btn-success btn-sm">Ver</a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="8" class="text-center text-muted">No hay estudiantes registrados</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
                           
                                   <!-- Botones de Acción -->
                                   <div class="d-flex justify-content-end mt-5">

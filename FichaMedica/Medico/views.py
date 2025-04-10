@@ -3,11 +3,10 @@ from django.http import HttpResponse
 from weasyprint import HTML
 from django.utils.html import format_html
 from django.http import HttpResponse
-from django.views.generic import ListView,UpdateView
+from django.views.generic import ListView
 from django.db.models import Q
 from django.db import transaction
 from weasyprint import HTML
-from django.views.generic import View
 from account.models import Profile
 from persona.models import Jugador,JugadorCategoriaEquipo
 from RegistroMedico.models import RegistroMedico, AntecedenteEnfermedades
@@ -19,9 +18,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.http import JsonResponse
-from django.urls import reverse
 from estudiante.models import Estudiante, AntecedentesCUS
-from estudiante.models import Tutor
 from account.models import Profile
 from Medico.models import Medico
 from Cus.models import *
@@ -1074,7 +1071,6 @@ def recomendaciones_view(request, estudiante_id, cus_id):
 @login_required
 def cus_form_view(request, estudiante_id):
     estudiante = get_object_or_404(Estudiante, id=estudiante_id)
-
     cus = Cus.objects.filter(estudiante=estudiante).first()
     if not cus:
         cus = Cus(estudiante=estudiante)
@@ -1083,7 +1079,12 @@ def cus_form_view(request, estudiante_id):
         form = CusForm(request.POST, instance=cus)
         if form.is_valid():
             instance = form.save(commit=False)
+            #Cargamos la fecha de caducidad automatica 
+            if not instance.fecha_de_llenado:
+                instance.fecha_de_llenado = date.today()
 
+                # Establecer fecha de caducidad: 1 de enero del año siguiente
+                instance.fecha_caducidad = date(instance.fecha_de_llenado.year + 1, 1, 1)
             # Asociar médico logueado si no está
             profile_id = request.session.get("user_profile_id")
             if profile_id and not instance.medico:
@@ -1097,6 +1098,11 @@ def cus_form_view(request, estudiante_id):
 
             instance.save()
             messages.success(request, "✅ Datos personales del CUS guardados correctamente.")
+
+            # 👇 Verificamos qué botón se presionó
+            if 'guardar_ficha_completa' in request.POST:
+                return redirect('cus_home')  # redirige al home del médico
+
             return redirect('cus_update_view', cus_id=cus.id)
     else:
         form = CusForm(instance=cus)
@@ -1105,7 +1111,7 @@ def cus_form_view(request, estudiante_id):
         'form': form,
         'estudiante': estudiante
     })
-    
+
 @login_required
 def cus_views(request, cus_id):
     cus = get_object_or_404(Cus, id=cus_id)
@@ -1135,9 +1141,13 @@ def cus_views(request, cus_id):
             print(f"❌ {nombre}: No se encontró instancia")
         # Cargar formularios (solo visualización, no POST)
     
-    
+    profile_id = request.session.get("user_profile_id")
+    perfil = None
+    if profile_id:
+        perfil = Profile.objects.filter(id=profile_id).first()
     
     contexto = {
+        'perfil': perfil,
         'cus': cus,
         'estudiante': estudiante,
         'tutor': f"{estudiante.tutor.profile.nombre} {estudiante.tutor.profile.apellido}" if estudiante.tutor else "-",
@@ -1179,215 +1189,13 @@ def cus_views(request, cus_id):
         neuro_form = contexto['neuro_form']
         comentario_form = contexto['comentario_form']
         recomendaciones_form = contexto['recomendaciones_form']
-        html_content = f"""
-    <html>
-    <head>
-        <style>
-            body {{
-                font-family: Arial, sans-serif;
-                font-size: 12px;
-            }}
-            .section-title {{
-                font-weight: bold;
-                text-align: center;
-                text-decoration: underline;
-                margin: 20px 0 10px;
-            }}
-            .form-label {{
-                font-weight: bold;
-                display: inline-block;
-                min-width: 180px;
-            }}
-            .yes-no-box {{
-                display: inline-block;
-                margin-left: 15px;
-            }}
-                .form-row {{
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            font-size: 12px;
-            margin-bottom: 4px;
-        }}
-        .form-row span {{
-            margin-right: 10px;
-          }}
-            </style>
-    </head>
-    <body>
-        <div>
 
+        html = render_to_string("medico/cus_pdf.html", contexto)
+        pdf = HTML(string=html, base_url=request.build_absolute_uri('/')).write_pdf()
 
-        <p class="section-title">CERTIFICADO ÚNICO DE SALUD (C.U.S.)</p>
-        <p style="text-align: center;"><em>A llenar por profesional médico matriculado a nivel provincial - Validez por 1 año.</em></p>
-        <p style="text-align: center;"><em>Para ingreso escolar, actividades de educación física curriculares y extracurriculares.</em></p>
-
-        <div class="form-row">
-            <span><strong>FECHA:</strong> {cus.fecha_de_llenado.strftime('%d/%m/%Y')}</span>
-            <span><strong>D.N.I. Nº:</strong> {estudiante.dni}</span>
-        </div>
-
-        <div class="form-row">
-            <span><strong>Apellido y Nombre:</strong> {estudiante.apellido} {estudiante.nombre}</span>
-        </div>
-
-        <div class="form-row">
-            <span><strong>Fecha Nacimiento:</strong> {estudiante.fecha_nacimiento.strftime('%d/%m/%Y')}</span>
-            <span><strong>Edad:</strong> {estudiante.edad}</span>
-            <span><strong>Sexo:</strong> {getattr(estudiante, 'sexo', '-')}</span>
-            <span><strong>Lugar de nacimiento:</strong> {getattr(estudiante, 'lugar_nacimiento', '-')}</span>
-        </div>
-
-        <div class="form-row">
-            <span><strong>Domicilio:</strong> {estudiante.domicilio}</span>
-            <span><strong>Localidad:</strong> {estudiante.localidad}</span>
-            <span><strong>Tel:</strong> {getattr(estudiante, 'telefono', '-')}</span>
-        </div>
-
-
-            <hr>
-           <div class="contenido">
-
-    <!-- Columna izquierda: ANTECEDENTES -->
-    <div class="columna">
-        <p class="section-title">ANTECEDENTES</p>
-
-        <p><strong>1. VACUNACIONES</strong></p>
-        <p>
-            Carnet: {'SI' if antecedentes.carnet_vacunacion else 'NO'} &nbsp;&nbsp;
-            Completo: {'SI' if antecedentes.esquema_completo else 'NO'}
-        </p>
-        <p>Debe completar esquema con: {antecedentes.esquema_faltante or '-'}</p>
-
-        <p><strong>2. ANTECEDENTES PATOLÓGICOS</strong></p>
-        <p>Enfermedades Importantes: {antecedentes.enfermedades_importantes}</p>
-        <p>Cirugías: {antecedentes.cirugias}</p>
-        <p>Cardiovasculares: {antecedentes.cardiovasculares}</p>
-        <p>Trauma funcional: {antecedentes.trauma_funcional}</p>
-        <p>Alergias: {antecedentes.alergias}</p>
-        <p>Oftalmológicos: {antecedentes.oftalmologicos}</p>
-        <p>Auditivos: {antecedentes.auditivos}</p>
-        <p>
-            Diabetes: {'SI' if antecedentes.diabetes else 'NO'} &nbsp;&nbsp;
-            Asma: {'SI' if antecedentes.asma else 'NO'} &nbsp;&nbsp;
-            Chagas: {'SI' if antecedentes.chagas else 'NO'} &nbsp;&nbsp;
-            Hipertensión: {'SI' if antecedentes.hipertension else 'NO'}
-        </p>
-        <p>
-            Neurológico: {'SI' if antecedentes.neurologico else 'NO'} &nbsp;&nbsp;
-            Otras: {antecedentes.otras}
-        </p>
-
-        <p><strong>3. CONDICIONES DE RIESGO</strong></p>
-        <p>{antecedentes.condiciones_riesgo}</p>
-
-        <p><strong>4. MEDICAMENTOS PRESCRIPTOS</strong></p>
-        <p>{antecedentes.medicamentos_prescriptos}</p>
-
-        <p><strong>5. DURANTE ACTIVIDAD FÍSICA PREVIA SUFRIÓ</strong></p>
-        <p>
-            Cansancio extremo: {'SI' if antecedentes.cansancio_extremo else 'NO'} &nbsp;&nbsp;
-            Falta de aire: {'SI' if antecedentes.falta_aire else 'NO'} &nbsp;&nbsp;
-            Pérdida de conocimiento: {'SI' if antecedentes.perdida_conocimiento else 'NO'}
-        </p>
-        <p>
-            Palpitaciones: {'SI' if antecedentes.palpitaciones else 'NO'} &nbsp;&nbsp;
-            Precordialgias: {'SI' if antecedentes.precordialgias else 'NO'} &nbsp;&nbsp;
-            Cefaleas: {'SI' if antecedentes.cefaleas else 'NO'} &nbsp;&nbsp;
-            Vómitos: {'SI' if antecedentes.vomitos else 'NO'}
-        </p>
-        <p>Otros síntomas: {antecedentes.otros}</p>
-    </div>
-
-   <div class="columna">
-    <p class="section-title">EXÁMENES MÉDICOS</p>
-
-    <p><strong>Examen Físico:</strong></p>
-    <p>Peso: {examen_fisico_form.instance.peso} | Talla: {examen_fisico_form.instance.talla} | IMC: {examen_fisico_form.instance.imc}</p>
-    <p>Diagnostico Antropometrico:: {examen_fisico_form.instance.diagnostico_antropometrico}</p>
-
-    <p><strong>Alimentación y Nutrición:</strong></p>
-    <p>Solicita plan especial: {'SI' if alimentacion_form.instance.solicita_plan_especial else 'NO'}</p>
-    <p>Tipo de plan: {alimentacion_form.instance.tipo_plan}</p>
-
-    <p><strong>Examen Oftalmológico:</strong></p>
-    <p>Agudeza visual OD: {oftalmologico_form.instance.agudeza_visual_der} | OI: {oftalmologico_form.instance.agudeza_visual_izq}</p>
-    <p>Usa anteojos: {'SI' if oftalmologico_form.instance.usa_anteojos else 'NO'}</p>
-    <p>Otros: {oftalmologico_form.instance.otros}</p>
-
-    <p><strong>Examen Fonoaudiológico:</strong></p>
-    <p>{fono_form.instance.detalles}</p>
-
-    <p><strong>Examen de Piel:</strong></p>
-    <p>{piel_form.instance.detalles}</p>
-
-    <p><strong>Examen Odontológico:</strong></p>
-    <p>{odonto_form.instance.detalles}</p>
-
-    <p><strong>Examen Cardiovascular:</strong></p>
-    <p>Auscultación: {cardio_form.instance.auscultacion} | Soplos: {cardio_form.instance.soplos}</p>
-    <p>R1: {cardio_form.instance.R1} | R2: {cardio_form.instance.R2}</p>
-    <p>Tensión arterial: {cardio_form.instance.tension_arterial}</p>
-    <p>Ruidos agregados: {cardio_form.instance.ruidos_agregados}</p>
-    <p>Observaciones: {cardio_form.instance.observaciones}</p>
-
-    <p><strong>Examen Respiratorio:</strong></p>
-    <p>{respiratorio_form.instance.detalles}</p>
-
-    <p><strong>Examen de Abdomen:</strong></p>
-    <p>{abdomen_form.instance.detalles}</p>
-
-    <p><strong>Examen Genitourinario:</strong></p>
-    <p>Menarca: {'SI' if genito_form.instance.menarca else 'NO'}</p>
-    <p>Turner: {'SI' if genito_form.instance.turner else 'NO'}</p>
-
-    <p><strong>Examen Endocrinológico:</strong></p>
-    <p>{endocrino_form.instance.detalles}</p>
-
-    <p><strong>Examen Osteoarticular:</strong></p>
-    <p>Columna normal: {'SI' if osteo_form.instance.columna_normal else 'NO'}</p>
-    <p>Cifosis: {'SI' if osteo_form.instance.cifosis else 'NO'} | Lordosis: {'SI' if osteo_form.instance.lordosis else 'NO'} | Escoliosis: {'SI' if osteo_form.instance.escoliosis else 'NO'}</p>
-    <p>Miembros superiores: {osteo_form.instance.miembros_superiores}</p>
-    <p>Miembros inferiores: {osteo_form.instance.miembros_inferiores}</p>
-
-    <p><strong>Examen Neurológico:</strong></p>
-    <p>{neuro_form.instance.detalles}</p>
-
-    <p><strong>Comentario / Derivación:</strong></p>
-    <p>Comentarios y/o derivaciones: {comentario_form.instance.comentarios_derivaciones}</p>
-    <p>Se recomienda: {comentario_form.instance.recomendaciones}</p>
-
-    <p><strong>Recomendaciones:</strong></p>
-    <p>{recomendaciones_form.instance.detalles}</p>
-</div>
-</div>
-
-<!-- Sección inferior: CERTIFICADO MÉDICO -->
-<div class="bloque-inferior">
-    <p class="section-title">CERTIFICADO MÉDICO</p>
-    <p><strong>Estado:</strong> {cus.estado}</p>
-    <p><strong>Fecha de emisión:</strong> {cus.fecha_de_llenado.strftime('%d/%m/%Y')}</p>
-    <p><strong>Fecha de vencimiento:</strong> {cus.fecha_caducidad.strftime('%d/%m/%Y')}</p>
-
-    <p class="mt-3">
-        Hago constar que <strong>{estudiante.apellido} {estudiante.nombre}</strong> se encuentra en condiciones para el ingreso escolar, la realización de actividades físicas curriculares y lo establecido en la Resolución M.E. 57 de acuerdo al examen clínico actual y en reposo practicado en la fecha.
-    </p>
-
-    <p class="fw-bold mt-2">
-        ESTA DOCUMENTACIÓN ORIGINAL DEBE PERMANECER EN CUSTODIA Y CONSERVACIÓN LEGAL DE LA DIRECCIÓN DEL CENTRO EDUCATIVO, Y LA COPIA EN PODER DEL RESPONSABLE LEGAL DEL ALUMNO.
-    </p>
-
-    <p class="mt-4"><strong>Médico responsable:</strong> {cus.medico.profile.nombre} {cus.medico.profile.apellido}</p>
-    <p><strong>Matrícula:</strong> {cus.medico.matricula}</p>
-</div>
-        </div>
-    </body>
-    </html>
-    """
-
-        pdf = HTML(string=html_content, base_url=request.build_absolute_uri('/')).write_pdf()
         response = HttpResponse(pdf, content_type='application/pdf')
         response['Content-Disposition'] = f'attachment; filename="cus_{estudiante.apellido}_{estudiante.nombre}.pdf"'
         return response
+        
 
     return render(request, 'medico/cus_views.html', contexto)

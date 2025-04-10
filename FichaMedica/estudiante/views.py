@@ -113,10 +113,18 @@ def ver_estudiante(request):
 def consultar_apto(request):
     estudiantes = Estudiante.objects.filter(cus__isnull=False).distinct()
 
-    return render(request, 'estudiante/consultar_apto.html', {
-        'estudiantes': estudiantes
-    })
+    perfil = None
+    profile_id = request.session.get("user_profile_id")
+    if profile_id:
+        try:
+            perfil = Profile.objects.get(id=profile_id)
+        except Profile.DoesNotExist:
+            perfil = None
 
+    return render(request, 'estudiante/consultar_apto.html', {
+        'estudiantes': estudiantes,
+        'perfil': perfil,
+    })
 @login_required
 def editar_estudiante(request, estudiante_id):
     estudiante = get_object_or_404(Estudiante, id=estudiante_id)

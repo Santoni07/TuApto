@@ -2,7 +2,7 @@
 from django.views.decorators.cache import never_cache
 from django.contrib import messages
 from django.db import IntegrityError
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
@@ -275,23 +275,27 @@ def modificar_perfil(request):
         'jugador': jugador  # Pasa el objeto jugador al contexto
     })
 
+
+@login_required
 def perfil(request):
-    # Obtener el perfil del usuario actual
-    profile = request.user.profile
+    # Obtener el perfil activo desde la sesión
+    profile_id = request.session.get("user_profile_id")
+    profile = Profile.objects.filter(id=profile_id).first()
+
+    if not profile:
+        return HttpResponse("No se pudo cargar el perfil.", status=404)
 
     # Obtener la persona asociada al perfil (si existe)
     persona = getattr(profile, 'persona', None)
 
     # Obtener el jugador asociado a la persona (si existe)
-    jugador = None
-    if persona:
-        jugador = getattr(persona, 'jugador', None)
+    jugador = getattr(persona, 'jugador', None) if persona else None
 
     # Pasar profile, persona y jugador al contexto
     return render(request, 'persona/perfil.html', {
-        'profile': profile,  # Pasamos el perfil
-        'persona': persona,  # Pasamos la persona
-        'jugador': jugador,  # Pasamos el jugador (si existe)
+        'profile': profile,
+        'persona': persona,
+        'jugador': jugador,
     })
 
 def cambiar_email(request):
