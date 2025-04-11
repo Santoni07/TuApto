@@ -19,6 +19,7 @@ class Profile(models.Model):
             ('jugador', 'Jugador'),
             ('medico', 'Médico'),
             ('representante', 'Representante'),
+            ('colegio' , 'Colegio'),
             ('estudiante', 'Estudiante'),
         ],
         default='jugador'

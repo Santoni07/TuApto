@@ -161,7 +161,7 @@
                                 <td>{{ jugador.categorias_equipo.0.torneo|default:"Sin torneo" }}</td>
                                 <td>
                                     {% if jugador.registro_medico_estado == 'APROBADA' %}
-                                        <a href="{% url 'ficha_medica' jugador.id %}" class="btn btn-success btn-sm" target="blank">Ver Ficha</a>
+                                        <a href="{% url 'ficha_medica' jugador.registro_id %}" class="btn btn-success btn-sm" target="blank">Ver Ficha</a>
                                     {% else %}
                                         <button class="btn btn-secondary btn-sm" disabled>No Disponible</button>
                                     {% endif %}

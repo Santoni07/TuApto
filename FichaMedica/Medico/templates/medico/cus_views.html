@@ -373,6 +373,8 @@
             <form method="get"
                 action="{% if perfil.rol == 'medico' %}{% url 'cus_home' %}
                         {% elif perfil.rol == 'estudiante' %}{% url 'menu_estudiante' %}
+                        {% elif perfil.rol == 'colegio' %}{% url 'colegio_home' %}
+
               
                         {% else %}{% url 'home' %}{% endif %}">
                         <button type="submit" class="btn btn-secondary w-100" style="min-width: 120px;">Volver</button>

@@ -123,6 +123,8 @@ def login_user_and_redirect(request, user):
         return redirect('menu_jugador')
     elif profile.rol == 'representante':
         return redirect('representante_home')
+    elif profile.rol == 'colegio':
+        return redirect('colegio_home')
     elif profile.rol == 'jugador':
         return redirect('menu_jugador')
     elif profile.rol == 'estudiante':

@@ -1,19 +1,26 @@
 
 
-
+from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, QueryDict
 from django.views import View
 from django.shortcuts import render
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import Representante
+from .models import Representante, RepresenteColegio
 from RegistroMedico.models import RegistroMedico, EstudiosMedico
 from persona.models import Categoria,Equipo,JugadorCategoriaEquipo,CategoriaEquipo,Jugador
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
+from estudiante.models import Estudiante
+from account.models import Profile
+from datetime import datetime
+
 
 class RepresentanteHomeView(LoginRequiredMixin, View):
     def get(self, request):
-        representante = Representante.objects.filter(profile=request.user.profile).first()
+        profile_id = request.session.get("user_profile_id")
+        profile = get_object_or_404(Profile, id=profile_id)
+
+        representante = Representante.objects.filter(profile=profile).first()
         if not representante:
             return render(request, 'Representante/torneo_home.html', {
                 "error": "No se encontró información del representante."
@@ -87,14 +94,15 @@ class RepresentanteHomeView(LoginRequiredMixin, View):
         # Filtrar jugadores con registro médico aprobado y añadir estudios médicos
         jugadores_info = []
         for jugador in jugadores:
-            registro_medico = RegistroMedico.objects.filter(jugador=jugador).first()
+            registro_medico = RegistroMedico.objects.filter(jugador=jugador, torneo=representante.torneo).first()
             if registro_medico:
-                estudios_medicos = EstudiosMedico.objects.filter(ficha_medica=registro_medico)
+                estudios_medicos = EstudiosMedico.objects.filter(jugador=registro_medico.jugador)
                 jugador_info = {
                     "apellido": jugador.persona.profile.apellido,
                     "nombre": jugador.persona.profile.nombre,
                     "dni": jugador.persona.profile.dni,
                     "id": jugador.id,
+                    "registro_id": registro_medico.id,
                     "registro_medico_estado": registro_medico.estado,
                     "estudios_medicos": [
                         {
@@ -116,13 +124,14 @@ class RepresentanteHomeView(LoginRequiredMixin, View):
                     if jce.categoria_equipo.categoria.torneo == representante.torneo
                 ]
                 jugadores_info.append(jugador_info)
-
+    
         context = {
             "representante": representante,
             "jugadores_info": jugadores_info,
             "equipos": equipos,
             "categorias": categorias,
         }
+        print("Jugadores info:", jugadores_info)
         return render(request, 'Representante/torneo_home.html', context)  
     
 class TraerEquiposPorCategorias(LoginRequiredMixin, View):
@@ -176,3 +185,45 @@ def traer_equipos(request):
             equipos = Equipo.objects.filter(categoria_equipos__categoria=categoria).values('id', 'nombre')
             return JsonResponse({'equipos': list(equipos)})
     return JsonResponse({'error': 'Solicitud inválida'}, status=400)
+
+
+@login_required
+def colegio_home_view(request):
+    profile_id = request.session.get("user_profile_id")
+    representante = get_object_or_404(RepresenteColegio, Profile_id=profile_id)
+    colegio = representante.colegio
+
+    estudiantes = Estudiante.objects.none()
+
+    buscar = request.GET.get("buscar")
+    estado = request.GET.get("estado")
+    anio = request.GET.get("anio")
+
+    if buscar or estado or anio:
+        estudiantes = Estudiante.objects.filter(
+            estudiantecolegio__colegio=colegio,
+            estudiantecolegio__activo=True
+        ).distinct()
+
+        if buscar:
+            estudiantes = estudiantes.filter(
+                Q(nombre__icontains=buscar) |
+                Q(apellido__icontains=buscar) |
+                Q(dni__icontains=buscar)
+            )
+
+        if estado:
+            estudiantes = estudiantes.filter(cus__estado=estado).distinct()
+
+        if anio:
+            estudiantes = estudiantes.filter(cus__fecha_de_llenado__year=anio).distinct()
+
+    # Generar años dinámicamente (últimos 5 hasta el actual)
+    current_year = datetime.now().year
+    anios = list(range(current_year, current_year - 6, -1))
+
+    return render(request, "representante/colegio_home.html", {
+        "colegio": colegio,
+        "estudiantes": estudiantes,
+        "anios": anios,
+    })
