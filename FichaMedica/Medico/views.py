@@ -883,13 +883,11 @@ def cus_update_view(request, cus_id):
     cus = get_object_or_404(Cus, id=cus_id)
     estudiante = cus.estudiante
     cus_form = CusForm(instance=cus)
-    estudio_form = EstudioCusForm() 
+    estudio_form = EstudioCusForm()
 
     if request.method == 'POST':
-        print(request.POST)  # Debug para ver qué botón fue presionado
-        
+        print(request.POST)
 
-        # Cargar estudio médico
         if 'cargar_estudio' in request.POST:
             estudio_form = EstudioCusForm(request.POST, request.FILES)
             if estudio_form.is_valid():
@@ -901,7 +899,6 @@ def cus_update_view(request, cus_id):
                 messages.error(request, "❌ Error al cargar el estudio.")
             return redirect('cus_update_view', cus_id=cus.id)
 
-        # Guardar exámenes médicos
         elif 'guardar_examenes_medicos' in request.POST:
             forms_valid = True
             form_instances = {
@@ -936,10 +933,22 @@ def cus_update_view(request, cus_id):
 
             return redirect('cus_update_view', cus_id=cus.id)
 
-        # Guardar el formulario principal del CUS
         elif 'guardar_ficha_cus' in request.POST:
-            cus_form = CusForm(request.POST, instance=cus)
+            # Verificamos que TODOS los exámenes estén completos antes de guardar el certificado
+            campos_requeridos = [
+                ExamenFisico, AlimentacionNutricion, ExamenOftalmologico,
+                ExamenFonoaudiologico, ExamenPiel, ExamenOdontologico,
+                ExamenCardiovascular, ExamenRespiratorio, ExamenAbdomen,
+                ExamenGenitourinario, ExamenEndocrinologico, ExamenOsteoarticular,
+                ExamenNeurologico, ComentarioDerivacion, Recomendaciones
+            ]
+            faltantes = [modelo.__name__ for modelo in campos_requeridos if not modelo.objects.filter(cus=cus).exists()]
 
+            if faltantes:
+                messages.error(request, f"❌ No se puede guardar el CUS. Faltan completar los siguientes formularios: {', '.join(faltantes)}")
+                return redirect('cus_update_view', cus_id=cus.id)
+
+            cus_form = CusForm(request.POST, instance=cus)
             antecedentes = AntecedentesCUS.objects.filter(estudiante=estudiante).first()
             if not antecedentes:
                 antecedentes = AntecedentesCUS(estudiante=estudiante)
@@ -988,6 +997,7 @@ def cus_update_view(request, cus_id):
     }
 
     return render(request, 'medico/cargar_cus.html', context)
+
 # Manejo genérico para formularios del CUS
 
 

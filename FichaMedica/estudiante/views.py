@@ -1,3 +1,4 @@
+from datetime import date
 from django.shortcuts import render
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
@@ -7,6 +8,7 @@ from account.models import Profile
 from django.contrib.auth.decorators import login_required
 from Cus.models import Cus
 from django.utils.timezone import now
+from Cus.form import CusForm
 # Create your views here.
 @login_required
 def home_estudiante(request):
@@ -277,3 +279,58 @@ def detalle_antecedente(request, estudiante_id):
         'antecedente': antecedente
     }
     return render(request, 'estudiante/detalle_antecedente.html', context)
+
+@login_required
+def crear_cus_nuevo(request, estudiante_id):
+    profile_id = request.session.get("user_profile_id")
+    tutor = Tutor.objects.filter(profile_id=profile_id).first()
+
+    if not tutor:
+        messages.error(request, "No se encontró un tutor asociado.")
+        return redirect("home")
+
+    estudiante = get_object_or_404(Estudiante, id=estudiante_id, tutor=tutor)
+
+    # Verificamos si ya existe un CUS vencido
+    cus_anterior = Cus.objects.filter(estudiante=estudiante, estado="VENCIDO").order_by('-fecha_de_llenado').first()
+
+    # Si no hay CUS vencido, no se permite continuar
+    if not cus_anterior:
+        messages.warning(request, "Solo puedes cargar antecedentes si el CUS está vencido.")
+        return redirect('ver_antecedentes')
+
+    # Creamos nuevo objeto CUS pero sin guardar aún
+    nuevo_cus = Cus(estudiante=estudiante)
+
+    # Si hay antecedentes previos, los traemos
+    antecedentes_previos = getattr(estudiante, 'antecedentes', None)
+
+    if request.method == "POST":
+        cus_form = CusForm(request.POST, instance=nuevo_cus)
+        antecedentes_form = AntecedentesCUSForm(request.POST, instance=antecedentes_previos)
+
+        if cus_form.is_valid() and antecedentes_form.is_valid():
+            nuevo_cus = cus_form.save(commit=False)
+            nuevo_cus.estado = "PROCESO"
+            nuevo_cus.fecha_de_llenado = date.today()
+            nuevo_cus.fecha_caducidad = date(nuevo_cus.fecha_de_llenado.year + 1, 1, 1)
+            nuevo_cus.save()
+
+            # Guardar los antecedentes como relacionados a este estudiante
+            antecedentes = antecedentes_form.save(commit=False)
+            antecedentes.estudiante = estudiante
+            antecedentes.save()
+
+            messages.success(request, "Nuevo CUS creado correctamente.")
+            return redirect("cus_update_view", cus_id=nuevo_cus.id)
+
+    else:
+        # Precargamos los formularios con la info previa
+        cus_form = CusForm(instance=nuevo_cus)
+        antecedentes_form = AntecedentesCUSForm(instance=antecedentes_previos)
+
+    return render(request, "estudiante/crear_nuevo_cus.html", {
+        "cus_form": cus_form,
+        "antecedentes_form": antecedentes_form,
+        "estudiante": estudiante,
+    })

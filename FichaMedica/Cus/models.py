@@ -73,14 +73,34 @@ class ExamenFisico(models.Model):
     def save(self, *args, **kwargs):
         if self.peso and self.talla:
             try:
-                altura_metros = float(self.talla) / 100  # Convertir cm a metros
+                altura_metros = float(self.talla) / 100
                 self.imc = round(float(self.peso) / (altura_metros ** 2), 2)
+
+                # Diagnóstico según IMC
+                if self.imc < 20:
+                    self.diagnostico_antropometrico = "Bajo peso"
+                elif 20 <= self.imc < 25:
+                    self.diagnostico_antropometrico = "Peso Ideal"
+                elif 25 <= self.imc < 30:
+                    self.diagnostico_antropometrico = "Sobrepeso"
+                elif 30 <= self.imc < 35:
+                    self.diagnostico_antropometrico = "Obesidad I"
+                elif 35 <= self.imc < 40:
+                    self.diagnostico_antropometrico = "Obesidad II"
+                else:
+                    self.diagnostico_antropometrico = "Obesidad III (mórbida)"
+
             except (ZeroDivisionError, ValueError):
-                self.imc = None  # Evita errores si talla es 0 o inválida
+                self.imc = None
+                self.diagnostico_antropometrico = None
         else:
-            self.imc = None  # No calcular si falta algún dato
+            self.imc = None
+            self.diagnostico_antropometrico = None
+
         super().save(*args, **kwargs)
-        
+
+    
+   
           
 #MODELO DE ALIMENTACION-NUTRICION
 
@@ -204,7 +224,7 @@ class ExamenGenitourinario(models.Model):
     cus = models.OneToOneField('Cus', on_delete=models.CASCADE, related_name='genitourinario')
     
     menarca = models.BooleanField(null=True, blank=True)
-    turner = models.BooleanField(null=True, blank=True)
+    turner = models.TextField(null=True, blank=True)
 
     class Meta:
         db_table = 'examen_genitourinario'
@@ -299,8 +319,7 @@ class ComentarioDerivacion(models.Model):
     cus = models.OneToOneField('Cus', on_delete=models.CASCADE, related_name='comentarios')
 
     comentarios = models.TextField(null=True, blank=True, verbose_name="Comentarios y/o derivaciones")
-    recomendaciones = models.TextField(null=True, blank=True, verbose_name="Se recomienda")
-
+    
     class Meta:
         db_table = 'comentarios_derivaciones'
         verbose_name = 'Comentarios y Derivaciones'

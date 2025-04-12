@@ -29,22 +29,43 @@ class CusForm(forms.ModelForm):
             # Solo si no hay instancia con valor ya cargado
             if not self.instance.pk or not self.instance.fecha_de_llenado:
                 self.fields['fecha_de_llenado'].initial = date.today()
-
 class ExamenFisicoForm(forms.ModelForm):
     imc = forms.DecimalField(
         label='IMC',
         required=False,
-        widget=forms.NumberInput(attrs={'class': 'form-control', 'readonly': 'readonly'})
+        widget=forms.NumberInput(attrs={
+            'class': 'form-control',
+            'readonly': 'readonly',
+            'id': 'id_imc'
+        })
+    )
+
+    diagnostico_antropometrico = forms.CharField(
+        label='Diagnóstico Antropométrico',
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'readonly': 'readonly',
+            'id': 'id_diagnostico_antropometrico'
+        })
     )
 
     class Meta:
         model = ExamenFisico
         fields = ['peso', 'talla', 'imc', 'diagnostico_antropometrico']
         widgets = {
-            'peso': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'id': 'id_peso'}),
-            'talla': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'id': 'id_talla'}),
-            'diagnostico_antropometrico': widget_input(),
+            'peso': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'step': '0.01',
+                'id': 'id_peso'
+            }),
+            'talla': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'step': '0.01',
+                'id': 'id_talla'
+            }),
         }
+
 class AlimentacionNutricionForm(forms.ModelForm):
     class Meta:
         model = AlimentacionNutricion
@@ -112,7 +133,7 @@ class ExamenGenitourinarioForm(forms.ModelForm):
         fields = ['menarca', 'turner']
         widgets = {
             'menarca': widget_checkbox(),
-            'turner': widget_checkbox(),
+            'turner': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: Normal, Sospecha, etc.'}),
         }
 
 class ExamenEndocrinologicoForm(forms.ModelForm):
@@ -154,10 +175,10 @@ class EstudioCusForm(forms.ModelForm):
 class ComentarioDerivacionForm(forms.ModelForm):
     class Meta:
         model = ComentarioDerivacion
-        fields = ['comentarios', 'recomendaciones']
+        fields = ['comentarios']
         widgets = {
             'comentarios': widget_textarea(3),
-            'recomendaciones': widget_textarea(3),
+            
         }
 
 class RecomendacionesForm(forms.ModelForm):

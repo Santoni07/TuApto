@@ -18,6 +18,7 @@ urlpatterns = [
    path('consultar_apto/', views.consultar_apto, name='consultar_apto'),
    path('seleccionar_estudiante/', views.seleccionar_estudiante, name='seleccionar_estudiante'),
    path('cargar_antecedente/', views.cargar_antecedente_estudiante, name='cargar_antecedente_estudiante'),
+   path('nuevo_cus/', views.crear_cus_nuevo, name='crear_nuevo_cus'),
    
 
 

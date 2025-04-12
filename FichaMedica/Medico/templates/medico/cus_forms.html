@@ -154,24 +154,50 @@
 
     <div class="row">
         <div class="col-md-6">
-            <!-- Examen Físico -->
-            <div class="card mb-3">
-                <div class="card-header">
-                    <button class="btn btn-secondary w-100" onclick="toggleForm('examen-fisico')">Examen Físico</button>
-                </div>
-                <div id="examen-fisico" class="collapse">
-                    <div class="card-body">
-                        <form method="POST" class="ajax-form">
-                            {% csrf_token %}
-                            {{ examen_fisico_form.as_p }}
-                            <div class="d-flex justify-content-end">
-                                <button type="submit" class="btn btn-primary w-20">Guardar</button>
-                            </div>
-                        </form>
-                    </div>
+           
+          <!-- Examen Físico -->
+          <div class="card mb-3">
+            <div class="card-header">
+                <button class="btn btn-secondary w-100" onclick="toggleForm('examen-fisico')">Examen Físico</button>
+            </div>
+            <div id="examen-fisico" class="collapse">
+                <div class="card-body">
+                    <form method="POST" class="ajax-form">
+                        {% csrf_token %}
+        
+                        <!-- Peso -->
+                        <div class="mb-3">
+                            <label for="{{ examen_fisico_form.peso.id_for_label }}" class="form-label">Peso:</label>
+                            {{ examen_fisico_form.peso }}
+                            <small class="form-text text-muted">Peso en kilogramos</small>
+                        </div>
+        
+                        <!-- Talla -->
+                        <div class="mb-3">
+                            <label for="{{ examen_fisico_form.talla.id_for_label }}" class="form-label">Talla:</label>
+                            {{ examen_fisico_form.talla }}
+                            <small class="form-text text-muted">Talla en centímetros</small>
+                        </div>
+        
+                        <!-- IMC (sólo visual) -->
+                        <div class="mb-3">
+                            <label class="form-label">IMC:</label>
+                            <p class="form-control-plaintext">{{ examen_fisico_form.instance.imc|default:"-" }}</p>
+                        </div>
+        
+                        <!-- Diagnóstico Antropométrico (sólo visual) -->
+                        <div class="mb-3">
+                            <label class="form-label">Diagnóstico Antropométrico:</label>
+                            <p class="form-control-plaintext">{{ examen_fisico_form.instance.diagnostico_antropometrico|default:"-" }}</p>
+                        </div>
+        
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-primary w-20">Guardar</button>
+                        </div>
+                    </form>
                 </div>
             </div>
-        
+        </div>
             <!-- Alimentación y Nutrición -->
             <div class="card mb-3">
                 <div class="card-header">
@@ -462,23 +488,6 @@
         });
     });
 </script>
-<script>
-    function calcularIMC() {
-        const peso = parseFloat(document.getElementById("id_peso").value);
-        const talla = parseFloat(document.getElementById("id_talla").value);
 
-        if (!isNaN(peso) && !isNaN(talla) && talla > 0) {
-            const tallaMetros = talla / 100;
-            const imc = peso / (tallaMetros * tallaMetros);
-            document.getElementById("id_imc").value = imc.toFixed(2);
-        } else {
-            document.getElementById("id_imc").value = "";
-        }
-    }
-
-    document.addEventListener("DOMContentLoaded", function() {
-        document.getElementById("id_peso").addEventListener("input", calcularIMC);
-        document.getElementById("id_talla").addEventListener("input", calcularIMC);
-    });
-</script>
+  
 {% endblock %}
