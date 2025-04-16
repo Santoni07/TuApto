@@ -3,6 +3,7 @@ from django.utils.timezone import now
 from estudiante.models import Estudiante
 from Medico.models import Medico
 from datetime import datetime, timedelta
+from datetime import date
 
 
 class Cus(models.Model):
@@ -342,3 +343,40 @@ class Recomendaciones(models.Model):
 
     def __str__(self):
         return f"Recomendaciones - CUS {self.cus.id}"
+    
+
+# ACTUALIZACION CUS    
+class ActualizacionCUS(models.Model):
+    cus = models.ForeignKey(Cus, on_delete=models.CASCADE, related_name='actualizaciones')
+    medico = models.ForeignKey(Medico, on_delete=models.SET_NULL, null=True, blank=True, related_name='actualizaciones_realizadas')
+    fecha = models.DateField(auto_now_add=True)
+    vencimiento= models.DateField(null=True, blank=True)
+    lugar = models.CharField(max_length=100)
+
+    edad = models.PositiveIntegerField()
+    peso = models.DecimalField(max_digits=5, decimal_places=2)
+    talla = models.DecimalField(max_digits=5, decimal_places=2)
+    imc = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    diagnostico_antropometrico = models.CharField(max_length=200, null=True, blank=True)
+
+    antecedentes = models.TextField(blank=True)
+    examen_fisico = models.TextField(blank=True)
+
+    estado_salud_normal = models.BooleanField(default=True)
+    derivado_a = models.CharField(max_length=100, blank=True)
+    debe_volver = models.CharField(max_length=100, blank=True)
+    observaciones = models.TextField(blank=True)
+
+    class Meta:
+        ordering = ['-fecha']
+        verbose_name = 'Actualización CUS'
+        verbose_name_plural = 'Actualizaciones CUS'
+
+    def __str__(self):
+        return f"Actualización del {self.fecha} - CUS #{self.cus.id}"
+    
+    def save(self, *args, **kwargs):
+        if not self.vencimiento:
+            año_siguiente = (self.fecha or date.today()).year + 1
+            self.vencimiento = date(año_siguiente, 1, 1)
+        super().save(*args, **kwargs)

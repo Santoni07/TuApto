@@ -67,8 +67,38 @@ class EstudioCusAdmin(admin.ModelAdmin):
 
 @admin.register(ComentarioDerivacion)
 class ComentarioDerivacionAdmin(admin.ModelAdmin):
-    list_display = ['cus', 'comentarios', 'recomendaciones']
+    list_display = ['cus', 'comentarios']
 
 @admin.register(Recomendaciones)
 class RecomendacionesAdmin(admin.ModelAdmin):
     list_display = ['cus', 'detalles']
+@admin.register(ActualizacionCUS)
+class ActualizacionCUSAdmin(admin.ModelAdmin):
+    list_display = (
+        'cus',
+        'medico',
+        'fecha',
+        'vencimiento',
+        'lugar',
+        'edad',
+        'peso',
+        'talla',
+        'imc',
+        'diagnostico_antropometrico',
+        'estado_salud_normal',
+    )
+    list_filter = ('fecha', 'estado_salud_normal')
+    search_fields = ('cus__id', 'lugar', 'derivado_a', 'observaciones', 'medico__profile__nombre')
+    readonly_fields = ('imc', 'diagnostico_antropometrico', 'fecha')
+
+    fieldsets = (
+        (None, {
+            'fields': ('cus', 'medico', 'fecha', 'vencimiento','lugar')
+        }),
+        ('Datos clínicos', {
+            'fields': ('edad', 'peso', 'talla', 'imc', 'diagnostico_antropometrico')
+        }),
+        ('Observaciones', {
+            'fields': ('antecedentes', 'examen_fisico', 'estado_salud_normal', 'derivado_a', 'debe_volver', 'observaciones')
+        }),
+    )

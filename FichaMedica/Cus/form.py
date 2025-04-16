@@ -188,4 +188,25 @@ class RecomendacionesForm(forms.ModelForm):
         widgets = {'detalles': widget_textarea(3)}
 
         
- 
+class ActualizacionCUSForm(forms.ModelForm):
+    medico = forms.ModelChoiceField(
+        queryset=Medico.objects.all(),
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        label="Médico responsable"
+    )
+    class Meta:
+        model = ActualizacionCUS
+        exclude = ['cus', 'fecha', 'imc', 'diagnostico_antropometrico']
+        widgets = {
+            'lugar': forms.TextInput(attrs={'class': 'form-control'}),
+            'edad': forms.NumberInput(attrs={'class': 'form-control'}),
+            'peso': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
+            'talla': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
+            'antecedentes': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
+            'examen_fisico': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
+            'estado_salud_normal': forms.CheckboxInput(),
+            'derivado_a': forms.TextInput(attrs={'class': 'form-control'}),
+            'debe_volver': forms.TextInput(attrs={'class': 'form-control'}),
+            'observaciones': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
+            
+        }

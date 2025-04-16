@@ -237,9 +237,9 @@
                             </div>
                         </div>
                     </div>
-                    <div class="d-flex justify-content-center mt-3">
-                        <button type="submit" name="guardar_examenes_medicos" class="btn btn-primary px-4">Guardar Exámenes Médicos</button>
-                    </div>
+                    <button type="submit" name="guardar_examenes_medicos" class="btn btn-primary px-4" {% if vencido %}disabled{% endif %}>
+                        Guardar Exámenes Médicos
+                    </button>
                 </form>
             </div>
         </div>
@@ -254,14 +254,48 @@
                         <form method="POST">
                             {% csrf_token %}
                             {{ cus_form.as_p }}
-                            <div class="text-end">
-                                <button type="submit" name="guardar_ficha_cus" class="btn btn-success">Guardar Ficha Completa</button>
-                            </div>
+                            <button type="submit" name="guardar_ficha_cus" class="btn btn-success" {% if vencido %}disabled{% endif %}>
+                                Guardar Ficha Completa
+                            </button>
                         </form>
                     </div>
                 </div>
             </div>
 
+             <!-- BLOQUE DE ACTUALIZACION CUS -->
+            {% if vencido %}
+            <div class="card mt-4 shadow-sm">
+                <div class="card-header bg-warning text-dark text-center">
+                    <h4 class="mb-0">ACTUALIZACIÓN / RENOVACIÓN ANUAL (C.U.S.)</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        {{ actualizacion_form.lugar.label_tag }} {{ actualizacion_form.lugar }}
+                        {{ actualizacion_form.edad.label_tag }} {{ actualizacion_form.edad }}
+                        {{ actualizacion_form.peso.label_tag }} {{ actualizacion_form.peso }}
+                        {{ actualizacion_form.talla.label_tag }} {{ actualizacion_form.talla }}
+                        {{ actualizacion_form.antecedentes.label_tag }} {{ actualizacion_form.antecedentes }}
+                        {{ actualizacion_form.examen_fisico.label_tag }} {{ actualizacion_form.examen_fisico }}
+                        {{ actualizacion_form.estado_salud_normal.label_tag }} {{ actualizacion_form.estado_salud_normal }}
+                        {{ actualizacion_form.derivado_a.label_tag }} {{ actualizacion_form.derivado_a }}
+                        {{ actualizacion_form.debe_volver.label_tag }} {{ actualizacion_form.debe_volver }}
+                        {{ actualizacion_form.observaciones.label_tag }} {{ actualizacion_form.observaciones }}
+                    
+                        
+                        {{ actualizacion_form.medico.label_tag }} {{ actualizacion_form.medico }}
+                    
+                        <div class="text-end mt-3">
+                            <button type="submit" name="guardar_actualizacion" class="btn btn-success">
+                                Guardar Actualización
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
+            
   
    
     <div class="text-center mt-4">
@@ -287,13 +321,37 @@
     function calcularIMC() {
         const peso = parseFloat(document.getElementById("id_peso").value);
         const talla = parseFloat(document.getElementById("id_talla").value);
+        const diagnosticoField = document.getElementById("id_diagnostico_antropometrico");
 
         if (!isNaN(peso) && !isNaN(talla) && talla > 0) {
             const tallaMetros = talla / 100;
             const imc = peso / (tallaMetros * tallaMetros);
             document.getElementById("id_imc").value = imc.toFixed(2);
+
+            // Diagnóstico automático
+            let diagnostico = "";
+            if (imc < 18.5) {
+                diagnostico = "Bajo peso";
+            } else if (imc <= 24.9) {
+                diagnostico = "Normal";
+            } else if (imc <= 29.9) {
+                diagnostico = "Sobrepeso";
+            } else if (imc <= 34.9) {
+                diagnostico = "Obesidad grado I";
+            } else if (imc <= 39.9) {
+                diagnostico = "Obesidad grado II";
+            } else {
+                diagnostico = "Obesidad grado III";
+            }
+
+            if (diagnosticoField) {
+                diagnosticoField.value = diagnostico;
+            }
         } else {
             document.getElementById("id_imc").value = "";
+            if (diagnosticoField) {
+                diagnosticoField.value = "";
+            }
         }
     }
 

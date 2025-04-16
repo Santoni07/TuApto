@@ -877,6 +877,10 @@ class CusHomeView(LoginRequiredMixin, ListView):
 
 
 # vista para cargar_cus   
+def calcular_edad(fecha_nacimiento):
+    hoy = date.today()
+    return hoy.year - fecha_nacimiento.year - ((hoy.month, hoy.day) < (fecha_nacimiento.month, fecha_nacimiento.day))
+
 
 @login_required
 def cus_update_view(request, cus_id):
@@ -884,22 +888,33 @@ def cus_update_view(request, cus_id):
     estudiante = cus.estudiante
     cus_form = CusForm(instance=cus)
     estudio_form = EstudioCusForm()
+    actualizaciones_qs = cus.actualizaciones.all()
+    cantidad_actualizaciones = actualizaciones_qs.count()
+
+    # Verificar si el CUS está vencido
+    vencido = cus.fecha_caducidad and cus.fecha_caducidad < date.today()
+
+    if vencido and cantidad_actualizaciones >= 5:
+        cus.estado = "VENCIDO"
+        cus.save()
+        messages.warning(request, "❌ El CUS ha sido marcado como vencido tras 5 actualizaciones.")
+
+    actualizacion_form = None
+    if vencido and cantidad_actualizaciones < 5:
+        actualizacion_form = ActualizacionCUSForm(
+            request.POST or None,
+            initial={
+                'edad': calcular_edad(estudiante.fecha_nacimiento),
+                'lugar': getattr(estudiante, 'lugar_nacimiento', '')
+            }
+        )
+
+    antecedentes = estudiante.antecedentes if hasattr(estudiante, 'antecedentes') else None
 
     if request.method == 'POST':
-        print(request.POST)
+        print("📥 request.POST:", request.POST)
 
-        if 'cargar_estudio' in request.POST:
-            estudio_form = EstudioCusForm(request.POST, request.FILES)
-            if estudio_form.is_valid():
-                estudio = estudio_form.save(commit=False)
-                estudio.cus = cus
-                estudio.save()
-                messages.success(request, "✅ Estudio cargado exitosamente.")
-            else:
-                messages.error(request, "❌ Error al cargar el estudio.")
-            return redirect('cus_update_view', cus_id=cus.id)
-
-        elif 'guardar_examenes_medicos' in request.POST:
+        if 'guardar_examenes_medicos' in request.POST:
             forms_valid = True
             form_instances = {
                 'examen_fisico_form': ExamenFisicoForm(request.POST, instance=ExamenFisico.objects.filter(cus=cus).first() or ExamenFisico(cus=cus)),
@@ -919,22 +934,77 @@ def cus_update_view(request, cus_id):
                 'recomendaciones_form': RecomendacionesForm(request.POST, instance=Recomendaciones.objects.filter(cus=cus).first() or Recomendaciones(cus=cus)),
             }
 
-            for form in form_instances.values():
+            for name, form in form_instances.items():
                 if form.is_valid():
                     form.save()
+                    print(f"✅ Guardado: {name}")
                 else:
                     forms_valid = False
-                    print("❌ Error en examen:", form.errors)
+                    print(f"❌ Errores en {name}:", form.errors)
 
             if forms_valid:
                 messages.success(request, "✅ Exámenes médicos guardados correctamente.")
+                return redirect('cus_update_view', cus_id=cus.id)
             else:
                 messages.warning(request, "⚠️ Algunos exámenes tienen errores. Revisá los datos.")
+                context.update(form_instances)
+                return render(request, 'medico/cargar_cus.html', context)
 
+        elif 'guardar_actualizacion' in request.POST:
+            if cantidad_actualizaciones >= 5:
+                messages.error(request, "⚠️ No se pueden registrar más de 5 actualizaciones.")
+                return redirect('cus_update_view', cus_id=cus.id)
+
+            actualizacion_form = ActualizacionCUSForm(request.POST)
+            if actualizacion_form.is_valid():
+                actualizacion = actualizacion_form.save(commit=False)
+                actualizacion.cus = cus
+                actualizacion.edad = calcular_edad(estudiante.fecha_nacimiento)
+
+                profile_id = request.session.get("user_profile_id")
+                if profile_id:
+                    profile = Profile.objects.filter(id=profile_id).first()
+                    if profile:
+                        medico = Medico.objects.filter(profile=profile).first()
+                        if medico:
+                            actualizacion.medico = medico
+
+                if actualizacion.peso and actualizacion.talla:
+                    altura_m = float(actualizacion.talla) / 100
+                    imc = float(actualizacion.peso) / (altura_m ** 2)
+                    actualizacion.imc = round(imc, 2)
+                    if imc < 18.5:
+                        actualizacion.diagnostico_antropometrico = "Bajo peso"
+                    elif 18.5 <= imc <= 24.9:
+                        actualizacion.diagnostico_antropometrico = "Normal"
+                    elif 25 <= imc <= 29.9:
+                        actualizacion.diagnostico_antropometrico = "Sobrepeso"
+                    elif 30 <= imc <= 34.9:
+                        actualizacion.diagnostico_antropometrico = "Obesidad grado I"
+                    elif 35 <= imc <= 39.9:
+                        actualizacion.diagnostico_antropometrico = "Obesidad grado II"
+                    else:
+                        actualizacion.diagnostico_antropometrico = "Obesidad grado III"
+
+                actualizacion.vencimiento = date(date.today().year + 1, 1, 1)
+                actualizacion.save()
+                cus.estado = "APROBADA"
+                cus.save()
+                messages.success(request, "✅ Actualización guardada y CUS aprobado.")
+                return redirect('cus_views', cus_id=cus.id)
+
+        elif 'cargar_estudio' in request.POST:
+            estudio_form = EstudioCusForm(request.POST, request.FILES)
+            if estudio_form.is_valid():
+                estudio = estudio_form.save(commit=False)
+                estudio.cus = cus
+                estudio.save()
+                messages.success(request, "✅ Estudio cargado exitosamente.")
+            else:
+                messages.error(request, "❌ Error al cargar el estudio.")
             return redirect('cus_update_view', cus_id=cus.id)
 
         elif 'guardar_ficha_cus' in request.POST:
-            # Verificamos que TODOS los exámenes estén completos antes de guardar el certificado
             campos_requeridos = [
                 ExamenFisico, AlimentacionNutricion, ExamenOftalmologico,
                 ExamenFonoaudiologico, ExamenPiel, ExamenOdontologico,
@@ -945,7 +1015,7 @@ def cus_update_view(request, cus_id):
             faltantes = [modelo.__name__ for modelo in campos_requeridos if not modelo.objects.filter(cus=cus).exists()]
 
             if faltantes:
-                messages.error(request, f"❌ No se puede guardar el CUS. Faltan completar los siguientes formularios: {', '.join(faltantes)}")
+                messages.error(request, f"❌ No se puede guardar el CUS. Faltan completar: {', '.join(faltantes)}")
                 return redirect('cus_update_view', cus_id=cus.id)
 
             cus_form = CusForm(request.POST, instance=cus)
@@ -954,18 +1024,17 @@ def cus_update_view(request, cus_id):
                 antecedentes = AntecedentesCUS(estudiante=estudiante)
                 antecedentes.save()
 
-            if cus_form.is_valid():
-                cus_form.save()
-                messages.success(request, "✅ Certificado CUS guardado correctamente.")
+            cus = cus_form.save(commit=False)
+
+                # Calcular fecha de caducidad en base a fecha_de_llenado
+            if cus.fecha_de_llenado:
+                    cus.fecha_caducidad = date(cus.fecha_de_llenado.year + 1, 1, 1)
+
+                    cus.save()
+                    messages.success(request, "✅ Certificado CUS guardado correctamente.")
             else:
                 messages.error(request, "❌ Error al guardar el certificado CUS.")
-            return redirect('cus_update_view', cus_id=cus.id)
-
-    else:
-        cus_form = CusForm(instance=cus)
-        estudio_form = EstudioCusForm()
-
-    antecedentes = estudiante.antecedentes if hasattr(estudiante, 'antecedentes') else None
+            return redirect('cus_home', cus_id=cus.id)
 
     context = {
         'cus': cus,
@@ -994,9 +1063,15 @@ def cus_update_view(request, cus_id):
         'neuro_form': ExamenNeurologicoForm(instance=ExamenNeurologico.objects.filter(cus=cus).first()),
         'comentario_form': ComentarioDerivacionForm(instance=ComentarioDerivacion.objects.filter(cus=cus).first()),
         'recomendaciones_form': RecomendacionesForm(instance=Recomendaciones.objects.filter(cus=cus).first()),
+        'actualizacion_form': actualizacion_form,
+        'vencido': vencido,
+        'actualizaciones': cus.actualizaciones.all()
     }
 
     return render(request, 'medico/cargar_cus.html', context)
+
+
+
 
 # Manejo genérico para formularios del CUS
 
@@ -1127,35 +1202,34 @@ def cus_views(request, cus_id):
     cus = get_object_or_404(Cus, id=cus_id)
     estudiante = cus.estudiante
     examenes = {
-    'Examen Físico': ExamenFisico.objects.filter(cus=cus).first(),
-    'Alimentación y Nutrición': AlimentacionNutricion.objects.filter(cus=cus).first(),
-    'Oftalmológico': ExamenOftalmologico.objects.filter(cus=cus).first(),
-    'Fonoaudiológico': ExamenFonoaudiologico.objects.filter(cus=cus).first(),
-    'Piel': ExamenPiel.objects.filter(cus=cus).first(),
-    'Odontológico': ExamenOdontologico.objects.filter(cus=cus).first(),
-    'Cardiovascular': ExamenCardiovascular.objects.filter(cus=cus).first(),
-    'Respiratorio': ExamenRespiratorio.objects.filter(cus=cus).first(),
-    'Abdomen': ExamenAbdomen.objects.filter(cus=cus).first(),
-    'Genitourinario': ExamenGenitourinario.objects.filter(cus=cus).first(),
-    'Endocrinológico': ExamenEndocrinologico.objects.filter(cus=cus).first(),
-    'Osteoarticular': ExamenOsteoarticular.objects.filter(cus=cus).first(),
-    'Neurológico': ExamenNeurologico.objects.filter(cus=cus).first(),
-    'Comentario': ComentarioDerivacion.objects.filter(cus=cus).first(),
-    'Recomendaciones': Recomendaciones.objects.filter(cus=cus).first(),
-}
-    
+        'Examen Físico': ExamenFisico.objects.filter(cus=cus).first(),
+        'Alimentación y Nutrición': AlimentacionNutricion.objects.filter(cus=cus).first(),
+        'Oftalmológico': ExamenOftalmologico.objects.filter(cus=cus).first(),
+        'Fonoaudiológico': ExamenFonoaudiologico.objects.filter(cus=cus).first(),
+        'Piel': ExamenPiel.objects.filter(cus=cus).first(),
+        'Odontológico': ExamenOdontologico.objects.filter(cus=cus).first(),
+        'Cardiovascular': ExamenCardiovascular.objects.filter(cus=cus).first(),
+        'Respiratorio': ExamenRespiratorio.objects.filter(cus=cus).first(),
+        'Abdomen': ExamenAbdomen.objects.filter(cus=cus).first(),
+        'Genitourinario': ExamenGenitourinario.objects.filter(cus=cus).first(),
+        'Endocrinológico': ExamenEndocrinologico.objects.filter(cus=cus).first(),
+        'Osteoarticular': ExamenOsteoarticular.objects.filter(cus=cus).first(),
+        'Neurológico': ExamenNeurologico.objects.filter(cus=cus).first(),
+        'Comentario': ComentarioDerivacion.objects.filter(cus=cus).first(),
+        'Recomendaciones': Recomendaciones.objects.filter(cus=cus).first(),
+    }
+
     for nombre, instancia in examenes.items():
         if instancia:
             print(f"✅ {nombre}: {instancia}")
         else:
             print(f"❌ {nombre}: No se encontró instancia")
-        # Cargar formularios (solo visualización, no POST)
-    
+
     profile_id = request.session.get("user_profile_id")
     perfil = None
     if profile_id:
         perfil = Profile.objects.filter(id=profile_id).first()
-    
+
     contexto = {
         'perfil': perfil,
         'cus': cus,
@@ -1178,34 +1252,14 @@ def cus_views(request, cus_id):
         'neuro_form': ExamenNeurologicoForm(instance=ExamenNeurologico.objects.filter(cus=cus).first() or ExamenNeurologico(cus=cus)),
         'comentario_form': ComentarioDerivacionForm(instance=ComentarioDerivacion.objects.filter(cus=cus).first() or ComentarioDerivacion(cus=cus)),
         'recomendaciones_form': RecomendacionesForm(instance=Recomendaciones.objects.filter(cus=cus).first() or Recomendaciones(cus=cus)),
-    
+        'actualizaciones': cus.actualizaciones.all()
     }
 
-# Repetí esto para cada formulario que aparece vacío
     if request.GET.get('descargar_pdf') == 'true':
-        antecedentes = contexto['antecedentes']
-        examen_fisico_form = contexto['examen_fisico_form']
-        alimentacion_form = contexto['alimentacion_form']
-        oftalmologico_form = contexto['oftalmologico_form']
-        fono_form = contexto['fono_form']
-        piel_form = contexto['piel_form']
-        odonto_form = contexto['odonto_form']
-        cardio_form = contexto['cardio_form']
-        respiratorio_form = contexto['respiratorio_form']
-        abdomen_form = contexto['abdomen_form']
-        genito_form = contexto['genito_form']
-        endocrino_form = contexto['endocrino_form']
-        osteo_form = contexto['osteo_form']
-        neuro_form = contexto['neuro_form']
-        comentario_form = contexto['comentario_form']
-        recomendaciones_form = contexto['recomendaciones_form']
-
         html = render_to_string("medico/cus_pdf.html", contexto)
         pdf = HTML(string=html, base_url=request.build_absolute_uri('/')).write_pdf()
-
         response = HttpResponse(pdf, content_type='application/pdf')
         response['Content-Disposition'] = f'attachment; filename="cus_{estudiante.apellido}_{estudiante.nombre}.pdf"'
         return response
-        
 
     return render(request, 'medico/cus_views.html', contexto)

@@ -135,12 +135,18 @@
                                         <a href="{% url 'cus_update_view' estudiante.cus_id %}" 
                                            class="btn btn-warning btn-seleccionar"
                                            onclick="window.location.href=this.href; return false;">
-                                            Cargar CUS {{ estudiante.cus_id }}
+                                            Cargar CUS 
+                                        </a>
+                                    {% elif estudiante.estado == "VENCIDO" %}
+                                        <a href="{% url 'cus_update_view' estudiante.cus_id %}" 
+                                            class="btn btn-warning btn-seleccionar"
+                                            onclick="window.location.href=this.href; return false;">
+                                            Actualizar Cus 
                                         </a>
                                     {% elif estudiante.estado == "APROBADA" %}
                                         <a href="{% url 'cus_views' estudiante.cus_id %}" 
                                            class="btn btn-success">
-                                            Ver CUS {{ estudiante.cus_id }}
+                                            Ver CUS 
                                         </a>
                                     {% endif %}
                                 {% else %}
