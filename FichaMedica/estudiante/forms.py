@@ -20,11 +20,12 @@ class EstudianteForm(forms.ModelForm):
             'apellido': forms.TextInput(attrs={'class': 'form-control'}),
             'fecha_nacimiento': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'dni': forms.TextInput(attrs={'class': 'form-control'}),
-            'domicilio': forms.TextInput(attrs={'class': 'form-control'}),
-            'telefono': forms.TextInput(attrs={'class': 'form-control'}),
             'sexo': forms.Select(attrs={'class': 'form-control'}),
+            'telefono': forms.TextInput(attrs={'class': 'form-control'}),
+            'domicilio': forms.TextInput(attrs={'class': 'form-control'}),
             'localidad': forms.TextInput(attrs={'class': 'form-control'}),
             'lugar_nacimiento': forms.TextInput(attrs={'class': 'form-control'}),
+            
         }
 
 class ColegioForm(forms.ModelForm):

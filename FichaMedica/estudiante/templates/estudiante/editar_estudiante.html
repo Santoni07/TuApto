@@ -1,6 +1,5 @@
 {% extends 'core/base.html' %}
 {% load static %}
-
 {% block content %}
 <div class="container mt-5 pt-5">
     <div class="card shadow-lg p-5 bg-light rounded-4 mx-auto" style="max-width: 700px;">
@@ -8,7 +7,64 @@
 
         <form method="POST">
             {% csrf_token %}
-            {{ form.as_p }}
+            <div class="row">
+
+                <!-- DATOS NO EDITABLES COMO TEXTO -->
+                <div class="col-md-6 mb-2">
+                    <label class="form-label fw-bold">Nombre:</label>
+                    <p class="form-control-plaintext">{{ estudiante.nombre }}</p>
+                </div>
+                <div class="col-md-6 mb-2">
+                    <label class="form-label fw-bold">Apellido:</label>
+                    <p class="form-control-plaintext">{{ estudiante.apellido }}</p>
+                </div>
+                <div class="col-md-6 mb-2">
+                    <label class="form-label fw-bold">DNI:</label>
+                    <p class="form-control-plaintext">{{ estudiante.dni }}</p>
+                </div>
+                <div class="col-md-6 mb-2">
+                    <label class="form-label fw-bold">Fecha de nacimiento:</label>
+                    <p class="form-control-plaintext">{{ estudiante.fecha_nacimiento|date:"d/m/Y" }}</p>
+                </div>
+                <div class="col-md-6 mb-2">
+                    <label class="form-label fw-bold">Sexo:</label>
+                    <p class="form-control-plaintext">
+                        {% if estudiante.sexo == 'M' %}Masculino
+                        {% elif estudiante.sexo == 'F' %}Femenino
+                        {% else %}Otro{% endif %}
+                    </p>
+                </div>
+                <div class="col-md-6 mb-2">
+                    <label class="form-label fw-bold">Lugar de nacimiento:</label>
+                    <p class="form-control-plaintext">{{ estudiante.lugar_nacimiento }}</p>
+                </div>
+
+                <!-- CAMPOS EDITABLES -->
+                <hr class="my-3">
+
+                <p class="text-muted">Los siguientes campos son editables:</p>
+
+                <div class="col-md-6 mb-3">
+                    {{ form.telefono.label_tag }} {{ form.telefono }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    {{ form.domicilio.label_tag }} {{ form.domicilio }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    {{ form.localidad.label_tag }} {{ form.localidad }}
+                </div>
+
+                <!-- Campo personalizado: Colegio -->
+                <div class="col-md-12 mb-3">
+                    <label for="id_colegio" class="form-label">Institución Académica</label>
+                    <select class="form-select" id="id_colegio" name="colegio" required>
+                        <option value="" disabled {% if not form.initial.colegio %}selected{% endif %}>Seleccione un colegio</option>
+                        {% for colegio in colegios %}
+                            <option value="{{ colegio.id }}" {% if form.initial.colegio.id == colegio.id %}selected{% endif %}>{{ colegio.nombre }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
 
             <div class="text-center mt-4">
                 <a href="{% url 'listar_estudiantes' %}" class="btn btn-secondary">Cancelar</a>
@@ -17,4 +73,5 @@
         </form>
     </div>
 </div>
+
 {% endblock %}

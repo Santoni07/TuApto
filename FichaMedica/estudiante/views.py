@@ -8,7 +8,10 @@ from account.models import Profile
 from django.contrib.auth.decorators import login_required
 from Cus.models import Cus
 from django.utils.timezone import now
-from Cus.form import CusForm
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
+from Cus.models import *
 # Create your views here.
 @login_required
 def home_estudiante(request):
@@ -40,7 +43,7 @@ def home_estudiante(request):
         "profile": profile,
         "tutor": tutor
     })
-
+@login_required
 def cargar_estudiante(request):
     # 📌 Verificar que el usuario tiene un tutor asociado
     profile_id = request.session.get("user_profile_id")
@@ -90,7 +93,7 @@ def cargar_estudiante(request):
 
     colegios = Colegio.objects.all()  # Obtener todos los colegios disponibles
     return render(request, "estudiante/cargar_estudiante.html", {"form": form, "colegios": colegios})
-
+@login_required
 def listar_estudiantes(request):
     profile_id = request.session.get("user_profile_id")
 
@@ -108,10 +111,10 @@ def listar_estudiantes(request):
 
     return render(request, 'estudiante/listar_estudiantes.html', {"estudiantes": estudiantes})
 
-
+@login_required
 def ver_estudiante(request):
     return render(request, 'estudiante/ver_estudiante.html')
-
+@login_required
 def consultar_apto(request):
     estudiantes = Estudiante.objects.filter(cus__isnull=False).distinct()
 
@@ -127,22 +130,47 @@ def consultar_apto(request):
         'estudiantes': estudiantes,
         'perfil': perfil,
     })
+
 @login_required
 def editar_estudiante(request, estudiante_id):
     estudiante = get_object_or_404(Estudiante, id=estudiante_id)
 
+    # Traer el colegio activo actual si existe
+    relacion_actual = EstudianteColegio.objects.filter(estudiante=estudiante, activo=True).first()
+
     if request.method == 'POST':
         form = EstudianteForm(request.POST, instance=estudiante)
+        colegio_id = request.POST.get("colegio")
+
         if form.is_valid():
             estudiante = form.save()
+
+            # Si el colegio cambió, actualizar la relación
+            if colegio_id and (not relacion_actual or int(colegio_id) != relacion_actual.colegio.id):
+                # Desactivar el actual si existe
+                if relacion_actual:
+                    relacion_actual.activo = False
+                    relacion_actual.save()
+
+                # Activar el nuevo
+                nuevo_colegio = Colegio.objects.get(id=colegio_id)
+                EstudianteColegio.objects.create(estudiante=estudiante, colegio=nuevo_colegio, activo=True)
+
             messages.success(request, "Estudiante actualizado con éxito.")
-            return redirect('listar_estudiantes')  # Redirigir a la lista de estudiantes
+            return redirect('listar_estudiantes')
         else:
             messages.error(request, "Error en el formulario. Verifica los datos ingresados.")
     else:
-        form = EstudianteForm(instance=estudiante)  # Cargar los datos existentes en el formulario
+        form = EstudianteForm(instance=estudiante)
 
-    return render(request, 'estudiante/editar_estudiante.html', {'form': form, 'estudiante': estudiante})
+    colegios = Colegio.objects.all()
+
+    return render(request, 'estudiante/editar_estudiante.html', {
+        'form': form,
+        'estudiante': estudiante,
+        'colegios': colegios,
+        'colegio_actual': relacion_actual.colegio if relacion_actual else None
+    })
 
 @login_required
 def cargar_tutor(request):
@@ -280,57 +308,98 @@ def detalle_antecedente(request, estudiante_id):
     }
     return render(request, 'estudiante/detalle_antecedente.html', context)
 
+
+
+ 
 @login_required
-def crear_cus_nuevo(request, estudiante_id):
+def lista_estudiantes_para_cus(request):
+    # Obtener todos los estudiantes del tutor logueado
     profile_id = request.session.get("user_profile_id")
-    tutor = Tutor.objects.filter(profile_id=profile_id).first()
+    estudiantes = Estudiante.objects.filter(tutor__profile__id=profile_id)
+    
+    context = {
+        'estudiantes': estudiantes,
+    }
+    return render(request, 'estudiante/lista_generar_cus.html', context)
 
-    if not tutor:
-        messages.error(request, "No se encontró un tutor asociado.")
-        return redirect("home")
+@login_required
+def generar_cus_para_estudiante(request, estudiante_id):
+    estudiante = get_object_or_404(Estudiante, id=estudiante_id)
 
-    estudiante = get_object_or_404(Estudiante, id=estudiante_id, tutor=tutor)
+    # Crear nuevo CUS
+    nuevo_cus = Cus.objects.create(
+        estudiante=estudiante,
+        fecha_de_llenado=date.today(),
+        estado="INCOMPLETO"
+    )
 
-    # Verificamos si ya existe un CUS vencido
-    cus_anterior = Cus.objects.filter(estudiante=estudiante, estado="VENCIDO").order_by('-fecha_de_llenado').first()
+    messages.success(request, f"✅ Se ha creado el CUS para {estudiante.nombre} {estudiante.apellido}")
+    return redirect('cus_update_view', cus_id=nuevo_cus.id)
 
-    # Si no hay CUS vencido, no se permite continuar
-    if not cus_anterior:
-        messages.warning(request, "Solo puedes cargar antecedentes si el CUS está vencido.")
-        return redirect('ver_antecedentes')
-
-    # Creamos nuevo objeto CUS pero sin guardar aún
-    nuevo_cus = Cus(estudiante=estudiante)
-
-    # Si hay antecedentes previos, los traemos
-    antecedentes_previos = getattr(estudiante, 'antecedentes', None)
-
+@login_required
+@csrf_exempt
+def generar_cus_ajax(request, estudiante_id):
     if request.method == "POST":
-        cus_form = CusForm(request.POST, instance=nuevo_cus)
-        antecedentes_form = AntecedentesCUSForm(request.POST, instance=antecedentes_previos)
+        estudiante = get_object_or_404(Estudiante, id=estudiante_id)
 
-        if cus_form.is_valid() and antecedentes_form.is_valid():
-            nuevo_cus = cus_form.save(commit=False)
-            nuevo_cus.estado = "PROCESO"
-            nuevo_cus.fecha_de_llenado = date.today()
-            nuevo_cus.fecha_caducidad = date(nuevo_cus.fecha_de_llenado.year + 1, 1, 1)
-            nuevo_cus.save()
+        if Cus.objects.filter(estudiante=estudiante, estado__in=["EN PROCESO", "APROBADA"]).exists():
+            return JsonResponse({"success": False, "message": "El estudiante ya tiene un CUS activo."}, status=400)
 
-            # Guardar los antecedentes como relacionados a este estudiante
-            antecedentes = antecedentes_form.save(commit=False)
-            antecedentes.estudiante = estudiante
-            antecedentes.save()
+        nuevo_cus = Cus.objects.create(estudiante=estudiante, estado="PROCESO")
 
-            messages.success(request, "Nuevo CUS creado correctamente.")
-            return redirect("cus_update_view", cus_id=nuevo_cus.id)
+        return JsonResponse({
+            "success": True,
+            "cus_id": nuevo_cus.id
+        })
 
-    else:
-        # Precargamos los formularios con la info previa
-        cus_form = CusForm(instance=nuevo_cus)
-        antecedentes_form = AntecedentesCUSForm(instance=antecedentes_previos)
+    return JsonResponse({"success": False, "message": "Método no permitido"}, status=405)
 
-    return render(request, "estudiante/crear_nuevo_cus.html", {
-        "cus_form": cus_form,
-        "antecedentes_form": antecedentes_form,
-        "estudiante": estudiante,
-    })
+# DATOS PARA LA CURVA DE CRECIMIENTO 
+@login_required
+def curva_crecimiento_view(request):
+    estudiantes = Estudiante.objects.all()
+    datos = []
+
+    estudiante_id = request.GET.get('estudiante_id')
+    estudiante_seleccionado = None
+
+    if estudiante_id:
+        estudiante_seleccionado = get_object_or_404(Estudiante, id=estudiante_id)
+
+        registros = []
+
+        # CUS original
+        cus = Cus.objects.filter(estudiante=estudiante_seleccionado).order_by('fecha_de_llenado').first()
+        if cus and hasattr(cus, 'examen_fisico'):
+            peso = float(cus.examen_fisico.peso or 0)
+            talla = float(cus.examen_fisico.talla or 0)
+            imc = round(peso / ((talla/100)**2), 2) if peso and talla else 0
+            registros.append({
+                'fecha': cus.fecha_de_llenado.strftime('%Y-%m-%d') if cus.fecha_de_llenado else 'CUS',
+                'peso': peso,
+                'talla': talla,
+                'imc': imc
+            })
+
+        # Actualizaciones
+        actualizaciones = ActualizacionCUS.objects.filter(cus__estudiante=estudiante_seleccionado).order_by('fecha')
+        for act in actualizaciones:
+            peso = float(act.peso or 0)
+            talla = float(act.talla or 0)
+            imc = round(peso / ((talla/100)**2), 2) if peso and talla else 0
+            registros.append({
+                'fecha': act.fecha.strftime('%Y-%m-%d'),
+                'peso': peso,
+                'talla': talla,
+                'imc': imc
+            })
+
+        datos = json.dumps(registros)
+        print(F'Datos del estudiante ',datos)
+
+    context = {
+        'estudiantes': estudiantes,
+        'estudiante_seleccionado': estudiante_seleccionado,
+        'datos': datos
+    }
+    return render(request, 'estudiante/curva_crecimiento.html', context)
