@@ -92,11 +92,141 @@
     </header>
     {% endif %}
     {% block content %}{% endblock %}
+<!-- ✅ Chatbot Flotante estilo WhatsApp con flujo secuencial -->
+
+<!-- Botón flotante -->
+<div id="chatbot-boton" onclick="abrirChat()" class="btn btn-success rounded-circle d-flex justify-content-center align-items-center" style="position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; z-index: 1050;">
+    <i class="bi bi-chat-dots" style="font-size: 1.5rem;"></i>
+  </div>
+  
+  <!-- Contenedor del Chatbot -->
+  <div id="chatbot-contenedor" class="card shadow-sm" style="position: fixed; bottom: 90px; right: 20px; width: 320px; display: none; z-index: 1050;">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+      <span>¿Necesitás ayuda?</span>
+      <button class="btn-close btn-close-white" onclick="cerrarChat()"></button>
+    </div>
+    <div class="card-body">
+      <!-- Paso 1: Pregunta inicial -->
+      <div id="paso1">
+        <p>¿Necesitás ayuda?</p>
+        <div class="d-flex gap-2">
+          <button class="btn btn-outline-primary btn-sm w-100" onclick="siguientePaso(2)">Sí</button>
+          <button class="btn btn-outline-secondary btn-sm w-100" onclick="cerrarChat()">No</button>
+        </div>
+      </div>
+  
+      <!-- Paso 2: Selección de tipo de usuario -->
+      <div id="paso2" style="display: none;">
+        <p>¿Sos Tutor o Jugador?</p>
+        <div class="d-flex gap-2">
+          <button class="btn btn-outline-info btn-sm w-100" onclick="mostrarPreguntas('tutor')">Tutor</button>
+          <button class="btn btn-outline-success btn-sm w-100" onclick="mostrarPreguntas('jugador')">Jugador</button>
+        </div>
+      </div>
+  
+      <!-- Paso 3: Lista de preguntas -->
+      <div id="preguntas-container" style="display: none;">
+        <p class="fw-bold" id="titulo-preguntas"></p>
+        <ul class="list-group list-group-flush" id="lista-preguntas"></ul>
+        <div id="respuesta" class="alert alert-info mt-3 d-none"></div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  
+  <script>
+    const preguntasTutor = [
+      { q: "¿Cómo creo un nuevo CUS?", r: "Desde el panel de tutor, seleccioná al estudiante y hacé clic en 'Nuevo CUS'." },
+      { q: "¿Qué pasa si el CUS está vencido?", r: "Podés cargar uno nuevo, y el sistema traerá los datos anteriores." },
+      { q: "¿Dónde veo los antecedentes cargados?", r: "En la ficha del estudiante, sección 'Antecedentes Médicos'." },
+      { q: "¿Puedo actualizar antecedentes?", r: "Sí, solo si el CUS está vencido. Se habilita automáticamente." },
+      { q: "¿Qué estudios puedo cargar?", r: "Laboratorio, oftalmológico, torax, entre otros." },
+      { q: "¿Cuántas actualizaciones tiene el CUS?", r: "Hasta 5 actualizaciones. Luego se marca como vencido." },
+      { q: "¿Puedo ver el PDF del CUS?", r: "Sí, una vez aprobado podés descargarlo." },
+      { q: "¿Qué pasa si falta un formulario?", r: "No se puede guardar el CUS hasta completar todos los formularios." },
+      { q: "¿Puedo contactar al médico?", r: "Sí, desde el panel del estudiante verás los datos del médico asignado." },
+      { q: "¿Qué hago si el CUS fue rechazado?", r: "Revisá los comentarios del rechazo y corregilo para reenviarlo." }
+    ];
+  
+    const preguntasJugador = [
+      { q: "¿Cómo subo mis estudios médicos?", r: "Desde tu panel, clic en 'Cargar estudios' y adjuntá los archivos." },
+      { q: "¿Qué pasa si me rechazan un estudio?", r: "El médico dejará un comentario. Subí una nueva versión." },
+      { q: "¿Cuánto dura un apto físico?", r: "Hasta el 31 de diciembre del año en curso." },
+      { q: "¿Dónde veo si mi apto fue aprobado?", r: "En tu panel, el estado se muestra junto al nombre del torneo." },
+      { q: "¿Puedo descargar mi apto físico?", r: "Sí, una vez aprobado podés descargarlo como PDF." },
+      { q: "¿Qué estudios son obligatorios?", r: "Depende del torneo, usualmente laboratorio y cardiovascular." },
+      { q: "¿Puedo usar el mismo apto para varios torneos?", r: "Sí, si está vigente y es aceptado por cada organización." },
+      { q: "¿Quién ve mis estudios?", r: "Solo médicos autorizados y organizadores del torneo." },
+      { q: "¿Puedo subir estudios desde el celular?", r: "Sí, la plataforma es compatible con dispositivos móviles." },
+      { q: "¿Qué pasa si tengo varias fichas en curso?", r: "Podés gestionarlas por separado, cada una vinculada a su torneo." }
+    ];
+  
+    function abrirChat() {
+      document.getElementById("chatbot-contenedor").style.display = "block";
+      document.getElementById("chatbot-boton").style.display = "none";
+    }
+  
+    function cerrarChat() {
+      document.getElementById("chatbot-contenedor").style.display = "none";
+      document.getElementById("chatbot-boton").style.display = "flex";
+      document.getElementById("paso1").style.display = "block";
+      document.getElementById("paso2").style.display = "none";
+      document.getElementById("preguntas-container").style.display = "none";
+      document.getElementById("respuesta").classList.add("d-none");
+    }
+  
+    function siguientePaso(paso) {
+      document.getElementById("paso1").style.display = paso === 1 ? "block" : "none";
+      document.getElementById("paso2").style.display = paso === 2 ? "block" : "none";
+      document.getElementById("preguntas-container").style.display = "none";
+      document.getElementById("respuesta").classList.add("d-none");
+    }
+  
+    function mostrarPreguntas(tipo) {
+      const preguntas = tipo === 'tutor' ? preguntasTutor : preguntasJugador;
+      const lista = document.getElementById("lista-preguntas");
+      const titulo = document.getElementById("titulo-preguntas");
+      const paso1 = document.getElementById("paso1");
+      const paso2 = document.getElementById("paso2");
+      const preguntasContainer = document.getElementById("preguntas-container");
+  
+      if (!lista || !titulo || !paso1 || !paso2 || !preguntasContainer) {
+        console.error("❌ No se encuentran uno o más elementos del DOM necesarios para mostrar las preguntas.");
+        return;
+      }
+  
+      lista.innerHTML = "";
+      preguntas.forEach((item) => {
+        const li = document.createElement("li");
+        li.className = "list-group-item list-group-item-action";
+        li.style.cursor = "pointer";
+        li.textContent = item.q;
+        li.onclick = () => mostrarRespuesta(item.r);
+        lista.appendChild(li);
+      });
+  
+      titulo.textContent = tipo === 'tutor' ? "Preguntas frecuentes para Tutores" : "Preguntas frecuentes para Jugadores";
+  
+      paso1.style.display = "none";
+      paso2.style.display = "none";
+      preguntasContainer.style.display = "block";
+    }
+  
+    function mostrarRespuesta(texto) {
+      const div = document.getElementById("respuesta");
+      div.textContent = texto;
+      div.classList.remove("d-none");
+    }
+  </script>
+  
     {% block publicidad %}{% endblock %}
     {% block landingPage %} {% endblock %}
   
     {% block footer %}{% endblock %}
-
+    
+      
     <!-- Modal de confirmación de cierre de sesión -->
     <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
         <div class="modal-dialog">
