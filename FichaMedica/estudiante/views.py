@@ -274,41 +274,70 @@ def cargar_antecedente_estudiante(request):
                 consentimiento_persona=True
             )
 
-             # ✅ Mensaje para mostrar modal
+            # ✅ Mensaje para mostrar modal
             messages.success(request, "Antecedentes guardados con éxito.")
 
-            # Volvemos al mismo form para activar el modal
+            # Redirigimos para reiniciar el formulario y mostrar el modal
             return redirect(request.path + f"?estudiante_id={estudiante.id}")
     else:
         form = AntecedentesCUSForm()
 
     return render(request, 'estudiante/cargar_antecedente_form.html', {
         'form': form,
-        'estudiante': estudiante
+        'estudiante': estudiante,
+        'actualizar': False  # 👈 aclaramos que es carga nueva
     })
 @login_required
 def ver_antecedentes(request):
-    # Obtener estudiantes que tienen antecedentes cargados
-    estudiantes_con_antecedentes = Estudiante.objects.filter(antecedentes__isnull=False)
+    estudiantes = Estudiante.objects.filter(antecedentes__isnull=False).distinct()
+
+    datos_estudiantes = []
+
+    for estudiante in estudiantes:
+        # Último antecedente (por ID o por fecha si agregás fecha_creacion en el futuro)
+        ultimo_antecedente = estudiante.antecedentes.order_by('-id').first()
+
+        # Último CUS
+        cus = Cus.objects.filter(estudiante=estudiante).order_by('-fecha_de_llenado').first()
+        estado_cus = cus.estado if cus else None
+        fecha_caducidad_cus = cus.fecha_caducidad if cus else None
+
+        # Última actualización del CUS
+        actualizacion = ActualizacionCUS.objects.filter(cus__estudiante=estudiante).order_by('-fecha').first()
+
+        datos_estudiantes.append({
+            'estudiante': estudiante,
+            'cus': cus,
+            'estado_cus': estado_cus,
+            'fecha_caducidad': fecha_caducidad_cus,
+            'tiene_actualizacion': bool(actualizacion),
+            'vencimiento': actualizacion.vencimiento if actualizacion else None,
+            'puede_editar': estado_cus == 'VENCIDO',
+            'antecedente': ultimo_antecedente  # 👈 agregamos esto
+        })
 
     context = {
-        'estudiantes_con_antecedentes': estudiantes_con_antecedentes
+        'datos_estudiantes': datos_estudiantes
     }
     return render(request, 'estudiante/ver_antecedentes.html', context)
 
+
 @login_required
 def detalle_antecedente(request, estudiante_id):
-    # Obtener el estudiante y su antecedente asociado
     estudiante = get_object_or_404(Estudiante, id=estudiante_id)
-    antecedente = get_object_or_404(AntecedentesCUS, estudiante=estudiante)
+    
+    # Filtramos por estudiante y ordenamos descendente por ID (último creado)
+    antecedente = AntecedentesCUS.objects.filter(estudiante=estudiante).order_by('-id').first()
+
+    if not antecedente:
+        messages.error(request, "No se encontraron antecedentes para este estudiante.")
+        return redirect('ver_antecedentes')
 
     context = {
         'estudiante': estudiante,
         'antecedente': antecedente
     }
     return render(request, 'estudiante/detalle_antecedente.html', context)
-
-
 
  
 @login_required
@@ -403,3 +432,39 @@ def curva_crecimiento_view(request):
         'datos': datos
     }
     return render(request, 'estudiante/curva_crecimiento.html', context)
+
+# Funcion para generar un nuevo antecedente si cus es vencido 
+@login_required
+def actualizar_antecedente_si_cus_vencido(request, estudiante_id):
+    estudiante = get_object_or_404(Estudiante, id=estudiante_id)
+
+    # Obtener el último CUS
+    ultimo_cus = Cus.objects.filter(estudiante=estudiante).order_by('-fecha_de_llenado').first()
+
+    if not ultimo_cus or ultimo_cus.estado != 'VENCIDO':
+        messages.error(request, "⚠️ No se puede actualizar. El CUS no está vencido.")
+        return redirect('ver_antecedentes')
+
+    print(f'📝 Post: {request.POST}')
+
+    if request.method == 'POST':
+        form = AntecedentesCUSForm(request.POST)
+        if form.is_valid():
+            nuevo = form.save(commit=False)
+            nuevo.estudiante = estudiante
+            nuevo.save()
+            messages.success(request, "✅ Antecedente actualizado con historial guardado.")
+            return redirect('ver_antecedentes')
+        else:
+            print("❌ Formulario no válido")
+            print(form.errors)
+    else:
+        # precargar con los últimos antecedentes (si existen)
+        antecedentes_previos = estudiante.antecedentes.order_by('-id').first()
+        form = AntecedentesCUSForm(instance=antecedentes_previos)
+
+    return render(request, 'estudiante/cargar_antecedente_form.html', {
+        'form': form,
+        'estudiante': estudiante,
+        'cus': ultimo_cus
+    })

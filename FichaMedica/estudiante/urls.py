@@ -13,7 +13,8 @@ urlpatterns = [
    path('listar_estudiantes/', views.listar_estudiantes, name='listar_estudiantes'),
    path('ver_estudiante/', views.ver_estudiante, name='ver_estudiante'),
    path('ver-antecedentes/', views.ver_antecedentes, name='ver_antecedentes'),
-    path('detalle-antecedente/<int:estudiante_id>/', views.detalle_antecedente, name='detalle_antecedente'),
+   path('detalle-antecedente/<int:estudiante_id>/', views.detalle_antecedente, name='detalle_antecedente'),
+   path('antecedente/actualizar/<int:estudiante_id>/', views.actualizar_antecedente_si_cus_vencido, name='actualizar_antecedente_si_cus_vencido'),
 
    path('consultar_apto/', views.consultar_apto, name='consultar_apto'),
    path('seleccionar_estudiante/', views.seleccionar_estudiante, name='seleccionar_estudiante'),

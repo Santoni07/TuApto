@@ -25,7 +25,7 @@
                 <div class="container mt-5 pt-5">
                     <div class="card shadow-lg p-5 bg-light rounded-4 mx-auto" style="max-width: 1000px;">
                         <h3 class="text-center text-primary fw-bold mb-4">
-                            {% if actualizar %}Actualizar{% else %}Cargar{% endif %} Antecedentes Médicos para {{ estudiante.nombre }} {{ estudiante.apellido }}
+                            Cargar Antecedentes Médicos para {{ estudiante.nombre }} {{ estudiante.apellido }}
                         </h3>
 
                         <form method="POST" action="" onsubmit="return validarConsentimiento()">
@@ -41,31 +41,31 @@
                                         <label class="fw-bold">Carnet:</label>
                                         <select class="form-select mb-2" name="carnet_vacunacion">
                                             <option value="">Seleccione</option>
-                                            <option value="True">Sí</option>
-                                            <option value="False">No</option>
+                                            <option value="True" {% if antecedentes.carnet_vacunacion %}selected{% endif %}>Sí</option>
+                                            <option value="False" {% if antecedentes.carnet_vacunacion == False %}selected{% endif %}>No</option>
                                         </select>
                                     
                                         <label class="fw-bold">Completo:</label>
                                         <select class="form-select mb-2" name="esquema_completo">
                                             <option value="">Seleccione</option>
-                                            <option value="True">Sí</option>
-                                            <option value="False">No</option>
+                                            <option value="True" {% if antecedentes.esquema_completo %}selected{% endif %}>Sí</option>
+                                            <option value="False" {% if antecedentes.esquema_completo == False %}selected{% endif %}>No</option>
                                         </select>
                                     
                                         <label class="fw-bold">Debe completar esquema con:</label>
-                                        <input type="text" class="form-control mb-3" name="esquema_faltante">
+                                        <input type="text" class="form-control mb-3" name="esquema_faltante" value="{{ antecedentes.esquema_faltante }}">
                                     </div>
 
                                     <!-- Condiciones de Riesgo -->
                                     <div class="card border-primary p-3 mb-4 rounded-3">
                                         <h4 class="fw-bold text-primary">3. CONDICIONES DE RIESGO</h4>
-                                        <input type="text" class="form-control mb-3" name="condiciones_riesgo">
+                                        <input type="text" class="form-control mb-3" name="condiciones_riesgo" value="{{ antecedentes.condiciones_riesgo }}">
                                     </div>
 
                                     <!-- Medicamentos -->
                                     <div class="card border-primary p-3 mb-4 rounded-3">
                                         <h4 class="fw-bold text-primary">4. MEDICAMENTOS PRESCRIPTOS</h4>
-                                        <input type="text" class="form-control mb-3" name="medicamentos_prescriptos">
+                                        <input type="text" class="form-control mb-3" name="medicamentos_prescriptos" value="{{ antecedentes.medicamentos_prescriptos }}">
                                     </div>
                                 </div>
 
@@ -73,155 +73,116 @@
                                 <div class="col-md-6 d-flex flex-column justify-content-end">
                                     <div class="card border-primary p-3 mb-4 rounded-3">
                                         <h4 class="fw-bold text-primary">2. ANTECEDENTES PATOLÓGICOS</h4>
+
                                         <label>Enfermedades Importantes:</label>
-                                        <textarea class="form-control mb-2" name="enfermedades_importantes" rows="2"></textarea>
+                                        <textarea class="form-control mb-2" name="enfermedades_importantes" rows="2">{{ antecedentes.enfermedades_importantes }}</textarea>
 
                                         <label>Cirugías:</label>
-                                        <input type="text" class="form-control mb-2" name="cirugias">
+                                        <input type="text" class="form-control mb-2" name="cirugias" value="{{ antecedentes.cirugias }}">
 
                                         <label>Cardiovasculares:</label>
-                                        <input type="text" class="form-control mb-2" name="cardiovasculares">
+                                        <input type="text" class="form-control mb-2" name="cardiovasculares" value="{{ antecedentes.cardiovasculares }}">
 
                                         <label>Trauma c/alt. funcional:</label>
-                                        <input type="text" class="form-control mb-2" name="trauma_funcional">
+                                        <input type="text" class="form-control mb-2" name="trauma_funcional" value="{{ antecedentes.trauma_funcional }}">
 
                                         <label>Alergias/Especificar:</label>
-                                        <input type="text" class="form-control mb-2" name="alergias">
+                                        <input type="text" class="form-control mb-2" name="alergias" value="{{ antecedentes.alergias }}">
 
                                         <label>Oftalmológicos:</label>
-                                        <input type="text" class="form-control mb-2" name="oftalmologicos">
+                                        <input type="text" class="form-control mb-2" name="oftalmologicos" value="{{ antecedentes.oftalmologicos }}">
 
                                         <label>Auditivos:</label>
-                                        <input type="text" class="form-control mb-2" name="auditivos">
-                                        
-                                        <label>Diabetes:</label>
-                                        <select class="form-select mb-2" name="diabetes">
-                                            <option value="">Seleccione</option>
-                                            <option value="True">Sí</option>
-                                            <option value="False">No</option>
-                                        </select>
-
-                                        <label>Asma:</label>
-                                        <select class="form-select mb-2" name="asma">
-                                            <option value="">Seleccione</option>
-                                            <option value="True">Sí</option>
-                                            <option value="False">No</option>
-                                        </select>
-
-                                        <label>Chagas:</label>
-                                        <select class="form-select mb-2" name="chagas">
-                                            <option value="">Seleccione</option>
-                                            <option value="True">Sí</option>
-                                            <option value="False">No</option>
-                                        </select>
-
-                                        <label>Hipertensión:</label>
-                                        <select class="form-select mb-2" name="hipertension">
-                                            <option value="">Seleccione</option>
-                                            <option value="True">Sí</option>
-                                            <option value="False">No</option>
-                                        </select>
-
-                                        <label>Neurológico:</label>
-                                        <select class="form-select mb-2" name="neurologico">
-                                            <option value="">Seleccione</option>
-                                            <option value="True">Sí</option>
-                                            <option value="False">No</option>
-                                        </select>
-
-                                        <label>Otras enfermedades:</label>
-                                        <input type="text" class="form-control mb-2" name="otras">
-                                    
+                                        <input type="text" class="form-control mb-2" name="auditivos" value="{{ antecedentes.auditivos }}">
                                     </div>
                                 </div>
                             </div>
-
                             <!-- Actividad Física -->
                             <div class="card border-primary p-3 mb-4 rounded-3">
                                 <h4 class="fw-bold text-primary">5. DURANTE ACTIVIDAD FÍSICA PREVIA SUFRIÓ:</h4>
-                            
+
                                 <div class="row align-items-center mb-2">
                                     <div class="col-8"><label class="fw-bold">Cansancio extremo:</label></div>
                                     <div class="col-4">
                                         <select class="form-select form-select-sm" name="cansancio_extremo">
                                             <option value="">Seleccione</option>
-                                            <option value="True">Sí</option>
-                                            <option value="False">No</option>
+                                            <option value="True" {% if antecedentes.cansancio_extremo %}selected{% endif %}>Sí</option>
+                                            <option value="False" {% if antecedentes.cansancio_extremo == False %}selected{% endif %}>No</option>
                                         </select>
                                     </div>
                                 </div>
-                            
+
                                 <div class="row align-items-center mb-2">
                                     <div class="col-8"><label class="fw-bold">Falta de aire:</label></div>
                                     <div class="col-4">
                                         <select class="form-select form-select-sm" name="falta_aire">
                                             <option value="">Seleccione</option>
-                                            <option value="True">Sí</option>
-                                            <option value="False">No</option>
+                                            <option value="True" {% if antecedentes.falta_aire %}selected{% endif %}>Sí</option>
+                                            <option value="False" {% if antecedentes.falta_aire == False %}selected{% endif %}>No</option>
                                         </select>
                                     </div>
                                 </div>
-                            
+
                                 <div class="row align-items-center mb-2">
                                     <div class="col-8"><label class="fw-bold">Pérdida de conocimiento:</label></div>
                                     <div class="col-4">
                                         <select class="form-select form-select-sm" name="perdida_conocimiento">
                                             <option value="">Seleccione</option>
-                                            <option value="True">Sí</option>
-                                            <option value="False">No</option>
+                                            <option value="True" {% if antecedentes.perdida_conocimiento %}selected{% endif %}>Sí</option>
+                                            <option value="False" {% if antecedentes.perdida_conocimiento == False %}selected{% endif %}>No</option>
                                         </select>
                                     </div>
                                 </div>
-                            
+
                                 <div class="row align-items-center mb-2">
                                     <div class="col-8"><label class="fw-bold">Palpitaciones:</label></div>
                                     <div class="col-4">
                                         <select class="form-select form-select-sm" name="palpitaciones">
                                             <option value="">Seleccione</option>
-                                            <option value="True">Sí</option>
-                                            <option value="False">No</option>
+                                            <option value="True" {% if antecedentes.palpitaciones %}selected{% endif %}>Sí</option>
+                                            <option value="False" {% if antecedentes.palpitaciones == False %}selected{% endif %}>No</option>
                                         </select>
                                     </div>
                                 </div>
-                            
+
                                 <div class="row align-items-center mb-2">
                                     <div class="col-8"><label class="fw-bold">Precordialgias:</label></div>
                                     <div class="col-4">
                                         <select class="form-select form-select-sm" name="precordialgias">
                                             <option value="">Seleccione</option>
-                                            <option value="True">Sí</option>
-                                            <option value="False">No</option>
+                                            <option value="True" {% if antecedentes.precordialgias %}selected{% endif %}>Sí</option>
+                                            <option value="False" {% if antecedentes.precordialgias == False %}selected{% endif %}>No</option>
                                         </select>
                                     </div>
                                 </div>
-                            
+
                                 <div class="row align-items-center mb-2">
                                     <div class="col-8"><label class="fw-bold">Cefaleas:</label></div>
                                     <div class="col-4">
                                         <select class="form-select form-select-sm" name="cefaleas">
                                             <option value="">Seleccione</option>
-                                            <option value="True">Sí</option>
-                                            <option value="False">No</option>
+                                            <option value="True" {% if antecedentes.cefaleas %}selected{% endif %}>Sí</option>
+                                            <option value="False" {% if antecedentes.cefaleas == False %}selected{% endif %}>No</option>
                                         </select>
                                     </div>
                                 </div>
-                            
+
                                 <div class="row align-items-center mb-2">
                                     <div class="col-8"><label class="fw-bold">Vómitos:</label></div>
                                     <div class="col-4">
                                         <select class="form-select form-select-sm" name="vomitos">
                                             <option value="">Seleccione</option>
-                                            <option value="True">Sí</option>
-                                            <option value="False">No</option>
+                                            <option value="True" {% if antecedentes.vomitos %}selected{% endif %}>Sí</option>
+                                            <option value="False" {% if antecedentes.vomitos == False %}selected{% endif %}>No</option>
                                         </select>
                                     </div>
                                 </div>
-                            
-                                <label class="fw-bold mt-3">Otros:</label>
-                                <input type="text" class="form-control mb-3" name="otros">
-                            </div>
-                            
 
+                                <label class="fw-bold mt-3">Otros:</label>
+                                <input type="text" class="form-control mb-3" name="otros" value="{{ antecedentes.otros }}">
+                            </div>
+
+                           
                             <!-- Declaración Jurada -->
                             <div class="card border-danger p-3 mb-4 rounded-3">
                                 <h4 class="fw-bold text-danger">⚠️ DECLARACIÓN JURADA</h4>
@@ -243,7 +204,6 @@
                                 <button type="submit" class="btn btn-primary btn-lg w-45">Guardar</button>
                             </div>
                         </form>
-
                     </div>
                 </div>
             </div>
@@ -251,45 +211,39 @@
     </div>
 </div>
 
-                        <!-- Modal de éxito -->
-                        <div class="modal fade" id="modalExito" tabindex="-1" aria-labelledby="modalExitoLabel" aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered">
-                                <div class="modal-content shadow-lg border-success">
-                                    <div class="modal-header bg-success text-white">
-                                        <h5 class="modal-title" id="modalExitoLabel">✅ Antecedentes Guardados</h5>
-                                    </div>
-                                    <div class="modal-body text-center">
-                                        <p class="fs-5">Los antecedentes médicos fueron cargados con éxito.</p>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-success" id="btnAceptarModal">Aceptar</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+<!-- Modal de éxito -->
+{% if messages %}
+<div class="modal fade" id="modalExito" tabindex="-1" aria-labelledby="modalExitoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg border-success">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="modalExitoLabel">✅ Antecedentes Guardados</h5>
+            </div>
+            <div class="modal-body text-center">
+                <p class="fs-5">Los antecedentes médicos fueron cargados con éxito.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" id="btnAceptarModal">Aceptar</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
 
-                        <!-- Script para redirigir al cerrar el modal -->
-                        <script>
-                            document.addEventListener("DOMContentLoaded", function () {
-                              {% if messages %}
-                                const modalElement = document.getElementById('modalExito');
-                                const modal = new bootstrap.Modal(modalElement);
-                                modal.show();
-                          
-                                const btnAceptar = document.getElementById("btnAceptarModal");
-                                if (btnAceptar) {
-                                  btnAceptar.addEventListener("click", function () {
-                                    modal.hide();
-                                    setTimeout(() => {
-                                      window.location.href = "{% url 'menu_estudiante' %}";
-                                    }, 200);
-                                  });
-                                }
-                              {% endif %}
-                            });
-                          </script>
-<!-- Validación de consentimiento -->
 <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      {% if messages %}
+        const modal = new bootstrap.Modal(document.getElementById('modalExito'));
+        modal.show();
+        document.getElementById("btnAceptarModal").addEventListener("click", function () {
+          modal.hide();
+          setTimeout(() => {
+            window.location.href = "{% url 'menu_estudiante' %}";
+          }, 200);
+        });
+      {% endif %}
+    });
+
     function validarConsentimiento() {
         let checkBox = document.getElementById("{{ form.declaracion_jurada.id_for_label }}");
         if (!checkBox.checked) {
@@ -299,7 +253,5 @@
         return true;
     }
 </script>
-
-
 
 {% endblock %}

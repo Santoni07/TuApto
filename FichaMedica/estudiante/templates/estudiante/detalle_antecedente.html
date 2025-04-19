@@ -32,26 +32,34 @@
     </div>
 
     <!-- Sección 2: Antecedentes Patológicos -->
-    <div class="card p-4 border-primary shadow-lg mt-4">
-        <h2 class="text-primary fw-bold">2. Antecedentes Patológicos</h2>
-        <table class="table table-bordered text-center">
-            <thead class="table-primary"2
-                <tr>
-                    <th>Concepto</th>
-                    <th>Detalle</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr><td><strong>Enfermedades Importantes</strong></td><td>{{ antecedente.enfermedades_importantes|default:"N/A" }}</td></tr>
-                <tr><td><strong>Cirugías</strong></td><td>{{ antecedente.cirugias|default:"N/A" }}</td></tr>
-                <tr><td><strong>Cardiovasculares</strong></td><td>{{ antecedente.cardiovasculares|default:"N/A" }}</td></tr>
-                <tr><td><strong>Trauma Funcional</strong></td><td>{{ antecedente.trauma_funcional|default:"N/A" }}</td></tr>
-                <tr><td><strong>Alergias</strong></td><td>{{ antecedente.alergias|default:"N/A" }}</td></tr>
-                <tr><td><strong>Oftalmológicos</strong></td><td>{{ antecedente.oftalmologicos|default:"N/A" }}</td></tr>
-                <tr><td><strong>Auditivos</strong></td><td>{{ antecedente.auditivos|default:"N/A" }}</td></tr>
-            </tbody>
-        </table>
-    </div>
+<div class="card p-4 border-primary shadow-lg mt-4">
+    <h2 class="text-primary fw-bold">2. Antecedentes Patológicos</h2>
+    <table class="table table-bordered text-center">
+        <thead class="table-primary"2
+            <tr>
+                <th>Concepto</th>
+                <th>Detalle</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td><strong>Enfermedades Importantes</strong></td><td>{{ antecedente.enfermedades_importantes|default:"N/A" }}</td></tr>
+            <tr><td><strong>Cirugías</strong></td><td>{{ antecedente.cirugias|default:"N/A" }}</td></tr>
+            <tr><td><strong>Cardiovasculares</strong></td><td>{{ antecedente.cardiovasculares|default:"N/A" }}</td></tr>
+            <tr><td><strong>Trauma Funcional</strong></td><td>{{ antecedente.trauma_funcional|default:"N/A" }}</td></tr>
+            <tr><td><strong>Alergias</strong></td><td>{{ antecedente.alergias|default:"N/A" }}</td></tr>
+            <tr><td><strong>Oftalmológicos</strong></td><td>{{ antecedente.oftalmologicos|default:"N/A" }}</td></tr>
+            <tr><td><strong>Auditivos</strong></td><td>{{ antecedente.auditivos|default:"N/A" }}</td></tr>
+
+            <!-- CAMPOS AGREGADOS -->
+            <tr><td><strong>Diabetes</strong></td><td>{{ antecedente.diabetes|yesno:"Sí,No" }}</td></tr>
+            <tr><td><strong>Asma</strong></td><td>{{ antecedente.asma|yesno:"Sí,No" }}</td></tr>
+            <tr><td><strong>Chagas</strong></td><td>{{ antecedente.chagas|yesno:"Sí,No" }}</td></tr>
+            <tr><td><strong>Hipertensión</strong></td><td>{{ antecedente.hipertension|yesno:"Sí,No" }}</td></tr>
+            <tr><td><strong>Neurológico</strong></td><td>{{ antecedente.neurologico|yesno:"Sí,No" }}</td></tr>
+            <tr><td><strong>Otras Enfermedades</strong></td><td>{{ antecedente.otras|default:"N/A" }}</td></tr>
+        </tbody>
+    </table>
+</div>
 
     <!-- Sección 3: Condiciones de Riesgo -->
     <div class="card p-4 border-primary shadow-lg mt-4">

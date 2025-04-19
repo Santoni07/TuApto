@@ -68,7 +68,7 @@ class EstudianteColegio(models.Model):
     
     
 class AntecedentesCUS(models.Model):
-    estudiante = models.OneToOneField(Estudiante, on_delete=models.CASCADE, related_name="antecedentes", null=True, blank=True)
+    estudiante = models.ForeignKey(Estudiante, on_delete=models.CASCADE, related_name="antecedentes")
 
     # 1. VACUNACIONES
     carnet_vacunacion = models.BooleanField(default=False)

@@ -28,26 +28,44 @@ class EstudianteColegioAdmin(admin.ModelAdmin):
 
 @admin.register(AntecedentesCUS)
 class AntecedentesCUSAdmin(admin.ModelAdmin):
-    list_display = ("estudiante", "carnet_vacunacion", "esquema_completo", "condiciones_riesgo", "medicamentos_prescriptos")
-    list_filter = ("carnet_vacunacion", "esquema_completo", "condiciones_riesgo")
-    search_fields = ("estudiante__nombre", "estudiante__apellido", "enfermedades_importantes", "medicamentos_prescriptos")
-    readonly_fields = ("estudiante",)  # Para evitar que se edite directamente en admin
+    list_display = (
+        "id", "estudiante", "carnet_vacunacion", "esquema_completo",
+        "condiciones_riesgo", "medicamentos_prescriptos", "diabetes", "asma", "chagas"
+    )
+    list_filter = (
+        "id", "carnet_vacunacion", "esquema_completo", "condiciones_riesgo",
+        "diabetes", "asma", "chagas", "hipertension", "neurologico"
+    )
+    search_fields = (
+        "estudiante__nombre", "estudiante__apellido",
+        "enfermedades_importantes", "medicamentos_prescriptos", "otras"
+    )
 
     fieldsets = (
         ("Datos del Estudiante", {
             "fields": ("estudiante",)
         }),
-        ("Vacunaciones", {
+        ("1. Vacunaciones", {
             "fields": ("carnet_vacunacion", "esquema_completo", "esquema_faltante")
         }),
-        ("Antecedentes Patológicos", {
-            "fields": ("enfermedades_importantes", "cirugias", "cardiovasculares", "trauma_funcional")
+        ("2. Antecedentes Patológicos", {
+            "fields": (
+                "enfermedades_importantes", "cirugias", "cardiovasculares",
+                "trauma_funcional", "alergias", "oftalmologicos", "auditivos",
+                "diabetes", "asma", "chagas", "hipertension", "neurologico", "otras"
+            )
         }),
-        ("Condiciones de Riesgo y Medicación", {
+        ("3. Condiciones de Riesgo y Medicación", {
             "fields": ("condiciones_riesgo", "medicamentos_prescriptos")
         }),
-        ("Durante Actividad Física Previa Sufrió", {
-            "fields": ("cansancio_extremo", "falta_aire", "perdida_conocimiento", "palpitaciones", "precordialgias", "cefaleas", "vomitos", "otros")
+        ("4. Durante Actividad Física Previa Sufrió", {
+            "fields": (
+                "cansancio_extremo", "falta_aire", "perdida_conocimiento", "palpitaciones",
+                "precordialgias", "cefaleas", "vomitos", "otros"
+            )
+        }),
+        ("5. Declaración Jurada", {
+            "fields": ("declaracion_jurada",)
         }),
     )
 

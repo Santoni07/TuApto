@@ -50,6 +50,7 @@ class EstudianteColegioForm(forms.ModelForm):
 class AntecedentesCUSForm(forms.ModelForm):
     class Meta:
         model = AntecedentesCUS
+        exclude = ['estudiante']  # Este campo lo asignás manualmente
         fields = [
             # Relación con el estudiante
             'estudiante', 
