@@ -13,9 +13,16 @@ window.addEventListener('pageshow', function(event) {
   function toggleScrolled() {
     const selectBody = document.querySelector('body');
     const selectHeader = document.querySelector('#header');
+  
+    if (!selectHeader) return; // 👉 agregamos esto primero
+  
     if (!selectHeader.classList.contains('scroll-up-sticky') && !selectHeader.classList.contains('sticky-top') && !selectHeader.classList.contains('fixed-top')) return;
+    
     window.scrollY > 100 ? selectBody.classList.add('scrolled') : selectBody.classList.remove('scrolled');
   }
+  
+  document.addEventListener('scroll', toggleScrolled);
+  window.addEventListener('load', toggleScrolled);
 
   document.addEventListener('scroll', toggleScrolled);
   window.addEventListener('load', toggleScrolled);
@@ -30,7 +37,10 @@ window.addEventListener('pageshow', function(event) {
     mobileNavToggleBtn.classList.toggle('bi-list');
     mobileNavToggleBtn.classList.toggle('bi-x');
   }
-  mobileNavToggleBtn.addEventListener('click', mobileNavToogle);
+  
+  if (mobileNavToggleBtn) {
+    mobileNavToggleBtn.addEventListener('click', mobileNavToogle);
+  }
 
   /**
    * Hide mobile nav on same-page/hash links
@@ -69,23 +79,32 @@ window.addEventListener('pageshow', function(event) {
   /**
    * Scroll top button
    */
-  let scrollTop = document.querySelector('.scroll-top');
+  const scrollTop = document.querySelector('#scrollTop'); // o '.scroll-top' según tu HTML
 
-  function toggleScrollTop() {
-    if (scrollTop) {
-      window.scrollY > 100 ? scrollTop.classList.add('active') : scrollTop.classList.remove('active');
-    }
-  }
-  scrollTop.addEventListener('click', (e) => {
-    e.preventDefault();
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
+  if (scrollTop) {
+    scrollTop.addEventListener('click', (e) => {
+      e.preventDefault();
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
     });
-  });
+  }
+  
+ 
 
-  window.addEventListener('load', toggleScrollTop);
-  document.addEventListener('scroll', toggleScrollTop);
+  if (scrollTop) {
+    scrollTop.addEventListener('click', (e) => {
+      e.preventDefault();
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    });
+  
+    window.addEventListener('load', toggleScrollTop);
+    document.addEventListener('scroll', toggleScrollTop);
+  }
 
   /**
    * Animation on scroll function and init
@@ -120,14 +139,20 @@ window.addEventListener('pageshow', function(event) {
   /**
    * Initiate Pure Counter
    */
-  new PureCounter();
+  if (typeof PureCounter !== 'undefined') {
+    new PureCounter();
+ 
+  }
 
   /**
    * Initiate glightbox
    */
-  const glightbox = GLightbox({
-    selector: '.glightbox'
-  });
+  if (typeof GLightbox !== 'undefined') {
+    const glightbox = GLightbox({
+      selector: '.glightbox'
+    });
+ 
+  }
 
   /**
    * Init isotope layout and filters

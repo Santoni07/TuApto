@@ -17,7 +17,15 @@
    
 
     function toggleFields() {
-        var estado = document.getElementById("estado").value;
+        var estadoElement = document.getElementById("estado");
+
+        if (!estadoElement) {
+           
+            return;
+        }
+    
+        var estado = estadoElement.value;
+        // Ahora podés usar `estado` sin problemas
         
         var fechaDeLlenadoDiv = document.getElementById("fecha_de_llenado_div");
         var fechaCaducidadDiv = document.getElementById("fecha_caducidad_div");
