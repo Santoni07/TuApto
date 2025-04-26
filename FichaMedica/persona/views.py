@@ -179,9 +179,7 @@ def menu_jugador(request):
         return redirect('registrar_jugador')
 
     # Obtener todas las fichas médicas del jugador
-    fichas_medicas = RegistroMedico.objects.filter(jugador=jugador).select_related('torneo').values(
-    'id', 'estado', 'consentimiento_persona', 'torneo__nombre', 'fecha_caducidad'
-)
+    fichas_medicas = RegistroMedico.objects.filter(jugador=jugador).select_related('torneo')
 
 
 # Convertir el QuerySet en una lista de diccionarios para enviarlo a la plantilla

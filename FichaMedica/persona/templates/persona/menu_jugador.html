@@ -146,40 +146,54 @@
                   <i class="bi bi-plus-circle"></i> Inscribirme a un Torneo
                 </a>
               </li>
-              <!-- Notificaciones -->
-              <li class="nav-item dropdown" style="position: relative;">
-                <a
-                  class="nav-link dropdown-toggle fs-5"
-                  href="#"
-                  data-menu="link"
-                  id="notificaciones"
-                  style="color: white; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);"
-                >
-                  <i class="bi bi-bell"></i> Notificaciones
-                </a>
-                <ul id="submenuNotificaciones" style="
-                  display: none;
-                  
-                  background-color: #00c4f6;
-                 
-                ">
-                  <li>
-                    <div class="alert alert-success ficha-medica aprobada"  style="margin: 0px;">
-                      {% for ficha in ficha_medica_data%}
-                      <strong>Estado del Apto Médico:</strong> {{ ficha.estado }}
-                      <strong>- Fecha de Caducidad:</strong> {{ ficha.fecha_caducidad }}
-                      {% endfor %}
-                      {% for categoria_equipo in jugador_info.categorias_equipo %}
-                      
-                      <strong>- Torneo:</strong> {{ categoria_equipo.torneo.nombre }}
-                  
-                      <br>
-                    {% endfor %}
-                     
-                    </div>
-                  </li>
-                </ul>
-              </li>
+          <!-- Notificaciones -->
+          <li class="nav-item dropdown" style="position: relative;">
+            <a
+              class="nav-link dropdown-toggle fs-5"
+              href="#"
+              data-menu="link"
+              id="notificaciones"
+              style="color: white; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);"
+            >
+              <i class="bi bi-bell"></i> Notificaciones
+            </a>
+          
+            <ul id="submenuNotificaciones" style="
+                display: none;
+                background-color: #00c4f6;
+                position: absolute;
+                list-style: none;
+                padding: 10px;
+                border-radius: 5px;
+                z-index: 1000;
+                min-width: 300px;">
+                
+              {% if ficha_medica_data %}
+                {% for ficha in ficha_medica_data %}
+                <li style="margin-bottom: 5px;">
+                  <a href="#" style="
+                      color: white;
+                      text-decoration: none;
+                      display: block;
+                      padding: 8px;
+                      border-radius: 5px;
+                      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+                      background-color: #00b0e0;">
+                    
+                    <strong>{{ ficha.torneo.nombre }}</strong><br>
+                    <small>Fecha de Caducidad: {{ ficha.fecha_caducidad|date:"d/m/Y" }}</small><br>
+                    <small>Estado: {{ ficha.estado }}</small>
+          
+                  </a>
+                </li>
+                {% endfor %}
+              {% else %}
+                <li style="color: white; padding: 8px; text-align: center;">No hay notificaciones disponibles.</li>
+              {% endif %}
+            </ul>
+          </li>
+          
+
             </ul>
           </div>
         </div>
