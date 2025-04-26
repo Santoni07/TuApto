@@ -1,101 +1,126 @@
 {% extends 'core/base.html' %}
 {% block content %}
+
 <div class="container mt-4">
-    <div class="modal fade" id="verificacionModal" tabindex="-1" aria-labelledby="verificacionModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header bg-warning">
-                    <h5 class="modal-title text-center" id="verificacionModalLabel">Informacion Imortante</h5>
-                </div>
-                <div class="modal-body">
-                    <p class="mb-2">Antes de generar un nuevo CUS, verifique si necesita editar los datos del estudiante.</p>
-                    <p class="mb-0">Recuerde que si el estudiante cambió de colegio, debe editar los datos para evitar inconvenientes en el certificado.</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" id="cancelarBtn">Cancelar</button>
-                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Aceptar</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <h3 class="text-center text-primary fw-bold mb-4 border-bottom pb-2">
-        Seleccionar Estudiante para Generar Nuevo CUS
-    </h3>
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Nombre</th>
-                <th>Apellido</th>
-                <th>DNI</th>
-                <th>Colegio</th>
-                <th>Acción</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for estudiante in estudiantes %}
-            <tr>
-                <td>{{ estudiante.nombre }}</td>
-                <td>{{ estudiante.apellido }}</td>
-                <td>{{ estudiante.dni }}</td>
-                <td>{{ estudiante.colegio_activo }}</td>
-                <td>
-                    <button class="btn btn-success btn-sm" onclick="confirmarGeneracionCUS({{ estudiante.id }})">Generar CUS</button>
-                    <a href="{% url 'editar_estudiante' estudiante.id %}" class="btn btn-warning btn-sm">Editar</a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-
-     <!-- Botones de Acción -->
-     <div class="d-flex justify-content-end mt-5">
-        <a href="{% url 'menu_estudiante' %}" class="btn btn-secondary btn-lg w-45 me-3">Volver</a>
-        
-    </div>
-    
-</div>
-<!-- Modal de éxito -->
-<div class="modal fade" id="modalGenerarCUS" tabindex="-1" aria-labelledby="modalGenerarCUSLabel" aria-hidden="true">
+  <!-- Modal de verificación -->
+  <div class="modal fade" id="verificacionModal" tabindex="-1" aria-labelledby="verificacionModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content text-center">
-        <div class="modal-header bg-success text-white">
-          <h5 class="modal-title w-100" id="modalGenerarCUSLabel">¡CUS generado exitosamente!</h5>
+      <div class="modal-content">
+        <div class="modal-header bg-warning">
+          <h5 class="modal-title w-100 text-center" id="verificacionModalLabel">Información Importante</h5>
         </div>
         <div class="modal-body">
-          <p>Dirígete a tu médico para completar el certificado.</p>
-          <button class="btn btn-primary" onclick="window.location.href='{% url 'consultar_apto' %}'">Aceptar</button>
+          <p class="mb-2">Antes de generar un nuevo CUS, verifique si necesita editar los datos del estudiante.</p>
+          <p class="mb-0">Recuerde que si el estudiante cambió de colegio, debe editar los datos para evitar inconvenientes en el certificado.</p>
+        </div>
+        <div class="modal-footer d-flex flex-column flex-md-row">
+          <button type="button" class="btn btn-secondary w-100 w-md-auto mb-2 mb-md-0" id="cancelarBtn">Cancelar</button>
+          <button type="button" class="btn btn-primary w-100 w-md-auto" data-bs-dismiss="modal">Aceptar</button>
         </div>
       </div>
     </div>
   </div>
-<script>
-    window.addEventListener('DOMContentLoaded', () => {
-        const modal = new bootstrap.Modal(document.getElementById('verificacionModal'));
-        modal.show();
 
-        document.getElementById('cancelarBtn').addEventListener('click', () => {
-            window.location.href = "{% url 'menu_estudiante' %}";
-        });
-    });
-</script>
+  <h3 class="text-center text-primary fw-bold mb-4 border-bottom pb-2">
+    Seleccionar Estudiante para Generar Nuevo CUS
+  </h3>
+
+  <!-- Tabla de estudiantes -->
+  <div class="table-responsive">
+    <table class="table table-striped align-middle text-center">
+      <thead class="table-primary d-none d-md-table-header-group">
+        <tr>
+          <th>Nombre</th>
+          <th>Apellido</th>
+          <th>DNI</th>
+          <th>Colegio</th>
+          <th>Acción</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for info in estudiantes_info %}
+        <tr class="d-block d-md-table-row mb-4 border rounded p-2">
+          <td class="d-flex d-md-table-cell justify-content-between">
+            <strong class="d-block d-md-none">Nombre:</strong> {{ info.estudiante.nombre }}
+          </td>
+          <td class="d-flex d-md-table-cell justify-content-between">
+            <strong class="d-block d-md-none">Apellido:</strong> {{ info.estudiante.apellido }}
+          </td>
+          <td class="d-flex d-md-table-cell justify-content-between">
+            <strong class="d-block d-md-none">DNI:</strong> {{ info.estudiante.dni }}
+          </td>
+          <td class="d-flex d-md-table-cell justify-content-between">
+            <strong class="d-block d-md-none">Colegio:</strong> {{ info.estudiante.colegio_activo }}
+          </td>
+          <td class="d-flex d-md-table-cell justify-content-between flex-wrap gap-1">
+            {% if info.puede_generar_cus %}
+              <button class="btn btn-success btn-sm w-100 w-md-auto" onclick="confirmarGeneracionCUS({{ info.estudiante.id }})">Generar CUS</button>
+            {% else %}
+              <button class="btn btn-secondary btn-sm w-100 w-md-auto" disabled>Generar CUS</button>
+            {% endif %}
+            <a href="{% url 'editar_estudiante' info.estudiante.id %}" class="btn btn-warning btn-sm w-100 w-md-auto">Editar</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if not alguno_puede_generar %}
+  <div class="alert alert-info mt-4" role="alert">
+    Si el botón "Generar CUS" aparece deshabilitado, es porque el último CUS todavía está vigente o aún puede actualizarse (Recuerda que todos los CUS vencen el 1 de Enero del año siguiente a la fecha de llenado).
+  </div>
+  {% endif %}
+
+  <!-- Botón volver -->
+  <div class="d-grid d-md-flex justify-content-md-end mt-5">
+    <a href="{% url 'menu_estudiante' %}" class="btn btn-secondary btn-lg w-100 w-md-auto">Volver</a>
+  </div>
+</div>
+
+<!-- Modal de éxito -->
+<div class="modal fade" id="modalGenerarCUS" tabindex="-1" aria-labelledby="modalGenerarCUSLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content text-center">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title w-100" id="modalGenerarCUSLabel">¡CUS generado exitosamente!</h5>
+      </div>
+      <div class="modal-body">
+        <p>Dirígete a tu médico para completar el certificado.</p>
+        <button class="btn btn-primary w-100 w-md-auto" onclick="window.location.href='{% url 'consultar_apto' %}'">Aceptar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Script de modales -->
 <script>
-    function confirmarGeneracionCUS(estudianteId) {
-      fetch(`/estudiante/ajax/generar_cus/${estudianteId}/`, {
-        method: "POST",
-        headers: {
-          "X-CSRFToken": "{{ csrf_token }}",
-          "Content-Type": "application/json"
-        }
-      })
-      .then(response => {
-        if (response.ok) {
-          const modal = new bootstrap.Modal(document.getElementById("modalGenerarCUS"));
-          modal.show();
-        } else {
-          alert("❌ Error al generar el CUS. Intenta nuevamente.");
-        }
-      });
-    }
-  </script>
+  window.addEventListener('DOMContentLoaded', () => {
+    const modal = new bootstrap.Modal(document.getElementById('verificacionModal'));
+    modal.show();
+
+    document.getElementById('cancelarBtn').addEventListener('click', () => {
+      window.location.href = "{% url 'menu_estudiante' %}";
+    });
+  });
+
+  function confirmarGeneracionCUS(estudianteId) {
+    fetch(`/estudiante/ajax/generar_cus/${estudianteId}/`, {
+      method: "POST",
+      headers: {
+        "X-CSRFToken": "{{ csrf_token }}",
+        "Content-Type": "application/json"
+      }
+    })
+    .then(response => {
+      if (response.ok) {
+        const modal = new bootstrap.Modal(document.getElementById("modalGenerarCUS"));
+        modal.show();
+      } else {
+        alert("❌ Error al generar el CUS. Intenta nuevamente.");
+      }
+    });
+  }
+</script>
+
 {% endblock %}
