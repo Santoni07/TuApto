@@ -141,7 +141,7 @@
                                         <a href="{% url 'cus_update_view' estudiante.cus_id %}" 
                                             class="btn btn-warning btn-seleccionar"
                                             onclick="window.location.href=this.href; return false;">
-                                            Actualizar Cus 
+                                            Actualizar Cus {{estudiante.cus_id}}
                                         </a>
                                     {% elif estudiante.estado == "APROBADA" %}
                                         <a href="{% url 'cus_views' estudiante.cus_id %}" 

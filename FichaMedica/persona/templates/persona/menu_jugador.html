@@ -140,7 +140,12 @@
                   <i class="bi bi-trophy"></i> Ver Torneo
                 </a>
               </li>
-      
+               <!-- Inscripcion a nuevo Torneo -->
+              <li class="nav-item">
+                <a class="nav-link fs-5" href="{% url 'inscribirse_a_torneo' %}" style="color: white; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);">
+                  <i class="bi bi-plus-circle"></i> Inscribirme a un Torneo
+                </a>
+              </li>
               <!-- Notificaciones -->
               <li class="nav-item dropdown" style="position: relative;">
                 <a
@@ -500,6 +505,7 @@
           "datomedico": "submenuDatosMedicos",
           "estudios": "submenuEstudios",
           "notificaciones": "submenuNotificaciones"
+          // 🔹 No incluir 'inscribirmeTorneo' aquí
       };
 
       // ✅ Función para ocultar todas las secciones excepto welcome
@@ -520,47 +526,51 @@
 
       // ✅ Función para manejar clics en el menú principal
       function handleMenuClick(event) {
-        event.preventDefault();
-        const targetId = this.getAttribute("id");
-    
-        console.log("🔹 Click en:", targetId);
-    
-        // Cerrar todos los submenús al hacer clic en cualquier opción del menú
-        closeAllSubmenus();
-    
-        // Si es "Datos Médicos", "Estudios" o "Notificaciones", solo mostrar welcome y detener ejecución
-        if (submenus[targetId]) {
-            const submenu = document.getElementById(submenus[targetId]);
-            if (submenu) {
-                submenu.style.display = (submenu.style.display === "block") ? "none" : "block";
-            }
-            
-            hideAllSections(); // Asegura que todo lo demás se oculta
-            welcomeSection.classList.remove("d-none"); // Mantener welcome visible
-            return; // Termina la ejecución aquí
-        }
-    
-        // Ocultar todas las secciones y el welcome
-        hideAllSections();
-        welcomeSection.classList.add("d-none");
-    
-        // Mostrar la sección correspondiente
-        const selectedSection = document.getElementById(
-            targetId === "consultarApto" ? "aptoTable" :
-            targetId === "datospersonales" ? "datosPersonales" :
-            targetId === "vertorneo" ? "torneoSeleccionado" : null
-        );
-    
-        if (selectedSection) {
-            selectedSection.classList.remove("d-none");
-            console.log("✅ Mostrando sección:", targetId);
-        } else {
-            console.warn("⚠ Sección no encontrada:", targetId);
-        }
-    }
-    
+          const targetId = this.getAttribute("id");
 
-      // ✅ Asignar eventos a las opciones del menú principal
+          // 🔹 Si el botón es "inscribirmeTorneo", no interferir, dejar que redirija
+          if (targetId === "inscribirmeTorneo") {
+              return; // Permite redirección normal
+          }
+
+          event.preventDefault();
+          console.log("🔹 Click en:", targetId);
+
+          // Cerrar todos los submenús
+          closeAllSubmenus();
+
+          // Si es submenú, abrirlo y mostrar welcome
+          if (submenus[targetId]) {
+              const submenu = document.getElementById(submenus[targetId]);
+              if (submenu) {
+                  submenu.style.display = (submenu.style.display === "block") ? "none" : "block";
+              }
+
+              hideAllSections();
+              welcomeSection.classList.remove("d-none");
+              return;
+          }
+
+          // Ocultar todo y mostrar la sección correspondiente
+          hideAllSections();
+          welcomeSection.classList.add("d-none");
+
+          const selectedSection = document.getElementById(
+              targetId === "consultarApto" ? "aptoTable" :
+              targetId === "datospersonales" ? "datosPersonales" :
+              targetId === "vertorneo" ? "torneoSeleccionado" :
+              null
+          );
+
+          if (selectedSection) {
+              selectedSection.classList.remove("d-none");
+              console.log("✅ Mostrando sección:", targetId);
+          } else {
+              console.warn("⚠ Sección no encontrada:", targetId);
+          }
+      }
+
+      // ✅ Asignar eventos a los botones de menú principal
       document.querySelectorAll('[data-menu="link"]').forEach(link => {
           link.addEventListener("click", handleMenuClick);
       });
@@ -569,24 +579,22 @@
       document.querySelectorAll("#submenuDatosMedicos a, #submenuEstudios a, #submenuNotificaciones a").forEach(subLink => {
           subLink.addEventListener("click", function () {
               hideAllSections();
-              welcomeSection.classList.add("d-none"); // Ocultar welcome al seleccionar una opción dentro del submenú
-              closeAllSubmenus(); // Cerrar el submenú
+              welcomeSection.classList.add("d-none");
+              closeAllSubmenus();
           });
       });
 
-      // ✅ Cerrar submenús si se hace clic fuera del menú
+      // ✅ Cerrar submenús si se hace clic fuera
       document.addEventListener("click", function (event) {
           if (!event.target.closest(".nav-item")) {
               closeAllSubmenus();
           }
       });
 
-      // ✅ Mostrar welcome al cargar la página
+      // ✅ Mostrar welcome al cargar
       hideAllSections();
       welcomeSection.classList.remove("d-none");
   });
-
-  
 </script>
 
 

@@ -1,0 +1,118 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+  <div class="card shadow">
+    <div class="card-header bg-info text-white">
+      <h3 class="text-center">Inscribirme a un Torneo</h3>
+    </div>
+    <div class="card-body">
+      {% if torneos_disponibles %}
+        <form method="POST" id="formInscripcion">
+          {% csrf_token %}
+
+          <!-- Selección de Torneo -->
+          <div class="mb-3">
+            <label for="torneo_id" class="form-label">Seleccioná un Torneo:</label>
+            <select name="torneo_id" id="torneo_id" class="form-select" required>
+              <option value="">-- Seleccioná un torneo --</option>
+              {% for torneo in torneos_disponibles %}
+                <option value="{{ torneo.id }}">{{ torneo.nombre }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Selección de Categoría -->
+          <div class="mb-3 d-none" id="categoriaContainer">
+            <label for="categoria_id" class="form-label">Seleccioná una Categoría:</label>
+            <select name="categoria_id" id="categoria_id" class="form-select" required>
+              <option value="">-- Seleccioná una categoría --</option>
+            </select>
+          </div>
+
+          <!-- Selección de Equipo -->
+          <div class="mb-3 d-none" id="equipoContainer">
+            <label for="equipo_id" class="form-label">Seleccioná un Equipo:</label>
+            <select name="equipo_id" id="equipo_id" class="form-select" required>
+              <option value="">-- Seleccioná un equipo --</option>
+            </select>
+          </div>
+
+          <!-- Botón de envío -->
+          <div class="text-center d-none" id="botonContainer">
+            <button type="submit" class="btn btn-primary">Confirmar Inscripción</button>
+          </div>
+        </form>
+      {% else %}
+        <p class="text-muted text-center">Ya estás inscripto en todos los torneos disponibles.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const torneoSelect = document.getElementById("torneo_id");
+      const categoriaSelect = document.getElementById("categoria_id");
+      const equipoSelect = document.getElementById("equipo_id");
+    
+      const categoriaContainer = document.getElementById("categoriaContainer");
+      const equipoContainer = document.getElementById("equipoContainer");
+      const botonContainer = document.getElementById("botonContainer");
+    
+      torneoSelect.addEventListener("change", function () {
+        const torneoId = this.value;
+        categoriaSelect.innerHTML = '<option value="">-- Cargando categorías --</option>';
+        equipoSelect.innerHTML = '<option value="">-- Seleccioná un equipo --</option>';
+        categoriaContainer.classList.add("d-none");
+        equipoContainer.classList.add("d-none");
+        botonContainer.classList.add("d-none");
+    
+        if (torneoId) {
+          fetch(`/persona/fetch_categorias/${torneoId}/`)
+            .then(response => response.json())
+            .then(data => {
+              categoriaSelect.innerHTML = '<option value="">-- Seleccioná una categoría --</option>';
+              data.categorias.forEach(categoria => {
+                const option = document.createElement("option");
+                option.value = categoria.id;
+                option.textContent = categoria.nombre;
+                categoriaSelect.appendChild(option);
+              });
+              categoriaContainer.classList.remove("d-none");
+            });
+        }
+      });
+    
+      categoriaSelect.addEventListener("change", function () {
+        const categoriaId = this.value;
+        equipoSelect.innerHTML = '<option value="">-- Cargando equipos --</option>';
+        equipoContainer.classList.add("d-none");
+        botonContainer.classList.add("d-none");
+    
+        if (categoriaId) {
+          fetch(`/persona/fetch_equipos/${categoriaId}/`)
+            .then(response => response.json())
+            .then(data => {
+              equipoSelect.innerHTML = '<option value="">-- Seleccioná un equipo --</option>';
+              data.equipos.forEach(equipo => {
+                const option = document.createElement("option");
+                option.value = equipo.id;
+                option.textContent = equipo.nombre;
+                equipoSelect.appendChild(option);
+              });
+              equipoContainer.classList.remove("d-none");
+            });
+        }
+      });
+    
+      equipoSelect.addEventListener("change", function () {
+        if (this.value) {
+          botonContainer.classList.remove("d-none");
+        } else {
+          botonContainer.classList.add("d-none");
+        }
+      });
+    });
+    </script>
+{% endblock %}

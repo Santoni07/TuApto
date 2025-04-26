@@ -855,7 +855,8 @@ class CusHomeView(LoginRequiredMixin, ListView):
 
         if 'estudiantes' in context and context['estudiantes'].exists():
             for estudiante in context['estudiantes']:
-                cus = Cus.objects.filter(estudiante=estudiante).first()
+               
+                cus = Cus.objects.filter(estudiante=estudiante).order_by('-id').first()
                 
                 info = {
                     'id': estudiante.id,
@@ -893,6 +894,7 @@ def cus_update_view(request, cus_id):
 
     # Verificar si el CUS está vencido
     vencido = cus.fecha_caducidad and cus.fecha_caducidad < date.today()
+    print(f"Vencido : ", vencido)
 
     if vencido and cantidad_actualizaciones >= 5:
         cus.estado = "VENCIDO"
@@ -909,8 +911,7 @@ def cus_update_view(request, cus_id):
             }
         )
 
-    antecedentes = estudiante.antecedentes if hasattr(estudiante, 'antecedentes') else None
-
+    antecedentes = AntecedentesCUS.objects.filter(estudiante=estudiante).order_by('-id').first()
     if request.method == 'POST':
         print("📥 request.POST:", request.POST)
 
@@ -1002,7 +1003,7 @@ def cus_update_view(request, cus_id):
                 messages.success(request, "✅ Estudio cargado exitosamente.")
             else:
                 messages.error(request, "❌ Error al cargar el estudio.")
-            return redirect('cus_update_view', cus_id=cus.id)
+            return redirect('cus_update_view')
 
         elif 'guardar_ficha_cus' in request.POST:
             campos_requeridos = [
@@ -1034,7 +1035,7 @@ def cus_update_view(request, cus_id):
                     messages.success(request, "✅ Certificado CUS guardado correctamente.")
             else:
                 messages.error(request, "❌ Error al guardar el certificado CUS.")
-            return redirect('cus_home', cus_id=cus.id)
+            return redirect('cus_home')
 
     context = {
         'cus': cus,
@@ -1067,7 +1068,9 @@ def cus_update_view(request, cus_id):
         'vencido': vencido,
         'actualizaciones': cus.actualizaciones.all()
     }
-
+    if vencido and actualizacion_form is None:
+        messages.error(request, "No se pudo generar el formulario de actualización. Contacte a soporte.")
+        return redirect('cus_home')
     return render(request, 'medico/cargar_cus.html', context)
 
 

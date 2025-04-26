@@ -18,9 +18,11 @@ urlpatterns = [
     # URL para cambiar la contraseña
     path('modificar_contrasena/', views.cambiar_contraseña, name='modificar_contrasena'),
    
-   
+    
     path('modificar_perfil/', views.modificar_perfil, name='modificar_perfil'),
     
+    # URL para inscribirse en un nuevo torneo
+    path('inscribirse-a-torneo/', views.inscribirse_a_torneo, name='inscribirse_a_torneo'),
     
 ]
 """ 

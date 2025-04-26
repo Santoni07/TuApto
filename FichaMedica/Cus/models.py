@@ -29,7 +29,11 @@ class Cus(models.Model):
 
     def __str__(self):
         return f"CUS {self.id} - {self.estudiante.nombre} {self.estudiante.apellido}"
-
+    def actualizaciones_cargadas(self):
+        """
+        Retorna la cantidad de actualizaciones hechas sobre este CUS.
+        """
+        return self.actualizaciones.count()
     @staticmethod
     def marcar_cus_vencidas():
         """Marca como 'VENCIDO' las CUS que han pasado su fecha de caducidad."""
@@ -374,6 +378,7 @@ class ActualizacionCUS(models.Model):
 
     def __str__(self):
         return f"Actualización del {self.fecha} - CUS #{self.cus.id}"
+    
     
     def save(self, *args, **kwargs):
         if not self.vencimiento:

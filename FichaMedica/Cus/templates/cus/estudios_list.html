@@ -22,54 +22,61 @@
         <div class="container mt-5">
             <div class="card shadow-lg p-4 bg-light rounded-4">
                 <h2 class="text-center text-primary fw-bold mb-4">Estudios Cargados de {{ estudiante.nombre }} {{ estudiante.apellido }}</h2>
-
                 <div class="table-responsive">
-                    <table class="table table-bordered table-striped text-center">
-                        <thead class="table-info">
-                            <tr>
-                                <th>Tipo de Estudio</th>
-                                <th>Observaciones</th>
-                                <th>Fecha de Carga</th>
-                                <th>Fecha de Caducidad</th>
-                                <th>Archivo</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for estudio in estudios %}
-                            <tr>
-                                <td>{{ estudio.get_tipo_estudio_display }}</td>
-                                <td>{{ estudio.observaciones|default:"-" }}</td>
-                                <td>{{ estudio.fecha_creacion|date:"d/m/Y" }}</td>
-                                <td>{{ estudio.fecha_caducidad|date:"d/m/Y" }}</td>
-                                <td>
-                                    {% if estudio.archivo %}
-                                        <a href="{{ estudio.archivo.url }}" target="_blank" class="btn btn-outline-primary btn-sm">Ver Archivo</a>
-                                    {% else %}
-                                        <span class="text-muted">No disponible</span>
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    <button type="button"
-                                        class="btn btn-danger btn-sm"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#modalEliminarGlobal"
-                                        data-estudio-id="{{ estudio.id }}"
-                                        data-estudio-nombre="{{ estudio.get_tipo_estudio_display }}">
-                                            Eliminar
-                                    </button>
-                                
-                                  
-                                </td>
-                            </tr>
-                            {% empty %}
-                            <tr>
-                                <td colspan="6" class="text-muted">No hay estudios registrados.</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
+                    <table class="table table-bordered table-striped text-center align-middle">
+                      <thead class="table-info d-none d-md-table-header-group">
+                        <tr>
+                          <th>Tipo de Estudio</th>
+                          <th>Observaciones</th>
+                          <th>Fecha de Carga</th>
+                          <th>Fecha de Caducidad</th>
+                          <th>Archivo</th>
+                          <th>Acciones</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for estudio in estudios %}
+                        <tr class="d-block d-md-table-row mb-3 border rounded-3 p-2">
+                          <td class="d-flex d-md-table-cell justify-content-between align-items-center">
+                            <strong class="d-md-none">Tipo de Estudio:</strong> {{ estudio.get_tipo_estudio_display }}
+                          </td>
+                          <td class="d-flex d-md-table-cell justify-content-between align-items-center">
+                            <strong class="d-md-none">Observaciones:</strong> {{ estudio.observaciones|default:"-" }}
+                          </td>
+                          <td class="d-flex d-md-table-cell justify-content-between align-items-center">
+                            <strong class="d-md-none">Fecha de Carga:</strong> {{ estudio.fecha_creacion|date:"d/m/Y" }}
+                          </td>
+                          <td class="d-flex d-md-table-cell justify-content-between align-items-center">
+                            <strong class="d-md-none">Fecha de Caducidad:</strong> {{ estudio.fecha_caducidad|date:"d/m/Y" }}
+                          </td>
+                          <td class="d-flex d-md-table-cell justify-content-between align-items-center">
+                            <strong class="d-md-none">Archivo:</strong>
+                            {% if estudio.archivo %}
+                              <a href="{{ estudio.archivo.url }}" target="_blank" class="btn btn-outline-primary btn-sm mt-1 mt-md-0">Ver Archivo</a>
+                            {% else %}
+                              <span class="text-muted">No disponible</span>
+                            {% endif %}
+                          </td>
+                          <td class="d-flex d-md-table-cell justify-content-center flex-wrap gap-2">
+                            <button type="button"
+                              class="btn btn-danger btn-sm"
+                              data-bs-toggle="modal"
+                              data-bs-target="#modalEliminarGlobal"
+                              data-estudio-id="{{ estudio.id }}"
+                              data-estudio-nombre="{{ estudio.get_tipo_estudio_display }}">
+                                Eliminar
+                            </button>
+                          </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                          <td colspan="6" class="text-center text-muted">No hay estudios registrados.</td>
+                        </tr>
+                        {% endfor %}
+                      </tbody>
                     </table>
-                </div>
+                  </div>
+                  
 
                 <div class="d-flex justify-content-end mt-4">
                     <a href="{% url 'menu_estudiante' %}" class="btn btn-secondary">Volver al Menú</a>

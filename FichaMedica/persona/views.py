@@ -344,3 +344,46 @@ def cambiar_contraseña(request):
         form = CustomPasswordChangeForm(request.user)
 
     return render(request, 'persona/modificar_contrasena.html', {'form': form})
+
+# funcion para inscribirme en un nuevo torneo 
+@login_required
+def inscribirse_a_torneo(request):
+    profile = get_object_or_404(Profile, user=request.user, rol='jugador')
+    jugador = get_object_or_404(Jugador, persona__profile=profile)
+
+    torneos_actuales_ids = RegistroMedico.objects.filter(jugador=jugador).values_list('torneo_id', flat=True)
+    torneos_disponibles = Torneo.objects.exclude(id__in=torneos_actuales_ids)
+
+    if request.method == 'POST':
+        torneo_id = request.POST.get('torneo_id')
+        categoria_id = request.POST.get('categoria_id')
+        equipo_id = request.POST.get('equipo_id')
+
+        if torneo_id and categoria_id and equipo_id:
+            torneo = get_object_or_404(Torneo, id=torneo_id)
+            categoria = get_object_or_404(Categoria, id=categoria_id, torneo=torneo)
+            equipo = get_object_or_404(Equipo, id=equipo_id)
+
+            categoria_equipo, created = CategoriaEquipo.objects.get_or_create(categoria=categoria, equipo=equipo)
+
+            if not JugadorCategoriaEquipo.objects.filter(jugador=jugador, categoria_equipo=categoria_equipo).exists():
+                JugadorCategoriaEquipo.objects.create(jugador=jugador, categoria_equipo=categoria_equipo)
+
+            antecedente = get_object_or_404(AntecedenteEnfermedades, jugador=jugador)
+
+            RegistroMedico.objects.create(
+                jugador=jugador,
+                torneo=torneo,
+                estado='PROCESO',
+                consentimiento_persona=True,
+                observacion='Inscripción a torneo con selección dinámica'
+            )
+
+            return redirect('menu_jugador')
+        else:
+            # Si faltan datos, redireccionar o mostrar error
+            return redirect('inscribirse_a_torneo')  # O podrías usar messages.error() y renderizar el formulario
+
+    return render(request, 'persona/inscribirse_torneo.html', {
+        'torneos_disponibles': torneos_disponibles
+    })

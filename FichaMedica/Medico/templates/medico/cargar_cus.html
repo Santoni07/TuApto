@@ -237,9 +237,11 @@
                             </div>
                         </div>
                     </div>
-                    <button type="submit" name="guardar_examenes_medicos" class="btn btn-primary px-4" {% if vencido %}disabled{% endif %}>
-                        Guardar Exámenes Médicos
-                    </button>
+                    {% if not vencido %}
+                        <button type="submit" name="guardar_examenes_medicos" class="btn btn-primary px-4">
+                            Guardar Exámenes Médicos
+                        </button>
+                    {% endif %}
                 </form>
             </div>
         </div>
@@ -254,16 +256,18 @@
                         <form method="POST">
                             {% csrf_token %}
                             {{ cus_form.as_p }}
-                            <button type="submit" name="guardar_ficha_cus" class="btn btn-success" {% if vencido %}disabled{% endif %}>
-                                Guardar Ficha Completa
-                            </button>
+                            {% if not vencido %}
+                                <button type="submit" name="guardar_ficha_cus" class="btn btn-success">
+                                    Guardar Ficha Completa
+                                </button>
+                            {% endif %}
                         </form>
                     </div>
                 </div>
             </div>
 
              <!-- BLOQUE DE ACTUALIZACION CUS -->
-            {% if vencido %}
+             {% if vencido and actualizacion_form %}
             <div class="card mt-4 shadow-sm">
                 <div class="card-header bg-warning text-dark text-center">
                     <h4 class="mb-0">ACTUALIZACIÓN / RENOVACIÓN ANUAL (C.U.S.)</h4>
