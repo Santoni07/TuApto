@@ -11,6 +11,7 @@ from django.contrib.auth import logout
 from django.utils.timezone import now
 from django.contrib.sessions.models import Session
 from django.contrib import messages
+from django import forms
 
 from django.contrib.auth.models import User
 from .models import Profile
@@ -48,24 +49,21 @@ def user_login(request):
 
 @login_required
 def check_session(request):
-    try:
-        session_key = request.session.session_key
-        if not session_key:
-            # La sesión no existe
-            return JsonResponse({'session_expired': True})
+    session_key = request.session.session_key
 
-        # Obtener la sesión actual
+    if not session_key:
+        return JsonResponse({'session_expired': True})
+
+    try:
         session = Session.objects.get(session_key=session_key)
-        
-        # Verificar si la sesión ha expirado
+
         if session.expire_date < now():
             return JsonResponse({'session_expired': True})
 
         return JsonResponse({'session_expired': False})
+        
     except Session.DoesNotExist:
-        # Si la sesión no existe o es inválida
-        return JsonResponse({'session_expired': True}, status=401)
-
+        return JsonResponse({'session_expired': True})
 
 
 def logout_view(request):
@@ -173,7 +171,7 @@ def select_role(request):
             return redirect("select_role")
 
     return render(request, "account/select_role.html", {"profiles": profiles})
-
+""" 
 def register(request):
     print(f"📥 Request recibido: {request.method} en {request.path}")  # Depuración
 
@@ -219,8 +217,146 @@ def register(request):
             return render(request, 'account/register_done.html', {'new_user': user.email})
 
         else:
+            print("❌ Errores del formulario:", user_form.errors)
             messages.error(request, "Hubo un error en el formulario. Verifica los datos ingresados.")
 
     # Si hay error o es GET, renderiza el formulario correspondiente
     template = "account/register.html" if user_role == "jugador" else "account/estudiante/register.html"
-    return render(request, template, {'user_form': UserRegistrationForm()})
+    return render(request, template, {'user_form': UserRegistrationForm()}) """
+
+
+
+def preparar_formulario_existente(email, rol):
+    form = UserRegistrationForm(initial={'email': email}, rol=rol)
+    campos_ocultos = ['nombre', 'apellido', 'dni', 'fecha_nacimiento', 'password2']
+    for campo in campos_ocultos:
+        form.fields[campo].widget = forms.HiddenInput()
+        form.fields[campo].required = False
+        form.fields[campo].widget.attrs['readonly'] = True
+    return form
+
+def register(request):
+    print(f"📥 Request recibido: {request.method} en {request.path}")
+
+    user_role = "jugador"
+    if request.path == "/account/register_alumnos/":
+        user_role = "estudiante"
+
+    # ✅ VALIDACIÓN ANTES DE MOSTRAR EL FORMULARIO COMPLETO
+    if request.method == 'GET' and 'email' in request.GET:
+        email = request.GET.get('email')
+        user = User.objects.filter(email=email).first()
+        
+        print(f"rol del usuario", user)
+
+        if user:
+            if Profile.objects.filter(user=user, rol=user_role).exists():
+                messages.error(request, f"Ya estás registrado como {user_role}. Iniciá sesión para continuar.")
+                return redirect('login')
+
+            # Si el usuario existe pero no con este rol, mostrar solo campo de contraseña
+            form = preparar_formulario_existente(email, user_role)
+            template = "account/register.html" if user_role == "jugador" else "account/estudiante/register.html"
+            return render(request, template, {
+                'verificar_password': True,
+                'email': email,
+                'user_form': form  # ✅ acá usás el form reducido
+            })
+
+    # 🧾 Registro POST
+    if request.method == 'POST':
+        print("📨 Se recibió POST")
+        print("📥 POST DATA:", request.POST)
+        email = request.POST.get('email')
+        password = request.POST.get('password1')
+
+        try:
+            user_existente = User.objects.get(email=email)
+            print("⚠️ Ya existe un usuario con ese email")
+
+            user_auth = authenticate(request, username=user_existente.username, password=password)
+
+            if user_auth is None:
+                messages.error(request, "Contraseña incorrecta para el email proporcionado.")
+                form = preparar_formulario_existente(email, user_role)
+                form.fields['email'].initial = ''
+                return render(
+                    'account/register.html' if user_role == 'jugador' else 'account/estudiante/register.html',
+                    {'user_form': form}
+                )
+
+            if Profile.objects.filter(user=user_existente, rol=user_role).exists():
+                messages.error(request, f"Ya estás registrado en esta sección como {user_role}. Por favor, iniciá sesión.")
+                return redirect('login')
+
+            # 🔄 Heredar datos de otro perfil si existe
+            # Buscar cualquier otro perfil existente del usuario (sin filtrar por rol)
+            otro_perfil = Profile.objects.filter(user=user_existente).first()
+
+            nombre = request.POST.get('nombre') or (otro_perfil.nombre if otro_perfil else '')
+            apellido = request.POST.get('apellido') or (otro_perfil.apellido if otro_perfil else '')
+            dni = request.POST.get('dni') or (otro_perfil.dni if otro_perfil else '')
+            fecha_nacimiento = request.POST.get('fecha_nacimiento') or (otro_perfil.fecha_nacimiento if otro_perfil else None)
+
+            profile = Profile.objects.create(
+                user=user_existente,
+                nombre=nombre,
+                apellido=apellido,
+                dni=dni,
+                fecha_nacimiento=fecha_nacimiento,
+                email=email,
+                rol=user_role
+            )
+            request.session['user_profile_id'] = profile.id
+            return redirect('select_role')
+
+        except User.DoesNotExist:
+            form = UserRegistrationForm(request.POST, rol=user_role)
+            if form.is_valid():
+                user, profile = form.save()
+                request.session['user_profile_id'] = profile.id
+                return redirect('select_role')
+            else:
+                print("❌ Errores del formulario:", form.errors)
+                messages.error(request, "Error en el registro. Verifica los datos.")
+    else:
+        form = UserRegistrationForm(rol=user_role)
+        form.fields['email'].initial = ''
+
+    template = "account/register.html" if user_role == "jugador" else "account/estudiante/register.html"
+    return render(request, template, {'user_form': form})
+
+def verificar_email(request):
+    email = request.GET.get('email')
+    rol_deseado = request.GET.get('rol')  # opcional, 'jugador', 'estudiante', etc.
+    data = {'existe': False, 'tiene_rol': False}
+
+    if email:
+        try:
+            user = User.objects.get(email=email)
+            data['existe'] = True
+            print(f"Usuario encontrado: {user.email}")
+
+            perfiles = Profile.objects.filter(user=user)
+            if perfiles.exists():
+                if rol_deseado:
+                    perfil_rol = perfiles.filter(rol=rol_deseado).first()
+                    if perfil_rol:
+                        data['tiene_rol'] = True
+                        data['rol'] = perfil_rol.rol
+                        print(f"Ya tiene rol {rol_deseado}")
+                    else:
+                        print(f"El usuario no tiene el rol {rol_deseado}")
+                else:
+                    primer_perfil = perfiles.first()
+                    data['rol'] = primer_perfil.rol
+                    print(f"Rol del primer perfil encontrado: {primer_perfil.rol}")
+            else:
+                print("El usuario no tiene perfiles asociados.")
+
+        except User.DoesNotExist:
+            print("No se encontró el usuario con ese email.")
+        except Exception as e:
+            print(f"Error inesperado: {str(e)}")
+
+    return JsonResponse(data)

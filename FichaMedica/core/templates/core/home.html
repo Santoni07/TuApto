@@ -2,7 +2,7 @@
 Físicos{% endblock %} 
 
 {% block content %}
-{% if messages %}
+{% comment %} {% if messages %}
 <div class="container mt-3">
   {% for message in messages %}
     <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -11,7 +11,7 @@ Físicos{% endblock %}
     </div>
   {% endfor %}
 </div>
-{% endif %}
+{% endif %} {% endcomment %}
 <style>
   /* Estilos para los botones del carrusel */
   .black-controls {

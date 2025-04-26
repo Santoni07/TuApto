@@ -25,6 +25,7 @@ urlpatterns = [
          name='password_reset_complete'),
     path('check_session/', views.check_session, name='check_session'),
     path('terminos_condiciones/', views.terminos_condiciones, name='terminos_condiciones'),
+    path('verificar-email/', views.verificar_email, name='verificar_email')
    
     ]
 

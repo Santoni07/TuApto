@@ -25,10 +25,22 @@ class UserRegistrationForm(forms.ModelForm):
         model = Profile
         fields = ['nombre', 'apellido', 'dni', 'fecha_nacimiento', 'email', 'password1', 'password2']
 
+    def __init__(self, *args, **kwargs):
+        # Recibimos el rol desde la vista
+        self.rol = kwargs.pop('rol', None)
+        super().__init__(*args, **kwargs)
+
     def clean_email(self):
         email = self.cleaned_data.get('email')
-        if Profile.objects.filter(email=email).exists() or User.objects.filter(email=email).exists():
-            raise forms.ValidationError("Este correo electrónico ya está registrado.")
+
+        try:
+            user = User.objects.get(email=email)
+            # Verificamos si ya tiene un perfil con este rol
+            if Profile.objects.filter(user=user, rol=self.rol).exists():
+                raise forms.ValidationError("Este correo electrónico ya tiene un perfil con ese rol.")
+        except User.DoesNotExist:
+            pass  # No hay problema, lo podrá registrar
+
         return email
 
     def clean_password2(self):
@@ -38,24 +50,30 @@ class UserRegistrationForm(forms.ModelForm):
         return cd['password2']
 
     def save(self, commit=True):
-        # Crear el usuario
-        user = User(
-            username=self.cleaned_data['email'],  # Usa el email como username
-            email=self.cleaned_data['email'],
-        )
-        user.set_password(self.cleaned_data['password1'])
-        if commit:
-            user.save()
+        email = self.cleaned_data['email']
 
-        # Crear el perfil asociado
+        # Reutilizamos el usuario si ya existe
+        try:
+            user = User.objects.get(email=email)
+            # No cambiamos la contraseña si el usuario ya existía
+        except User.DoesNotExist:
+            user = User(
+                username=email,
+                email=email,
+            )
+            user.set_password(self.cleaned_data['password1'])
+            if commit:
+                user.save()
+
+        # Crear el perfil asociado (ya sea en flujo completo o reducido)
         profile = Profile(
             user=user,
-            nombre=self.cleaned_data['nombre'],
-            apellido=self.cleaned_data['apellido'],
-            dni=self.cleaned_data['dni'],
-            fecha_nacimiento=self.cleaned_data['fecha_nacimiento'],
-            email=self.cleaned_data['email'],
-            rol='general'
+            nombre=self.cleaned_data.get('nombre', ''),
+            apellido=self.cleaned_data.get('apellido', ''),
+            dni=self.cleaned_data.get('dni', ''),
+            fecha_nacimiento=self.cleaned_data.get('fecha_nacimiento', None),
+            email=email,
+            rol=self.rol or 'general'
         )
         if commit:
             profile.save()
