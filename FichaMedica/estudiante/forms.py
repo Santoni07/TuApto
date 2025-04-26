@@ -10,11 +10,13 @@ class TutorForm(forms.ModelForm):
             'telefono': forms.TextInput(attrs={'class': 'form-control'}),
             'localidad': forms.TextInput(attrs={'class': 'form-control'}),
         }
-
 class EstudianteForm(forms.ModelForm):
     class Meta:
         model = Estudiante
-        fields = ['nombre', 'apellido', 'fecha_nacimiento', 'dni', 'domicilio', 'telefono', 'sexo', 'localidad', 'lugar_nacimiento']
+        fields = [
+            'nombre', 'apellido', 'fecha_nacimiento', 'dni', 'domicilio',
+            'telefono', 'sexo', 'localidad', 'lugar_nacimiento'
+        ]
         widgets = {
             'nombre': forms.TextInput(attrs={'class': 'form-control'}),
             'apellido': forms.TextInput(attrs={'class': 'form-control'}),
@@ -25,9 +27,21 @@ class EstudianteForm(forms.ModelForm):
             'domicilio': forms.TextInput(attrs={'class': 'form-control'}),
             'localidad': forms.TextInput(attrs={'class': 'form-control'}),
             'lugar_nacimiento': forms.TextInput(attrs={'class': 'form-control'}),
-            
         }
 
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        if self.instance.pk:  # Ya existe: estamos editando, no creando
+            original = Estudiante.objects.get(pk=self.instance.pk)
+            for field in self.fields:
+                nuevo_valor = getattr(instance, field)
+                if not nuevo_valor:  # Si no se envió o está vacío, restaurar el original
+                    setattr(instance, field, getattr(original, field))
+        if commit:
+            instance.save()
+        return instance
+    
+    
 class ColegioForm(forms.ModelForm):
     class Meta:
         model = Colegio

@@ -114,17 +114,20 @@ def listar_estudiantes(request):
 @login_required
 def ver_estudiante(request):
     return render(request, 'estudiante/ver_estudiante.html')
+
+
 @login_required
 def consultar_apto(request):
-    estudiantes = Estudiante.objects.filter(cus__isnull=False).distinct()
-
     perfil = None
     profile_id = request.session.get("user_profile_id")
+
     if profile_id:
-        try:
-            perfil = Profile.objects.get(id=profile_id)
-        except Profile.DoesNotExist:
-            perfil = None
+        perfil = get_object_or_404(Profile, id=profile_id)
+
+    estudiantes = Estudiante.objects.filter(
+        tutor__profile=perfil,  # 🔹 Solo los estudiantes del tutor actual
+        cus__isnull=False
+    ).distinct()
 
     return render(request, 'estudiante/consultar_apto.html', {
         'estudiantes': estudiantes,
@@ -289,21 +292,28 @@ def cargar_antecedente_estudiante(request):
     })
 @login_required
 def ver_antecedentes(request):
-    estudiantes = Estudiante.objects.filter(antecedentes__isnull=False).distinct()
+    profile = Profile.objects.filter(user=request.user, rol='estudiante').first()
+
+    if not profile:
+        messages.error(request, "No se encontró un perfil de estudiante asociado a tu cuenta.")
+        return redirect('home')  # O donde quieras redirigir
+
+    tutor = Tutor.objects.get(profile=profile)
+    estudiantes = Estudiante.objects.filter(
+        tutor=tutor,
+        antecedentes__isnull=False
+    ).distinct()
+    
 
     datos_estudiantes = []
 
     for estudiante in estudiantes:
-        # Último antecedente (por ID o por fecha si agregás fecha_creacion en el futuro)
         ultimo_antecedente = estudiante.antecedentes.order_by('-id').first()
-
-        # Último CUS
-        cus = Cus.objects.filter(estudiante=estudiante).order_by('-fecha_de_llenado').first()
+        cus = Cus.objects.filter(estudiante=estudiante).order_by('-id').first()
         estado_cus = cus.estado if cus else None
         fecha_caducidad_cus = cus.fecha_caducidad if cus else None
 
-        # Última actualización del CUS
-        actualizacion = ActualizacionCUS.objects.filter(cus__estudiante=estudiante).order_by('-fecha').first()
+        actualizacion = ActualizacionCUS.objects.filter(cus=cus).order_by('-fecha').first()
 
         datos_estudiantes.append({
             'estudiante': estudiante,
@@ -313,7 +323,7 @@ def ver_antecedentes(request):
             'tiene_actualizacion': bool(actualizacion),
             'vencimiento': actualizacion.vencimiento if actualizacion else None,
             'puede_editar': estado_cus == 'VENCIDO',
-            'antecedente': ultimo_antecedente  # 👈 agregamos esto
+            'antecedente': ultimo_antecedente
         })
 
     context = {
@@ -325,9 +335,14 @@ def ver_antecedentes(request):
 @login_required
 def detalle_antecedente(request, estudiante_id):
     estudiante = get_object_or_404(Estudiante, id=estudiante_id)
-    
-    # Filtramos por estudiante y ordenamos descendente por ID (último creado)
+
+    # 🛡️ Verificamos que el estudiante sea del tutor logueado
+    if estudiante.tutor != request.user.profile:
+        messages.error(request, "No tienes permiso para ver este antecedente.")
+        return redirect('ver_antecedentes')
+
     antecedente = AntecedentesCUS.objects.filter(estudiante=estudiante).order_by('-id').first()
+    print(f"Antecedente encontrado para el estudiante {estudiante.id}: {antecedente}")
 
     if not antecedente:
         messages.error(request, "No se encontraron antecedentes para este estudiante.")
@@ -339,15 +354,39 @@ def detalle_antecedente(request, estudiante_id):
     }
     return render(request, 'estudiante/detalle_antecedente.html', context)
 
- 
+
+
 @login_required
 def lista_estudiantes_para_cus(request):
-    # Obtener todos los estudiantes del tutor logueado
     profile_id = request.session.get("user_profile_id")
     estudiantes = Estudiante.objects.filter(tutor__profile__id=profile_id)
-    
+
+    estudiantes_info = []
+    alguno_puede_generar = False
+
+    for estudiante in estudiantes:
+        cus = Cus.objects.filter(estudiante=estudiante).order_by('-id').first()
+        puede_generar_cus = False
+
+        if not cus:
+            puede_generar_cus = True
+        elif cus.estado == 'VENCIDO':
+            puede_generar_cus = True
+        elif cus.actualizaciones_cargadas() >= 5:
+            puede_generar_cus = True
+
+        if puede_generar_cus:
+            alguno_puede_generar = True  # ✅ Si hay uno que puede, ya sabemos
+
+        estudiantes_info.append({
+            'estudiante': estudiante,
+            'cus': cus,
+            'puede_generar_cus': puede_generar_cus,
+        })
+
     context = {
-        'estudiantes': estudiantes,
+        'estudiantes_info': estudiantes_info,
+        'alguno_puede_generar': alguno_puede_generar,  # 👈 pasamos esto
     }
     return render(request, 'estudiante/lista_generar_cus.html', context)
 
@@ -397,25 +436,27 @@ def curva_crecimiento_view(request):
 
         registros = []
 
-        # CUS original
-        cus = Cus.objects.filter(estudiante=estudiante_seleccionado).order_by('fecha_de_llenado').first()
-        if cus and hasattr(cus, 'examen_fisico'):
-            peso = float(cus.examen_fisico.peso or 0)
-            talla = float(cus.examen_fisico.talla or 0)
-            imc = round(peso / ((talla/100)**2), 2) if peso and talla else 0
-            registros.append({
-                'fecha': cus.fecha_de_llenado.strftime('%Y-%m-%d') if cus.fecha_de_llenado else 'CUS',
-                'peso': peso,
-                'talla': talla,
-                'imc': imc
-            })
+        # ✅ TODOS los CUS del estudiante
+        cus_qs = Cus.objects.filter(estudiante=estudiante_seleccionado).order_by('fecha_de_llenado')
+        for cus in cus_qs:
+            examen = ExamenFisico.objects.filter(cus=cus).first()
+            if examen:
+                peso = float(examen.peso or 0)
+                talla = float(examen.talla or 0)
+                imc = round(peso / ((talla / 100) ** 2), 2) if peso and talla else 0
+                registros.append({
+                    'fecha': cus.fecha_de_llenado.strftime('%Y-%m-%d') if cus.fecha_de_llenado else f'CUS #{cus.id}',
+                    'peso': peso,
+                    'talla': talla,
+                    'imc': imc
+                })
 
-        # Actualizaciones
+        # ✅ Todas las actualizaciones de todos los CUS del estudiante
         actualizaciones = ActualizacionCUS.objects.filter(cus__estudiante=estudiante_seleccionado).order_by('fecha')
         for act in actualizaciones:
             peso = float(act.peso or 0)
             talla = float(act.talla or 0)
-            imc = round(peso / ((talla/100)**2), 2) if peso and talla else 0
+            imc = round(peso / ((talla / 100) ** 2), 2) if peso and talla else 0
             registros.append({
                 'fecha': act.fecha.strftime('%Y-%m-%d'),
                 'peso': peso,
@@ -423,8 +464,11 @@ def curva_crecimiento_view(request):
                 'imc': imc
             })
 
+        # ✅ Ordenar cronológicamente todos los registros
+        registros.sort(key=lambda x: x['fecha'])
+
         datos = json.dumps(registros)
-        print(F'Datos del estudiante ',datos)
+        print(f'📈 Datos del estudiante {estudiante_seleccionado.id}:', datos)
 
     context = {
         'estudiantes': estudiantes,
@@ -432,7 +476,6 @@ def curva_crecimiento_view(request):
         'datos': datos
     }
     return render(request, 'estudiante/curva_crecimiento.html', context)
-
 # Funcion para generar un nuevo antecedente si cus es vencido 
 @login_required
 def actualizar_antecedente_si_cus_vencido(request, estudiante_id):
