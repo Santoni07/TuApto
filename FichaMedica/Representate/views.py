@@ -196,10 +196,11 @@ def colegio_home_view(request):
     estudiantes = Estudiante.objects.none()
 
     buscar = request.GET.get("buscar")
+    dni = request.GET.get("dni")
     estado = request.GET.get("estado")
     anio = request.GET.get("anio")
 
-    if buscar or estado or anio:
+    if buscar or dni or estado or anio:
         estudiantes = Estudiante.objects.filter(
             estudiantecolegio__colegio=colegio,
             estudiantecolegio__activo=True
@@ -208,9 +209,11 @@ def colegio_home_view(request):
         if buscar:
             estudiantes = estudiantes.filter(
                 Q(nombre__icontains=buscar) |
-                Q(apellido__icontains=buscar) |
-                Q(dni__icontains=buscar)
+                Q(apellido__icontains=buscar)
             )
+
+        if dni:
+            estudiantes = estudiantes.filter(dni__icontains=dni)
 
         if estado:
             estudiantes = estudiantes.filter(cus__estado=estado).distinct()
@@ -218,7 +221,6 @@ def colegio_home_view(request):
         if anio:
             estudiantes = estudiantes.filter(cus__fecha_de_llenado__year=anio).distinct()
 
-    # Generar años dinámicamente (últimos 5 hasta el actual)
     current_year = datetime.now().year
     anios = list(range(current_year, current_year - 6, -1))
 
