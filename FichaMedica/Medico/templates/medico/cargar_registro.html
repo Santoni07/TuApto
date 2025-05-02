@@ -681,30 +681,34 @@
                             <p>Esta certificación tiene validez por el año en curso a partir de la fecha de emisión y es válida sin enmiendas solo en original.</p>
 
                             <!-- Verificación de requisitos antes de habilitar el botón -->
-                                {% if electrocardiograma_cargado %}
-                                {% if jugador.edad >= 35 %}
-                                    {% if ergonometria_cargado %}
-                                        <div class="d-flex justify-content-center mt-3">
-                                            <button type="submit" id="guardarFichaBtn" class="btn btn-primary w-50">Guardar</button>
-                                        </div>
-                                    {% else %}
-                                        <div class="text-center mt-3">
-                                            <p class="text-danger">Falta Ergonometría</p>
-                                        </div>
-                                    {% endif %}
-                                {% else %}
-                                    <div class="d-flex justify-content-center mt-3">
-                                        <button type="submit" name="guardar_ficha_completa" id="guardarFichaBtn" class="btn btn-primary w-50">Guardar</button>
-                                    </div>
-                                {% endif %}
-                                {% else %}
+                            {% if jugador.edad >= 35 %}
+                            {# Jugador de 35 o más #}
+                            {% if electrocardiograma_cargado and ergonometria_cargado %}
+                                <div class="d-flex justify-content-center mt-3">
+                                    <button type="submit" id="guardarFichaBtn" class="btn btn-primary w-50">Guardar</button>
+                                </div>
+                            {% else %}
                                 <div class="text-center mt-3">
-                                    <p class="text-danger">Falta Electrocardiograma</p>
-                                    {% if jugador.edad >= 35 and not ergonometria_cargado %}
+                                    {% if not electrocardiograma_cargado %}
+                                        <p class="text-danger">Falta Electrocardiograma</p>
+                                    {% endif %}
+                                    {% if not ergonometria_cargado %}
                                         <p class="text-danger">Falta Ergonometría</p>
                                     {% endif %}
                                 </div>
-                                {% endif %}
+                            {% endif %}
+                        {% else %}
+                            {# Jugador menor de 35 #}
+                            {% if electrocardiograma_cargado %}
+                                <div class="d-flex justify-content-center mt-3">
+                                    <button type="submit" id="guardarFichaBtn" class="btn btn-primary w-50">Guardar</button>
+                                </div>
+                            {% else %}
+                                <div class="text-center mt-3">
+                                    <p class="text-danger">Falta Electrocardiograma</p>
+                                </div>
+                            {% endif %}
+                        {% endif %}
                         </form>
                     </div>
                 </div>

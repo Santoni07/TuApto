@@ -159,17 +159,17 @@ def error_registro(request):
     return render(request, 'persona/error_registro.html')
 
 
+
 @login_required
 @never_cache
 def menu_jugador(request):
     # Obtener el perfil del usuario logueado
-    try: 
-        profile= Profile.objects.get(user=request.user, rol='jugador')
-        print(f"Perfil del usuario: {profile}")
+    try:
+        profile = Profile.objects.get(user=request.user, rol='jugador')
     except Profile.DoesNotExist:
         return redirect('select_role')
 
-    # Intentar obtener la Persona asociada al profile del usuario
+    # Obtener la persona asociada
     try:
         persona = Persona.objects.get(profile=profile)
         jugador = Jugador.objects.get(persona=persona)
@@ -178,26 +178,20 @@ def menu_jugador(request):
     except Jugador.DoesNotExist:
         return redirect('registrar_jugador')
 
-    # Obtener todas las fichas médicas del jugador
+    # Fichas médicas
     fichas_medicas = RegistroMedico.objects.filter(jugador=jugador).select_related('torneo')
+    fichas_medicas_data = list(fichas_medicas)
 
+    # Antecedentes
+    antecedentes = AntecedenteEnfermedades.objects.filter(jugador=jugador).first()  # uno solo porque es OneToOneField
 
-# Convertir el QuerySet en una lista de diccionarios para enviarlo a la plantilla
-    fichas_medicas_data = list(fichas_medicas)  
-    print(f"Fichas médicas del jugador: {fichas_medicas_data}")
-    # Obtener los antecedentes usando el jugador
-    antecedentes = AntecedenteEnfermedades.objects.filter(jugador=jugador)
-
-    # Obtener las categorías, equipos y torneos relacionados al jugador
+    # Categorías y Equipos
     jugador_categoria_equipos = JugadorCategoriaEquipo.objects.select_related(
         'categoria_equipo__categoria__torneo',
         'categoria_equipo__equipo'
     ).filter(jugador=jugador)
 
-    # Inicializar una lista para almacenar torneos
-    torneos = []
-
-    # Crear una estructura para almacenar la información del jugador, categorías, equipos y torneos
+    # Construir info del jugador
     jugador_info = {
         'nombre': jugador.persona.profile.nombre,
         'apellido': jugador.persona.profile.apellido,
@@ -211,8 +205,11 @@ def menu_jugador(request):
 
     for jugador_categoria in jugador_categoria_equipos:
         categoria_equipo = jugador_categoria.categoria_equipo
-        torneo = categoria_equipo.categoria.torneo  # Obtener el torneo asociado a la categoría
-        
+        torneo = categoria_equipo.categoria.torneo
+
+        # Buscar ficha médica correspondiente a ese torneo
+        ficha_medica_asociada = fichas_medicas.filter(torneo=torneo).first()
+
         categoria_info = {
             'nombre_categoria': categoria_equipo.categoria.nombre,
             'nombre_equipo': categoria_equipo.equipo.nombre,
@@ -222,12 +219,11 @@ def menu_jugador(request):
                 'direccion': torneo.direccion if hasattr(torneo, 'direccion') else "No disponible",
                 'telefono': torneo.telefono if hasattr(torneo, 'telefono') else "No disponible",
                 'imagen' : torneo.imagen.url if torneo.imagen else None
-            }
+            },
+            'ficha_medica': ficha_medica_asociada
         }
         jugador_info['categorias_equipo'].append(categoria_info)
 
-
-    # Pasar el contexto necesario a la plantilla
     context = {
         'persona': persona,
         'profile': profile,
@@ -237,7 +233,6 @@ def menu_jugador(request):
         'antecedentes': antecedentes,
         'ficha_medica': fichas_medicas,
         'ficha_medica_data': fichas_medicas_data,
-        'torneos': torneos,  # Se pasa la lista de torneos al contexto
     }
 
     return render(request, 'persona/menu_jugador.html', context)

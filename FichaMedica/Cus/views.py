@@ -6,18 +6,34 @@ from django.urls import reverse_lazy
 from django.shortcuts import get_object_or_404
 from .models import EstudioCus, Estudiante
 from .form import EstudioCusForm   #  Asegurate de tener este form creado
-from estudiante.models import Estudiante  # Ajustá si tu modelo de estudiante está en otro lugar
+from estudiante.models import Estudiante, Tutor  # Ajustá si tu modelo de estudiante está en otro lugar
 from django.views.generic.edit import CreateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
-
+from account.models import Profile
 
 
 # ✅ CRUD para estudiosCus
 @login_required
 def seleccionar_estudiante_para_estudio(request):
-    estudiantes = Estudiante.objects.all()
-    accion = request.GET.get('accion', 'cargar')  # por defecto cargar
+    # Buscar el profile del usuario logueado
+    profile = Profile.objects.filter(user=request.user).first()
+
+    if not profile:
+        messages.error(request, "No se encontró un perfil asociado a tu cuenta.")
+        return redirect('home')
+
+    # Buscar el tutor asociado a ese profile
+    tutor = Tutor.objects.filter(profile=profile).first()
+
+    if not tutor:
+        messages.error(request, "No se encontró un tutor asociado a tu cuenta.")
+        return redirect('home')
+
+    # Traer solo los estudiantes asociados a este tutor
+    estudiantes = Estudiante.objects.filter(tutor=tutor).distinct()
+
+    accion = request.GET.get('accion', 'cargar')  # por defecto 'cargar'
 
     return render(request, 'cus/seleccionar_estudiante_para_estudio.html', {
         'estudiantes': estudiantes,

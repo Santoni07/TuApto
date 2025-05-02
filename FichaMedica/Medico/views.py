@@ -531,6 +531,7 @@ def ficha_medica_views(request, registro_id):
         'categoria': jugador_categoria_equipo.categoria_equipo.categoria.nombre if jugador_categoria_equipo else "Sin categoría",
         'equipo': jugador_categoria_equipo.categoria_equipo.equipo.nombre if jugador_categoria_equipo else "Sin equipo",
         'torneo': jugador_categoria_equipo.categoria_equipo.categoria.torneo.nombre if jugador_categoria_equipo else "Sin torneo",
+        
         'imagen_torneo': jugador_categoria_equipo.categoria_equipo.categoria.torneo.imagen.url if jugador_categoria_equipo and jugador_categoria_equipo.categoria_equipo.categoria.torneo.imagen else None,
         'torneo_descripcion': jugador_categoria_equipo.categoria_equipo.categoria.torneo.descripcion if jugador_categoria_equipo else "Sin Descripcion",
         'torneo_direccion': jugador_categoria_equipo.categoria_equipo.categoria.torneo.direccion if jugador_categoria_equipo else "Sin Direccion",
@@ -569,7 +570,7 @@ def ficha_medica_views(request, registro_id):
             }
             for ant in antecedentes
         ],
-
+        
         # 🔹 Agregar los formularios de estudios médicos específicos de este registro
         'electro_basal_form': ElectroBasalForm(instance=electro_basal) if electro_basal else None,
         'electro_esfuerzo_form': ElectroEsfuerzoForm(instance=electro_esfuerzo) if electro_esfuerzo else None,
@@ -580,7 +581,7 @@ def ficha_medica_views(request, registro_id):
         'otros_examenes_form': OtrosExamenesClinicosForm(instance=otros_examenes) if otros_examenes else None,
         'registro_medico_form': registro_medico_form,
     }
-
+    print("Jugador Info:", jugador_info)
     # Generar y descargar PDF si se solicita
     if request.GET.get('descargar_pdf') == 'true':
         html_content = render_to_string('medico/medico_views.html', {

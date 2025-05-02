@@ -241,55 +241,50 @@
                                   </tr>
                                 </thead>
                                 <tbody>
-                                  {% for categoria_equipo in jugador_info.categorias_equipo %}
+                                  <tbody>
+                                    {% for categoria_equipo in jugador_info.categorias_equipo %}
                                     <tr class="text-center">
-                                        <td class="fw-bold">{{ categoria_equipo.torneo.nombre }}</td>
-                                        <td>{{ categoria_equipo.nombre_categoria }}</td>
-                                        <td>{{ categoria_equipo.nombre_equipo }}</td>
-                                       
-                                
-                                        <!-- Buscar la ficha médica correspondiente a este torneo -->
-                                        {% with ficha_medica=None %}
-                                          {% for ficha in ficha_medica_data %}
-                                              {% if ficha.torneo__nombre.strip|lower == categoria_equipo.torneo.nombre.strip|lower %}
-                                                  {% with ficha_medica=ficha %}
-                                                      <td class="{% if ficha_medica.consentimiento_persona %}text-success{% else %}text-danger{% endif %}">
-                                                          {% if ficha_medica.consentimiento_persona %}Sí{% else %}No{% endif %}
-                                                      </td>
-                                                  {% endwith %}
-                                              {% endif %}
-                                          {% endfor %}
-                                         
-                                        {% endwith %}
-                                    
-                                        <td>
-                                            {% if antecedentes %}
-                                          
-                                                <a href="{% url 'registroMedico:ver_antecedente' jugador.id %}" class="btn btn-success btn-sm">Ver</a>
-                                            {% else %}
-                                                <a href="{% url 'registroMedico:cargar_antecedente' jugador.id %}" class="btn btn-warning btn-sm">Cargar</a>
-                                            {% endif %}
-                                        </td>
-                                    
-                                        {% with ficha_medica=None %}
-                                            {% for ficha in ficha_medica_data %}
-                                                {% if ficha.torneo__nombre == categoria_equipo.torneo.nombre %}
-                                                    {% with ficha_medica=ficha %}
-                                                        <td class="fw-bold {% if ficha_medica.estado == 'APROBADA' %}text-success{% else %}text-danger{% endif %}">
-                                                            {% if ficha_medica.estado == "APROBADA" %}
-                                                                <a href="{% url 'ficha_medica' ficha_medica.id %}" class="btn btn-success btn-sm">Ver</a>
-                                                            {% else %}
-                                                                <span>{{ ficha_medica.estado }}</span>
-                                                            {% endif %}
-                                                        </td>
-                                                    {% endwith %}
-                                                {% endif %}
-                                            {% endfor %}
-                                          
-                                        {% endwith %}
+                                      <td class="fw-bold">{{ categoria_equipo.torneo.nombre }}</td>
+                                      <td>{{ categoria_equipo.nombre_categoria }}</td>
+                                      <td>{{ categoria_equipo.nombre_equipo }}</td>
+                                  
+                                      <!-- Consentimiento -->
+                                      <td>
+                                        {% if categoria_equipo.ficha_medica %}
+                                          {% if categoria_equipo.ficha_medica.consentimiento_persona %}
+                                            <span class="text-success fw-bold">Sí</span>
+                                          {% else %}
+                                            <span class="text-danger fw-bold">No</span>
+                                          {% endif %}
+                                        {% else %}
+                                          <span class="text-muted">Sin ficha</span>
+                                        {% endif %}
+                                      </td>
+                                  
+                                      <!-- Antecedentes -->
+                                      <td>
+                                        {% if antecedentes %}
+                                          <a href="{% url 'registroMedico:ver_antecedente' jugador.id %}" class="btn btn-success btn-sm">Ver</a>
+                                        {% else %}
+                                          <a href="{% url 'registroMedico:cargar_antecedente' jugador.id %}" class="btn btn-warning btn-sm">Cargar</a>
+                                        {% endif %}
+                                      </td>
+                                  
+                                      <!-- Apto Médico -->
+                                      <td>
+                                        {% if categoria_equipo.ficha_medica %}
+                                          {% if categoria_equipo.ficha_medica.estado == 'APROBADA' %}
+                                            <a href="{% url 'ficha_medica' categoria_equipo.ficha_medica.id %}" class="btn btn-success btn-sm">Ver</a>
+                                          {% else %}
+                                            <span class="text-danger">{{ categoria_equipo.ficha_medica.estado }}</span>
+                                          {% endif %}
+                                        {% else %}
+                                          <span class="text-muted">Sin ficha</span>
+                                        {% endif %}
+                                      </td>
                                     </tr>
-                                  {% endfor %}
-
+                                    {% endfor %}
+                                  </tbody>
                                 </tbody>
                               </table>
                             </div>

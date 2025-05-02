@@ -332,12 +332,22 @@ def ver_antecedentes(request):
     return render(request, 'estudiante/ver_antecedentes.html', context)
 
 
+
 @login_required
 def detalle_antecedente(request, estudiante_id):
+    # Buscamos el perfil del usuario con rol 'estudiante' (que en tu caso representa al tutor)
+    profile = Profile.objects.filter(user=request.user, rol='estudiante').first()
+
+    if not profile:
+        messages.error(request, "No se encontró un perfil de estudiante asociado a tu cuenta.")
+        return redirect('home')
+
+    tutor = Tutor.objects.get(profile=profile)
+
     estudiante = get_object_or_404(Estudiante, id=estudiante_id)
 
-    # 🛡️ Verificamos que el estudiante sea del tutor logueado
-    if estudiante.tutor != request.user.profile:
+    # Validamos que el estudiante pertenezca al tutor logueado
+    if estudiante.tutor != tutor:
         messages.error(request, "No tienes permiso para ver este antecedente.")
         return redirect('ver_antecedentes')
 
@@ -353,8 +363,6 @@ def detalle_antecedente(request, estudiante_id):
         'antecedente': antecedente
     }
     return render(request, 'estudiante/detalle_antecedente.html', context)
-
-
 
 @login_required
 def lista_estudiantes_para_cus(request):
@@ -423,16 +431,20 @@ def generar_cus_ajax(request, estudiante_id):
     return JsonResponse({"success": False, "message": "Método no permitido"}, status=405)
 
 # DATOS PARA LA CURVA DE CRECIMIENTO 
+
 @login_required
 def curva_crecimiento_view(request):
-    estudiantes = Estudiante.objects.all()
+    profile = get_object_or_404(Profile, user=request.user, rol='estudiante')  
+    tutor = get_object_or_404(Tutor, profile=profile)
+    print(f'👤 Tutor: {tutor}')
+    estudiantes = Estudiante.objects.filter(tutor=tutor)  # 👈 filtrar los estudiantes de ese tutor
     datos = []
 
     estudiante_id = request.GET.get('estudiante_id')
     estudiante_seleccionado = None
 
     if estudiante_id:
-        estudiante_seleccionado = get_object_or_404(Estudiante, id=estudiante_id)
+        estudiante_seleccionado = get_object_or_404(Estudiante, id=estudiante_id, tutor=tutor)  # 👈 además, asegurarte que sea de *su* tutor
 
         registros = []
 
@@ -451,7 +463,7 @@ def curva_crecimiento_view(request):
                     'imc': imc
                 })
 
-        # ✅ Todas las actualizaciones de todos los CUS del estudiante
+        # ✅ Actualizaciones
         actualizaciones = ActualizacionCUS.objects.filter(cus__estudiante=estudiante_seleccionado).order_by('fecha')
         for act in actualizaciones:
             peso = float(act.peso or 0)
@@ -464,9 +476,7 @@ def curva_crecimiento_view(request):
                 'imc': imc
             })
 
-        # ✅ Ordenar cronológicamente todos los registros
         registros.sort(key=lambda x: x['fecha'])
-
         datos = json.dumps(registros)
         print(f'📈 Datos del estudiante {estudiante_seleccionado.id}:', datos)
 
