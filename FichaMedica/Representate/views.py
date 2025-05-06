@@ -193,14 +193,21 @@ def colegio_home_view(request):
     representante = get_object_or_404(RepresenteColegio, Profile_id=profile_id)
     colegio = representante.colegio
 
-    estudiantes = Estudiante.objects.none()
-
     buscar = request.GET.get("buscar")
     dni = request.GET.get("dni")
     estado = request.GET.get("estado")
     anio = request.GET.get("anio")
+    tipo = request.GET.get("tipo")  # ✅ nuevo parámetro
 
-    if buscar or dni or estado or anio:
+    estudiantes = Estudiante.objects.none()
+
+    # Si se selecciona tipo alumno sin más filtros, traemos todos
+    if tipo == "alumno" and not buscar and not dni and not estado and not anio:
+        estudiantes = Estudiante.objects.filter(
+            estudiantecolegio__colegio=colegio,
+            estudiantecolegio__activo=True
+        ).distinct()
+    elif tipo == "alumno" or buscar or dni or estado or anio:
         estudiantes = Estudiante.objects.filter(
             estudiantecolegio__colegio=colegio,
             estudiantecolegio__activo=True
@@ -221,6 +228,21 @@ def colegio_home_view(request):
         if anio:
             estudiantes = estudiantes.filter(cus__fecha_de_llenado__year=anio).distinct()
 
+    total_alumnos = None
+    total_aprobados = None
+
+    if tipo == "alumno":
+        total_alumnos = Estudiante.objects.filter(
+            estudiantecolegio__colegio=colegio,
+            estudiantecolegio__activo=True
+        ).distinct().count()
+
+        total_aprobados = Estudiante.objects.filter(
+            estudiantecolegio__colegio=colegio,
+            estudiantecolegio__activo=True,
+            cus__estado="APROBADA"
+        ).distinct().count()
+
     current_year = datetime.now().year
     anios = list(range(current_year, current_year - 6, -1))
 
@@ -228,4 +250,7 @@ def colegio_home_view(request):
         "colegio": colegio,
         "estudiantes": estudiantes,
         "anios": anios,
+        "tipo": tipo,  # 🔁 mantener valor en el select del template
+        "total_alumnos": total_alumnos,
+        "total_aprobados": total_aprobados,
     })

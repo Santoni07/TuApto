@@ -17,7 +17,7 @@ from Cus.models import *
 def home_estudiante(request):
     # 📌 Obtener el perfil del usuario autenticado desde la sesión
     profile_id = request.session.get('user_profile_id')
-    
+
     profile = Profile.objects.filter(id=profile_id, rol="estudiante").first()
     print(f"Perfil del usuario: {profile}")
 
@@ -48,7 +48,7 @@ def cargar_estudiante(request):
     # 📌 Verificar que el usuario tiene un tutor asociado
     profile_id = request.session.get("user_profile_id")
     print(f"🔍 Verificando perfil del usuario con ID: {profile_id}")
-    
+
     if not profile_id:
         messages.error(request, "Error: No tienes un perfil de tutor seleccionado.")
         return redirect("home")
@@ -56,7 +56,7 @@ def cargar_estudiante(request):
     # 🔍 Obtener el tutor asociado al perfil del usuario
     tutor = Tutor.objects.filter(profile_id=profile_id).first()
     print(f"🔍 Tutor asociado al perfil: {tutor}")
-    
+
     if not tutor:
         messages.error(request, "Debes completar la información del tutor antes de agregar estudiantes.")
         return redirect("cargar_tutor")
@@ -64,7 +64,7 @@ def cargar_estudiante(request):
     if request.method == 'POST':
         print("📩 Recibida solicitud POST con datos:", request.POST)  # 🚀 Depuración
         form = EstudianteForm(request.POST)
-        
+
         if form.is_valid():
             print("✅ Formulario válido. Creando estudiante...")  # 🚀 Depuración
             # 🛠 Crear el estudiante y asociarlo al tutor
@@ -82,12 +82,12 @@ def cargar_estudiante(request):
 
             messages.success(request, "Estudiante registrado con éxito.")
             return redirect("listar_estudiantes")  # 🔄 Redirigir a la lista de estudiantes
-        
+
         else:
             print("❌ ERROR: Formulario no válido")
             print("❌ Errores del formulario:", form.errors)  # Muestra los errores en la terminal
             messages.error(request, "Error en el formulario. Verifica los datos ingresados.")
-    
+
     else:
         form = EstudianteForm()
 
@@ -180,7 +180,7 @@ def cargar_tutor(request):
     # 📌 Obtener el perfil del estudiante desde la sesión
     profile_id = request.session.get('user_profile_id')
     profile = Profile.objects.filter(id=profile_id, rol="estudiante").first()
-    
+
     if not profile:
         messages.error(request, "Error al cargar tutor. Intenta nuevamente.")
         return redirect('home')
@@ -225,7 +225,7 @@ def eliminar_estudiante(request, estudiante_id):
 @login_required
 def datos_personales(request):
     profile = Profile.objects.filter(user=request.user).first()
-    
+
     if not profile:
         return render(request, "error.html", {"mensaje": "No tienes un perfil asociado."})
 
@@ -233,7 +233,6 @@ def datos_personales(request):
 
     estudiantes = Estudiante.objects.filter(tutor=tutor) if tutor else []
 
-    # Añadir el colegio a cada estudiante
     for est in estudiantes:
         relacion = EstudianteColegio.objects.filter(estudiante=est, activo=True).select_related('colegio').first()
         est.colegio = relacion.colegio if relacion else None
@@ -243,7 +242,11 @@ def datos_personales(request):
         "tutor": tutor,
         "estudiantes": estudiantes,
     }
+
+
     return render(request, "estudiante/datos_personales.html", context)
+
+
 
 @login_required
 def seleccionar_estudiante(request):
@@ -303,7 +306,7 @@ def ver_antecedentes(request):
         tutor=tutor,
         antecedentes__isnull=False
     ).distinct()
-    
+
 
     datos_estudiantes = []
 
@@ -330,8 +333,6 @@ def ver_antecedentes(request):
         'datos_estudiantes': datos_estudiantes
     }
     return render(request, 'estudiante/ver_antecedentes.html', context)
-
-
 
 @login_required
 def detalle_antecedente(request, estudiante_id):
@@ -363,6 +364,8 @@ def detalle_antecedente(request, estudiante_id):
         'antecedente': antecedente
     }
     return render(request, 'estudiante/detalle_antecedente.html', context)
+
+
 
 @login_required
 def lista_estudiantes_para_cus(request):
@@ -430,11 +433,11 @@ def generar_cus_ajax(request, estudiante_id):
 
     return JsonResponse({"success": False, "message": "Método no permitido"}, status=405)
 
-# DATOS PARA LA CURVA DE CRECIMIENTO 
+# DATOS PARA LA CURVA DE CRECIMIENTO
 
 @login_required
 def curva_crecimiento_view(request):
-    profile = get_object_or_404(Profile, user=request.user, rol='estudiante')  
+    profile = get_object_or_404(Profile, user=request.user, rol='estudiante')
     tutor = get_object_or_404(Tutor, profile=profile)
     print(f'👤 Tutor: {tutor}')
     estudiantes = Estudiante.objects.filter(tutor=tutor)  # 👈 filtrar los estudiantes de ese tutor
@@ -486,7 +489,10 @@ def curva_crecimiento_view(request):
         'datos': datos
     }
     return render(request, 'estudiante/curva_crecimiento.html', context)
-# Funcion para generar un nuevo antecedente si cus es vencido 
+
+
+
+# Funcion para generar un nuevo antecedente si cus es vencido
 @login_required
 def actualizar_antecedente_si_cus_vencido(request, estudiante_id):
     estudiante = get_object_or_404(Estudiante, id=estudiante_id)

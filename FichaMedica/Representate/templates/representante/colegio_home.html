@@ -19,43 +19,70 @@
     </style>
 
     <div class="container my-4" style="position: relative; z-index: 1;">
-        <div class="text-center mb-4">
-            <h1 class="fw-bold text-primary">Colegio: {{ colegio.nombre }}</h1>
-            {% if colegio.imagen %}
-                <img src="{{ colegio.imagen.url }}" alt="Logo Colegio" class="rounded shadow-sm" style="max-width: 100px;">
-            {% endif %}
-        </div>
+            <div class="d-flex align-items-center justify-content-start mb-4 gap-3">
+                {% if colegio.imagen %}
+                    <img src="{{ colegio.imagen.url }}" alt="Logo Colegio"  style="max-width: 100px; max-height: 100px;">
+                {% else %}
+                    <div class="d-flex align-items-center justify-content-center bg-light rounded shadow-sm" style="width: 100px; height: 100px; font-size: 0.9rem; color: #777;">
+                        Sin logo
+                    </div>
+                {% endif %}
+
+                <h1 class="fw-bold text-dark m-0 display-5">{{ colegio.nombre }}</h1>
+            </div>
 
         <div class="bg-light p-4 rounded shadow-sm">
             <h2 class="text-center text-info fw-bold">Buscar Estudiante</h2>
-            <form method="get" class="row g-3 justify-content-center">
-                <div class="col-md-3">
-                    <input type="text" name="buscar" class="form-control" placeholder="Nombre, Apellido o DNI" value="{{ request.GET.buscar }}">
-                </div>
-                <div class="col-md-2">
-                    <select name="estado" class="form-select">
-                        <option value="">Todos los estados</option>
-                        <option value="APROBADA" {% if request.GET.estado == "APROBADA" %}selected{% endif %}>Aprobada</option>
-                        <option value="RECHAZADA" {% if request.GET.estado == "RECHAZADA" %}selected{% endif %}>Rechazada</option>
-                        <option value="PROCESO" {% if request.GET.estado == "PROCESO" %}selected{% endif %}>En Proceso</option>
-                        <option value="VENCIDO" {% if request.GET.estado == "VENCIDO" %}selected{% endif %}>Vencida</option>
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <select name="anio" class="form-select">
-                        <option value="">Todos los años</option>
-                        {% for y in anios %}
-                            <option value="{{ y }}" {% if request.GET.anio == y|stringformat:"s" %}selected{% endif %}>{{ y }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <button type="submit" class="btn btn-primary w-100">Buscar</button>
-                </div>
-                <div class="col-md-2">
-                    <a href="{% url 'colegio_home' %}" class="btn btn-primary w-100">Refrescar</a>
-                </div>
-            </form>
+            <form method="get" class="row g-3 align-items-end justify-content-center">
+
+    <!-- Título y select de tipo de persona -->
+    <div class="col-md-2">
+        <label class="form-label fw-bold">Alumnos</label>
+        <select name="tipo" class="form-select">
+            <option value="">Individual</option>
+            <option value="alumno" {% if request.GET.tipo == "alumno" %}selected{% endif %}>Todos</option>
+        </select>
+    </div>
+
+    <!-- Input de búsqueda -->
+    <div class="col-md-3">
+        <label class="form-label">Nombre, Apellido o DNI</label>
+        <input type="text" name="buscar" class="form-control" placeholder="Buscar..." value="{{ request.GET.buscar }}">
+    </div>
+
+    <!-- Estado CUS -->
+    <div class="col-md-2">
+        <label class="form-label">Estado</label>
+        <select name="estado" class="form-select">
+            <option value="">Todos los estados</option>
+            <option value="APROBADA" {% if request.GET.estado == "APROBADA" %}selected{% endif %}>Aprobada</option>
+            <option value="RECHAZADA" {% if request.GET.estado == "RECHAZADA" %}selected{% endif %}>Rechazada</option>
+            <option value="PROCESO" {% if request.GET.estado == "PROCESO" %}selected{% endif %}>En Proceso</option>
+            <option value="VENCIDO" {% if request.GET.estado == "VENCIDO" %}selected{% endif %}>Vencida</option>
+        </select>
+    </div>
+
+    <!-- Año -->
+    <div class="col-md-2">
+        <label class="form-label">Año</label>
+        <select name="anio" class="form-select">
+            <option value="">Todos los años</option>
+            {% for y in anios %}
+                <option value="{{ y }}" {% if request.GET.anio == y|stringformat:"s" %}selected{% endif %}>{{ y }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <!-- Botón Buscar -->
+    <div class="col-md-1">
+        <button type="submit" class="btn btn-primary w-100">Buscar</button>
+    </div>
+
+    <!-- Botón Refrescar -->
+    <div class="col-md-1">
+        <a href="{% url 'colegio_home' %}" class="btn btn-primary w-100">Refrescar</a>
+    </div>
+</form>
         </div>
 
         <div class="table-responsive mt-4">
@@ -93,7 +120,7 @@
                                     {% elif cus and cus.estado == 'VENCIDO' %}
 
                                     <a href="{% url 'cus_views' cus.id %}" class="btn btn-success btn-sm">Ver</a>
-                                        
+
                                     {% endif %}
                                 </td>
                             </tr>
@@ -105,6 +132,12 @@
                     {% endfor %}
                 </tbody>
             </table>
+                  {% if tipo == "alumno" and total_alumnos is not None and total_aprobados is not None %}
+                <div class="mt-3 alert alert-info text-center fw-bold">
+                    Total de alumnos inscriptos: {{ total_alumnos }} |
+                    Alumnos con CUS aprobado: {{ total_aprobados }}
+                </div>
+            {% endif %}
         </div>
     </div>
 </main>

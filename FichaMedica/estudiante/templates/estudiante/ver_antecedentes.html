@@ -19,6 +19,11 @@
                     opacity: 0.4;
                     z-index: -1;
                 }
+                @media (min-width: 768px) {
+                      .d-md-table-header-group {
+                        display: table-header-group !important;
+                      }
+                }
             </style>
 
             <div style="position: relative; z-index: 1;">
@@ -113,7 +118,7 @@
                               </tbody>
                             </table>
                           </div>
-                          
+
 
                         <div class="d-flex justify-content-end mt-5">
                             <a href="{% url 'menu_estudiante' %}" class="btn btn-secondary btn-lg w-45 me-3">Volver</a>

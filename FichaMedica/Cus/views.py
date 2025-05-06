@@ -6,11 +6,13 @@ from django.urls import reverse_lazy
 from django.shortcuts import get_object_or_404
 from .models import EstudioCus, Estudiante
 from .form import EstudioCusForm   #  Asegurate de tener este form creado
-from estudiante.models import Estudiante, Tutor  # Ajustá si tu modelo de estudiante está en otro lugar
+from estudiante.models import Estudiante  # Ajustá si tu modelo de estudiante está en otro lugar
 from django.views.generic.edit import CreateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from account.models import Profile
+from estudiante.models import Estudiante, Tutor
+
 
 
 # ✅ CRUD para estudiosCus
@@ -66,7 +68,7 @@ class EliminarEstudioCUSView(DeleteView):
 
         # Agrega mensaje para mostrar en la vista de lista
         messages.success(request, "El estudio fue eliminado correctamente.")
-        
+
         # Redirige a la lista de estudios
         return redirect('listar_estudios', estudiante_id=estudiante_id)
 
@@ -88,7 +90,7 @@ class CargarEstudioCusView(LoginRequiredMixin, CreateView):
             return self.form_invalid(form)
 
         form.instance.cus = cus
-      
+
         messages.success(self.request, "Estudio cargado con éxito.")
         return super().form_valid(form)
 

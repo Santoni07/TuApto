@@ -18,6 +18,11 @@
           opacity: 0.4;
           z-index: -1;
         }
+        @media (min-width: 768px) {
+  .d-md-table-header-group {
+    display: table-header-group !important;
+  }
+}
       </style>
 
       <div style="position: relative; z-index: 1;">
@@ -87,11 +92,11 @@
          <!-- Botones de acción -->
             <div class="d-grid d-md-flex justify-content-md-end gap-3 mt-5">
                 <button type="button" onclick="window.location.href='{% url 'menu_estudiante' %}'"
-                class="btn btn-secondary flex-fill flex-md-grow-0" 
+                class="btn btn-secondary flex-fill flex-md-grow-0"
                 style="width: 100%; max-width: 200px; min-width: 120px;">
                 Volver
                 </button>
-            
+
                 <button type="button" onclick="window.location.href='{% url 'cargar_estudiante' %}'"
                 class="btn btn-primary flex-fill flex-md-grow-0"
                 style="width: 100%; max-width: 200px; min-width: 120px;">

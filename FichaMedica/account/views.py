@@ -61,7 +61,7 @@ def check_session(request):
             return JsonResponse({'session_expired': True})
 
         return JsonResponse({'session_expired': False})
-        
+
     except Session.DoesNotExist:
         return JsonResponse({'session_expired': True})
 
@@ -101,18 +101,18 @@ def login_user_and_redirect(request, user):
     # 🛠 Si solo tiene un perfil, lo usamos directamente
     profile = profiles.first()
     print("Usuario autenticado con rol:", profile.rol)
-    
-    
+
+
     # 🔐 Guardamos el ID del perfil en la sesión
     request.session['user_profile_id'] = profile.id
-    
+
     # 🔹 Si el usuario es estudiante, verificar si tiene un tutor asociado
     if profile.rol == 'estudiante':
         tutor_asociado = Tutor.objects.filter(profile=profile).exists()
-        
+
         if not tutor_asociado:
             return redirect('cargar_tutor')  # ❌ Si no tiene tutor, lo lleva a completar sus datos
-        
+
         return redirect('menu_estudiante')  # ✅ Si tiene tutor, lo lleva al menú de estudiante
     # 🔄 Redirección condicional según el rol
     if profile.rol == 'medico':
@@ -151,8 +151,8 @@ def select_role(request):
             print(f"✅ Redirigiendo a menú de {profile.rol}")
 
             # 🔹 Guardar el perfil en la sesión antes de redirigir
-            request.session["user_profile_id"] = profile.id  
-            request.session["user_profile_rol"] = profile.rol  
+            request.session["user_profile_id"] = profile.id
+            request.session["user_profile_rol"] = profile.rol
 
             # 🔄 Redirección según el rol seleccionado
             if profile.rol == "jugador":
@@ -171,7 +171,7 @@ def select_role(request):
             return redirect("select_role")
 
     return render(request, "account/select_role.html", {"profiles": profiles})
-""" 
+"""
 def register(request):
     print(f"📥 Request recibido: {request.method} en {request.path}")  # Depuración
 
@@ -246,7 +246,7 @@ def register(request):
     if request.method == 'GET' and 'email' in request.GET:
         email = request.GET.get('email')
         user = User.objects.filter(email=email).first()
-        
+
         print(f"rol del usuario", user)
 
         if user:
@@ -359,4 +359,15 @@ def verificar_email(request):
         except Exception as e:
             print(f"Error inesperado: {str(e)}")
 
+    return JsonResponse(data)
+
+
+
+def verificar_dni(request):
+    dni = request.GET.get('dni', None)
+    data = {
+        'existe': False
+    }
+    if dni and Profile.objects.filter(dni=dni).exists():
+        data['existe'] = True
     return JsonResponse(data)

@@ -16,6 +16,11 @@
             opacity: 0.4;
             z-index: -1;
         }
+        @media (min-width: 768px) {
+  .d-md-table-header-group {
+    display: table-header-group !important;
+  }
+}
     </style>
 
     <div style="position: relative; z-index: 1;">
@@ -76,7 +81,7 @@
                       </tbody>
                     </table>
                   </div>
-                  
+
 
                 <div class="d-flex justify-content-end mt-4">
                     <a href="{% url 'menu_estudiante' %}" class="btn btn-secondary">Volver al Menú</a>
@@ -113,17 +118,17 @@
             const button = event.relatedTarget;
             const estudioId = button.getAttribute('data-estudio-id');
             const estudioNombre = button.getAttribute('data-estudio-nombre');
-    
+
             // Actualizar el texto dentro del modal
             document.getElementById('nombreEstudioEnModal').textContent = estudioNombre;
-    
+
             // Actualizar la URL del form
             const form = document.getElementById('formEliminarEstudio');
             form.action = `/cus/eliminar/${estudioId}/`;  // Ruta definida en tu urls.py
         });
     });
     </script>
-    
+
 {% if request.GET.exito %}
 <script>
     document.addEventListener("DOMContentLoaded", function () {
@@ -147,7 +152,6 @@
 </div>
 {% endif %}
 {% endblock %}
-
 
 
 {% comment %} {% extends 'core/base.html' %}

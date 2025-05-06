@@ -61,15 +61,18 @@
     <div style="position: relative; z-index: 1;">
 
         <div class="container my-4">
-            <div class="text-center mb-4">
-                <h1 class="fw-bold text-primary">Página del Representante: {{ representante.torneo }}</h1>
-                {% if representante.torneo.imagen %}
-                    <img src="{{ representante.torneo.imagen.url }}" alt="Torneo {{ representante.torneo.nombre }}" class="rounded-circle shadow-sm" style="max-width: 100px;">
-                {% else %}
-                    <div class="bg-secondary rounded-circle d-inline-block" style="width: 100px; height: 100px;"></div>
-                {% endif %}
-            </div>
-        
+            <div class="d-flex align-items-center justify-content-start mb-4 gap-3">
+    {% if representante.torneo.imagen %}
+        <img src="{{ representante.torneo.imagen.url }}" alt="Torneo {{ representante.torneo.nombre }}" style="max-width: 100px; max-height: 100px;">
+    {% else %}
+        <div class="d-flex align-items-center justify-content-center bg-light rounded shadow-sm" style="width: 100px; height: 100px; font-size: 0.9rem; color: #777;">
+            Sin logo
+        </div>
+    {% endif %}
+
+    <h1 class="fw-bold text-dark m-0 display-5">Torneo  {{ representante.torneo.nombre }}</h1>
+</div>
+
             <div class="bg-light p-4 rounded shadow-sm">
                 <h2 class="text-center text-info fw-bold">Buscador de Jugadores</h2>
                 <form method="get" action="{% url 'representante_home' %}" class="row g-3 justify-content-center">
@@ -82,7 +85,7 @@
                             <option value="persona" {% if request.GET.filter_type == 'persona' %}selected{% endif %}>Persona</option>
                         </select>
                     </div>
-        
+
                   <!-- Filtro de Categoría -->
 <div id="filter-categoria" class="col-md-4 {% if request.GET.filter_type == 'categoria' %}d-block{% else %}d-none{% endif %}">
     <label for="filter_category" class="form-label fw-bold">Categoría</label>
@@ -118,22 +121,22 @@
 
 
 
-        
+
                     <div id="filter-persona" class="col-md-4 {% if request.GET.filter_type == 'persona' %}d-block{% else %}d-none{% endif %}">
                         <label for="search_query" class="form-label fw-bold">Buscar DNI</label>
                         <input type="text" name="search_query" id="search_query" class="form-control" placeholder="Ingrese Nombre o DNI" value="{{ request.GET.search_query|default:'' }}">
                     </div>
-        
+
                     <div class="col-md-2 text-center">
                         <button type="submit" class="btn btn-primary fw-bold w-100 mb-2">Buscar</button>
                         <button type="button" class="btn btn-primary fw-bold w-100" onclick="window.location.href='{% url 'representante_home' %}'">
                             Refrescar
                         </button>
                     </div>
-                        
+
                 </form>
             </div>
-        
+
             <div class="table-responsive mt-4">
                 <h2 class="text-center text-info fw-bold">Lista de Jugadores</h2>
                 <table class="table table-bordered table-hover shadow-sm">
@@ -185,39 +188,39 @@
             categoria: document.getElementById('filter-categoria'),
             persona: document.getElementById('filter-persona'),
         };
-    
+
         const filterType = document.getElementById('filter_type');
         const filterCategory = document.getElementById('filter_category');
         console.log(filter_category)
         const filterTeamByCategory = document.getElementById('filter_team_by_category');
         const filterEquipoCategoria = document.getElementById('filter-equipo-categoria');
         const resultsContainer = document.getElementById('results-container');
-    
+
         // 🔍 Mostrar la sección seleccionada al cargar la página
         const initialFilter = filterType ? filterType.value : '';
         if (filterSections[initialFilter]) {
             filterSections[initialFilter].classList.remove('d-none');
         }
-    
+
         // ✅ Manejar el cambio en el filtro principal
         if (filterType) {
             filterType.addEventListener('change', function () {
                 const selectedFilter = this.value;
                 console.log("Filtro seleccionado:", selectedFilter);
-    
+
                 // Ocultar todas las secciones
                 Object.values(filterSections).forEach(section => section.classList.add('d-none'));
-    
+
                 // Mostrar la sección seleccionada
                 if (filterSections[selectedFilter]) {
                     filterSections[selectedFilter].classList.remove('d-none');
                 }
-    
+
                 // Limpiar resultados si se cambia el filtro
                 if (resultsContainer) {
                     resultsContainer.innerHTML = '';
                 }
-    
+
                 // Mostrar el menú de equipos si el filtro es "categoría"
                 if (selectedFilter === 'categoria') {
                     filterEquipoCategoria.classList.remove('d-none');
@@ -227,24 +230,24 @@
                 }
             });
         }
-    
+
         // ✅ Evento: cuando cambia la categoría
         if (filterCategory) {
             filterCategory.addEventListener('change', function () {
                 const categoryId = this.value;
                 console.log("Categoría seleccionada:", categoryId);
-    
+
                 // Enviar el formulario automáticamente al seleccionar una categoría
                 this.form.submit();
-    
+
                 // Limpiar resultados anteriores
                 if (resultsContainer) {
                     resultsContainer.innerHTML = '';
                 }
-    
+
                 // Vaciar el select de equipos
                 filterTeamByCategory.innerHTML = '<option value="">Seleccionar equipo</option>';
-    
+
                 if (categoryId) {
                     // Solicitud AJAX para obtener los equipos
                     fetch("{% url 'traer_equipos' %}", {
@@ -278,7 +281,7 @@
                 }
             });
         }
-    
+
         // ✅ Evento: cuando cambia el equipo seleccionado
         if (filterTeamByCategory) {
             filterTeamByCategory.addEventListener('change', function () {
@@ -289,55 +292,55 @@
             });
         }
     }); {% endcomment %}
-    
+
     document.addEventListener('DOMContentLoaded', function () {
         const filterSections = {
             equipo: document.getElementById('filter-equipo'),
             categoria: document.getElementById('filter-categoria'),
             persona: document.getElementById('filter-persona'),
         };
-    
+
         const filterType = document.getElementById('filter_type');
         const filterCategory = document.getElementById('filter_category');
         const filterTeamByCategory = document.getElementById('filter_team_by_category');
         const filterEquipoCategoria = document.getElementById('filter-equipo-categoria');
         const resultsContainer = document.getElementById('results-container');
-    
+
         console.log("Elementos encontrados:", {
             filterType,
             filterCategory,
             filterTeamByCategory,
             filterEquipoCategoria,
         });
-    
+
         if (!filterCategory) {
             console.error("El elemento #filter_category no fue encontrado en el DOM.");
             return; // Detenemos la ejecución si no existe el elemento
         }
-    
+
         // Mostrar la sección seleccionada al cargar la página
         const initialFilter = filterType ? filterType.value : '';
         console.log("Filtro inicial:", initialFilter);
-    
+
         if (filterSections[initialFilter]) {
             filterSections[initialFilter].classList.remove('d-none');
         }
-    
+
         if (filterType) {
             filterType.addEventListener('change', function () {
                 const selectedFilter = this.value;
                 console.log("Filtro seleccionado:", selectedFilter);
-    
+
                 Object.values(filterSections).forEach(section => section.classList.add('d-none'));
-    
+
                 if (filterSections[selectedFilter]) {
                     filterSections[selectedFilter].classList.remove('d-none');
                 }
-    
+
                 if (resultsContainer) {
                     resultsContainer.innerHTML = '';
                 }
-    
+
                 if (selectedFilter === 'categoria') {
                     filterEquipoCategoria.classList.remove('d-none');
                     filterTeamByCategory.innerHTML = '<option value="">Todos los equipos</option>';
@@ -346,11 +349,11 @@
                 }
             });
         }
-    
+
         filterCategory.addEventListener('change', function () {
             const categoryId = this.value;
             console.log("Categoría seleccionada:", categoryId);
-    
+
             // Verificar que el formulario existe
             if (this.form) {
                 console.log("Formulario encontrado, enviando...");
@@ -360,8 +363,8 @@
             }
         });
     });
-    
+
 
 </script>
 
-{% endblock %} 
+{% endblock %}
