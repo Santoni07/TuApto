@@ -54,6 +54,7 @@ class Colegio(models.Model):
     direccion = models.CharField(max_length=255)
     telefono = models.CharField(max_length=15)
     imagen= models.ImageField(upload_to='colegios/', null=True, blank=True)
+    
 
     def __str__(self):
         return self.nombre

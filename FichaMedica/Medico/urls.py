@@ -25,6 +25,10 @@ urlpatterns = [
     path('cus/vista/<int:cus_id>/', views.cus_views, name='cus_views'),
     path('seleccionar_apto/', views.seleccionar_apto, name='seleccionar_apto'),
     path('cus/form/<int:estudiante_id>/', cus_form_view, name='cus_form_view'),
+    path('documentacion/cargar/', views.cargar_documentacion, name='cargar_documentacion'),
+    path('verificar-qr/', views.verificar_qr_pdf, name='verificar_qr_pdf'),
+    path('contrato/', views.contrato, name='contrato'),
+    
     
 
 

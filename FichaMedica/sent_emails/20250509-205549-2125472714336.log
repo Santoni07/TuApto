@@ -1,0 +1,20 @@
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: =?utf-8?q?Contrase=C3=B1a_restablecida_en_localhost=3A8000?=
+From: webmaster@localhost
+To: cordoba@cordoba.com
+Date: Fri, 09 May 2025 23:55:49 -0000
+Message-ID: <174683494977.19000.6144773168399511951@Alejandro>
+
+
+Hola Marcelo Cordoba,
+
+Recibimos una solicitud para restablecer tu contraseña en .
+
+Haz clic en el siguiente enlace para restablecer tu contraseña:
+http://localhost:8000/account/reset/MjA/cpjzh1-3c6c9cf6f54003c932bf2c7c012788e7/
+
+Si no solicitaste esto, simplemente ignora este correo.
+
+-------------------------------------------------------------------------------

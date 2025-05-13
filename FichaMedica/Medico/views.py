@@ -1,5 +1,9 @@
 from django.contrib import messages
 from django.http import HttpResponse
+import requests
+import fitz  # PyMuPDF
+from PIL import Image
+from pyzbar.pyzbar import decode
 from weasyprint import HTML
 from django.utils.html import format_html
 from django.http import HttpResponse
@@ -20,7 +24,8 @@ from django.template.loader import render_to_string
 from django.http import JsonResponse
 from estudiante.models import Estudiante, AntecedentesCUS
 from account.models import Profile
-from Medico.models import Medico
+from Medico.models import Documentos, Medico
+from Medico.forms import DocumentosForm
 from Cus.models import *
 from Cus.form import *
 #Vista medico_home
@@ -1267,3 +1272,102 @@ def cus_views(request, cus_id):
         return response
 
     return render(request, 'medico/cus_views.html', contexto)
+
+
+def extraer_y_validar_qr(file_obj):
+    try:
+        doc = fitz.open(stream=file_obj.read(), filetype="pdf")
+        for i, page in enumerate(doc):
+            print(f"[DEBUG] Procesando página {i + 1}")
+            pix = page.get_pixmap()
+            img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
+            qrs = decode(img)
+            print(f"[DEBUG] QRs detectados: {len(qrs)}")
+            for qr in qrs:
+                data = qr.data.decode("utf-8")
+                print(f"[DEBUG] Contenido del QR: {data}")
+                try:
+                    response = requests.head(data, timeout=5)
+                    print(f"[DEBUG] Status HTTP: {response.status_code}")
+                    if response.status_code == 200:
+                        return {"valido": True, "url": data}
+                except requests.RequestException as e:
+                    print(f"[DEBUG] Error al validar URL del QR: {e}")
+                    return {"valido": False, "url": data}
+        print("[DEBUG] No se detectó ningún QR en el PDF.")
+        return {"valido": False}
+    except Exception as e:
+        print(f"[DEBUG] Error general al procesar el QR: {e}")
+        return {"valido": False}
+
+from django.views.decorators.csrf import csrf_exempt
+
+@login_required
+def cargar_documentacion(request):
+    profile = Profile.objects.get(user=request.user)
+    medico = Medico.objects.get(profile__user=request.user)
+    doc, _ = Documentos.objects.get_or_create(medico=medico)
+
+    if request.method == 'POST':
+        form = DocumentosForm(request.POST, request.FILES, instance=doc)
+
+        archivo_matricula = request.FILES.get("certificado_matricula")
+        archivo_firma = request.FILES.get("certificado_firma_electronica")
+        contrato_aceptado = request.POST.get("contrato_aceptado") == "on"
+
+        if not contrato_aceptado:
+            form.add_error("contrato_aceptado", "Debe aceptar los términos del contrato para continuar.")
+        if not archivo_matricula:
+            form.add_error("certificado_matricula", "Debe subir el certificado de matrícula.")
+        if not archivo_firma:
+            form.add_error("certificado_firma_electronica", "Debe subir el certificado de firma electrónica.")
+
+        if archivo_matricula and archivo_firma and contrato_aceptado:
+            resultado = extraer_y_validar_qr(archivo_matricula)
+            if resultado and resultado.get("valido"):
+                # Guardar los archivos y marcar estado como válido
+                doc.certificado_matricula = archivo_matricula
+                doc.certificado_firma_electronica = archivo_firma
+                doc.url_certificado = resultado["url"]
+                doc.qr_valido = True
+                doc.contrato_aceptado = True
+                doc.save()
+                print(f"[DEBUG] Documentación válida guardada correctamente.")
+                return redirect('medico_home')
+            else:
+                form.add_error("certificado_matricula", "El QR no es válido. Verifique el documento.")
+                print("[DEBUG] Certificado de matrícula con QR inválido.")
+
+    else:
+        form = DocumentosForm(instance=doc)
+
+    return render(request, 'medico/cargar_documentacion.html', {
+        'form': form,
+        'doc': doc,
+        'profile':profile
+    })
+
+@csrf_exempt
+@login_required
+def verificar_qr_pdf(request):
+    if request.method == "POST" and request.FILES.get("file"):
+        archivo = request.FILES["file"]
+        try:
+            doc = fitz.open(stream=archivo.read(), filetype="pdf")
+            for page in doc:
+                pix = page.get_pixmap()
+                img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
+                qrs = decode(img)
+                for qr in qrs:
+                    data = qr.data.decode("utf-8")
+                    if "cmpc.org.ar" in data:  # Validamos dominio
+                        resp = requests.head(data, timeout=5)
+                        return JsonResponse({"valido": resp.status_code == 200})
+            return JsonResponse({"valido": False})
+        except Exception as e:
+            print(f"[ERROR] Verificación QR fallida: {e}")
+            return JsonResponse({"valido": False})
+    return JsonResponse({"valido": False})
+
+def contrato (request):
+    return render(request, 'medico/contrato.html')

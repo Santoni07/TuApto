@@ -1,0 +1,242 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block content %}
+<main class="px-3" style="position: relative; min-height: 100vh; width: 100%; margin: 0; padding: 0;">
+  <style>
+    main::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url('{% static "core/img/medico_home.jpg" %}') no-repeat center center;
+      background-size: cover;
+      opacity: 0.15;
+      z-index: -1;
+    }
+  
+    body {
+      font-family: 'Nunito Sans', sans-serif;
+      font-size: 1.15rem;
+    }
+  
+    .card {
+      background-color: rgba(255, 255, 255, 0.97);
+      border-radius: 16px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+      border: none;
+    }
+  
+    .card-header {
+      background-color: #00a2d3;
+      color: white;
+      font-size: 1.75rem;
+      font-weight: 700;
+      padding: 1rem;
+      text-align: center;
+      border-radius: 16px 16px 0 0;
+    }
+  
+    .form-label {
+      font-weight: 600;
+      font-size: 1.2rem;
+      color: #333;
+    }
+  
+    .form-check-label {
+      font-size: 1.1rem;
+    }
+  
+    .btn-success {
+      background-color: #00a2d3;
+      border: none;
+      padding: 0.6rem 2rem;
+      font-size: 1.15rem;
+      font-weight: 600;
+      border-radius: 8px;
+    }
+  
+    .btn-secondary {
+      font-size: 1rem;
+      padding: 0.5rem 1.5rem;
+    }
+  
+    .btn-sm {
+      padding: 0.3rem 1rem;
+    }
+  
+    .alert {
+      font-size: 1.05rem;
+    }
+  
+    a {
+      color: #007bff;
+      text-decoration: none;
+    }
+  
+    a:hover {
+      text-decoration: underline;
+    }
+  
+    #confirmacionBanner .btn {
+      min-width: 130px;
+    }
+  </style>
+
+  <div style="position: relative; z-index: 1;">
+    <div class="container py-5">
+      <div class="row justify-content-center">
+        <div class="col-md-8">
+          <div class="mb-4 text-center">
+  <h2 class="fw-bold text-dark" style="font-size: 2rem;">Doctor {{ profile.nombre }} {{ profile.apellido }}</h2>
+  <p class="mt-2" style="font-size: 1.25rem; color: #555;">
+    Te damos la bienvenida a la plataforma <strong>Checkeate</strong>. Por favor completá la documentación obligatoria para comenzar a utilizar el sistema.
+  </p>
+</div>
+          <div class="card p-4">
+            <div class="card-header">📄 Cargar Certificados del Médico</div>
+            <div class="text-center mt-2 mb-3" style="font-size: 1.3rem; color: #555; font-weight: 500;">
+              Subí el certificado de matrícula en PDF con QR. El sistema lo escaneará automáticamente y validará su autenticidad.
+            </div>
+            <div class="card-body">
+              <form method="post" enctype="multipart/form-data" id="form-documentacion">
+                {% csrf_token %}
+              
+                <!-- 📄 Campo: Certificado de matrícula -->
+                <div class="mb-3">
+                  <label for="id_certificado_matricula" class="form-label fw-bold">Certificado matrícula:</label>
+                  {{ form.certificado_matricula }}
+                  {% if form.certificado_matricula.errors %}
+                    <div class="text-danger small mt-1">{{ form.certificado_matricula.errors }}</div>
+                  {% endif %}
+                </div>
+              
+                <!-- 🖊️ Campo: Firma electrónica -->
+                <div class="mb-3">
+                  <label for="id_certificado_firma_electronica" class="form-label fw-bold">Certificado firma electrónica:</label>
+                  {{ form.certificado_firma_electronica }}
+                  {% if form.certificado_firma_electronica.errors %}
+                    <div class="text-danger small mt-1">{{ form.certificado_firma_electronica.errors }}</div>
+                  {% endif %}
+                </div>
+              
+                <!-- ✅ Checkbox contrato -->
+                <div class="form-check mt-3">
+                  <input class="form-check-input" type="checkbox" id="id_contrato_aceptado" name="contrato_aceptado">
+                  <label class="form-check-label" for="id_contrato_aceptado">
+                    Acepto los <a href="{% url 'contrato' %}" target="_blank">términos del contrato</a>.
+                  </label>
+                  {% if form.contrato_aceptado.errors %}
+                    <div class="text-danger small mt-1">{{ form.contrato_aceptado.errors }}</div>
+                  {% endif %}
+                </div>
+              
+                <!-- 🚦 Alerta QR -->
+                <div id="alertaQR" class="alert mt-4 text-center" style="display: none;"></div>
+              
+             <!-- 🟢 Botón que muestra el banner -->
+              <div class="text-center mt-4">
+                <button type="button" class="btn btn-success btn-lg fw-bold" id="btnConfirmarBanner" disabled>Guardar</button>
+              </div>
+              
+              <!-- 🧾 Alerta de confirmación personalizada (inicialmente oculta) -->
+                <div id="confirmacionBanner" class="alert alert-warning d-none text-center mt-4" role="alert">
+                  Usted está por guardar la documentación.
+                  <div class="mt-3">
+                    <button type="submit" class="btn btn-success btn-sm">✔ Sí, confirmar envío</button>
+                    <button type="button" class="btn btn-secondary btn-sm ms-2" id="cancelarConfirmacion">Cancelar</button>
+                  </div>
+                </div>
+
+        
+              
+               
+              </form>
+              
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const fileMatricula = document.querySelector('#id_certificado_matricula');
+    const fileFirma = document.querySelector('#id_certificado_firma_electronica');
+    const contrato = document.querySelector('#id_contrato_aceptado');
+    const btnConfirmar = document.getElementById("btnConfirmarBanner");
+    const alerta = document.getElementById("alertaQR");
+    const bannerConfirmacion = document.getElementById("confirmacionBanner");
+    const cancelarBtn = document.getElementById("cancelarConfirmacion");
+
+    function validarCampos() {
+      const qrValido = btnConfirmar.dataset.qrValido === "true";
+      const firmaOk = fileFirma.files.length > 0;
+      const contratoOk = contrato.checked;
+
+      btnConfirmar.disabled = !(qrValido && firmaOk && contratoOk);
+    }
+
+    function verificarQR(file) {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      alerta.style.display = "block";
+      alerta.className = "alert alert-info mt-3";
+      alerta.innerText = "Verificando QR...";
+
+      fetch("{% url 'verificar_qr_pdf' %}", {
+        method: "POST",
+        headers: {
+          "X-CSRFToken": "{{ csrf_token }}",
+        },
+        body: formData,
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.valido) {
+          alerta.className = "alert alert-success mt-3";
+          alerta.innerText = "QR válido detectado. Ahora podés continuar.";
+          btnConfirmar.dataset.qrValido = "true";
+        } else {
+          alerta.className = "alert alert-danger mt-3";
+          alerta.innerText = "No se detectó un QR válido en el documento.";
+          btnConfirmar.dataset.qrValido = "false";
+        }
+        validarCampos();
+      })
+      .catch(() => {
+        alerta.className = "alert alert-warning mt-3";
+        alerta.innerText = "Error al verificar el QR.";
+        btnConfirmar.dataset.qrValido = "false";
+        validarCampos();
+      });
+    }
+
+    fileMatricula.addEventListener("change", function () {
+      if (this.files.length > 0) {
+        verificarQR(this.files[0]);
+      }
+    });
+
+    fileFirma.addEventListener("change", validarCampos);
+    contrato.addEventListener("change", validarCampos);
+
+    // 💡 Mostrar alerta de confirmación
+    btnConfirmar.addEventListener("click", function () {
+      bannerConfirmacion.classList.remove("d-none");
+      bannerConfirmacion.scrollIntoView({ behavior: 'smooth' });
+    });
+
+    // ❌ Cancelar confirmación
+    cancelarBtn.addEventListener("click", function () {
+      bannerConfirmacion.classList.add("d-none");
+    });
+  });
+</script>
+{% endblock %}
