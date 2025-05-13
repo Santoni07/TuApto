@@ -12,6 +12,7 @@ from django.utils.timezone import now
 from django.contrib.sessions.models import Session
 from django.contrib import messages
 from django import forms
+from Medico.models import Medico,Documentos
 
 from django.contrib.auth.models import User
 from .models import Profile
@@ -84,40 +85,50 @@ def generate_unique_username(email, role):
     return f"{email}_{role}"
 
 
+
+
 def login_user_and_redirect(request, user):
     login(request, user)
 
-    # 🛠 Obtener el perfil correcto basado en el rol
     profiles = Profile.objects.filter(user=user)
-
     if not profiles.exists():
         print("❌ No se encontró un perfil para este usuario.")
         return redirect('login')
 
-    # 🛠 Si el usuario tiene más de un perfil, redirigirlo a una pantalla de selección de rol
     if profiles.count() > 1:
         return redirect('select_role')
 
-    # 🛠 Si solo tiene un perfil, lo usamos directamente
     profile = profiles.first()
     print("Usuario autenticado con rol:", profile.rol)
 
-
-    # 🔐 Guardamos el ID del perfil en la sesión
     request.session['user_profile_id'] = profile.id
 
-    # 🔹 Si el usuario es estudiante, verificar si tiene un tutor asociado
     if profile.rol == 'estudiante':
         tutor_asociado = Tutor.objects.filter(profile=profile).exists()
-
         if not tutor_asociado:
-            return redirect('cargar_tutor')  # ❌ Si no tiene tutor, lo lleva a completar sus datos
+            return redirect('cargar_tutor')
+        return redirect('menu_estudiante')
 
-        return redirect('menu_estudiante')  # ✅ Si tiene tutor, lo lleva al menú de estudiante
-    # 🔄 Redirección condicional según el rol
+    # 🔍 Verificación especial para médicos
     if profile.rol == 'medico':
+        try:
+            medico = Medico.objects.get(profile=profile)
+        except Medico.DoesNotExist:
+            print("❌ No se encontró el perfil médico.")
+            return redirect('login')
+
+        try:
+            doc = medico.documentacion
+            if not (doc.certificado_matricula and doc.certificado_firma_electronica and doc.contrato_aceptado):
+                print("⚠️ Faltan documentos obligatorios del médico.")
+                return redirect('cargar_documentacion')
+        except Documentos.DoesNotExist:
+            print("⚠️ El médico no tiene documentación cargada.")
+            return redirect('cargar_documentacion')
+
         return redirect('seleccionar_apto')
-    elif profile.rol == 'general':
+
+    if profile.rol == 'general':
         return redirect('menu_jugador')
     elif profile.rol == 'representante':
         return redirect('representante_home')
@@ -129,6 +140,7 @@ def login_user_and_redirect(request, user):
         return redirect('menu_estudiante')
     else:
         return redirect('home')
+
 
 
 @login_required
