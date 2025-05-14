@@ -1,0 +1,97 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Información para Médicos Prestadores{% endblock %}
+
+{% block content %}
+<main class="px-3" style="position: relative; min-height: 100vh; width: 100%; margin: 0; padding: 0;">
+  <style>
+    main::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url('{% static "core/img/medico_home.jpg" %}') no-repeat center center;
+      background-size: cover;
+      opacity: 0.1;
+      z-index: -1;
+    }
+
+    .card {
+      background-color: rgba(255, 255, 255, 0.98);
+      border: none;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      padding: 2rem;
+    }
+  </style>
+
+  <div class="container py-5">
+    <div class="row justify-content-center">
+      <div class="col-lg-10">
+        <div class="card">
+          <h1 class="mb-4 text-center fw-bold text-primary">¿Querés ser prestador médico?</h1>
+          
+          <p class="text-dark" style="font-size: 1.1rem; line-height: 1.8; text-align: justify;">
+            En <strong>Checkeate</strong>, estamos profundamente comprometidos con la salud integral de deportistas y estudiantes. Creemos que tu rol como profesional médico es clave para garantizar procesos seguros, completos y confiables. Por eso, te invitamos a ser parte de nuestra red de prestadores.
+          </p>
+
+          <p class="text-dark" style="font-size: 1.1rem; line-height: 1.8; text-align: justify;">
+            Vas a recibir credenciales para ingresar a la plataforma. Al iniciar sesión por primera vez, deberás cargar tu <strong>certificado de matrícula</strong> y tu <strong>firma electrónica</strong>. El sistema escaneará automáticamente el código QR del certificado para validar su autenticidad. Una vez aceptado el contrato de prestación de servicios, podrás comenzar a usar todas las funcionalidades de Checkeate.
+          </p>
+
+          <h4 class="mt-4 text-primary">Paso a paso para aprobar un Apto Físico</h4>
+          <ol style="font-size: 1.05rem; line-height: 1.7;">
+            <li>Ingresá a la plataforma y seleccioná la opción <strong>"Aptos Físicos"</strong> desde el menú principal (vas a ver también la opción “CUS”).</li>
+            <li>Se te dirigirá al <strong>home de aptos físicos</strong>.</li>
+            <li>Buscá al paciente por <strong>nombre o DNI</strong>. Debe tener antecedentes cargados y consentimiento firmado.</li>
+            <li>En la columna <strong>“Acción”</strong>, hacé clic en el botón <strong>“Cargar Ficha”</strong>.</li>
+            <li>Serás dirigido al <strong>formulario de Registro Médico</strong>, donde encontrarás toda la información personal y médica del jugador.</li>
+            <li>En la pestaña <strong>“Estudios Médicos”</strong>, vas a poder:
+              <ul>
+                <li>Visualizar los estudios que el jugador ya subió.</li>
+                <li>Subir nuevos estudios como <strong>electrocardiograma</strong>, <strong>ergometría</strong>, <strong>análisis de orina</strong>, entre otros.</li>
+              </ul>
+            </li>
+            <li>Los estudios se cargan uno por uno, completando los datos requeridos y presionando <strong>“Guardar”</strong> en cada formulario.</li>
+            <li>Al final del proceso, accedé a la pestaña <strong>“Certificado Médico”</strong>.</li>
+            <li>Completá todos los campos del certificado, seleccioná <strong>Aprobar o Rechazar</strong>, y guardá.</li>
+            <li><strong>Importante:</strong> el botón “Guardar certificado” solo se habilitará si:
+              <ul>
+                <li>Todos los formularios están completos.</li>
+                <li>El jugador cargó un <strong>electrocardiograma</strong> (obligatorio).</li>
+                <li>Si es mayor de 35 años, también se requiere <strong>ergometría</strong>.</li>
+              </ul>
+            </li>
+            <li>Una vez aprobado, el apto queda disponible para <strong>visualización o descarga en PDF</strong>.</li>
+            <li>Podrás consultar el estado del apto en cualquier momento, buscando por DNI desde el menú.</li>
+          </ol>
+
+          <h4 class="mt-4 text-primary">¿Cómo cargar el Certificado Único de Salud (CUS)?</h4>
+          <ol style="font-size: 1.05rem; line-height: 1.7;">
+            <li>Desde el menú, elegí la opción <strong>“CUS”</strong>.</li>
+            <li>Buscá al estudiante por <strong>nombre o DNI</strong>.</li>
+            <li>Hacé clic en <strong>“Cargar CUS”</strong> para comenzar el proceso.</li>
+            <li>Completá los formularios médicos (antecedentes, estudios, exámenes físicos, derivaciones, etc.).</li>
+            <li>Guardá el formulario que contiene todos los estudios. Una vez finalizado, podrás guardar y emitir el CUS.</li>
+            <li>El sistema permite realizar <strong>actualizaciones</strong> del CUS si está vencido.</li>
+            <li>Podrás consultar todos los CUS aprobados previamente y descargarlos en formato PDF.</li>
+          </ol>
+
+          <p class="text-dark mt-4" style="font-size: 1.1rem; line-height: 1.8;">
+            En Checkeate vas a contar con una plataforma ágil, segura y moderna para realizar tu trabajo médico con excelencia. Sumate a nuestra red de profesionales y ayudanos a garantizar que cada deportista y estudiante esté en condiciones óptimas para su actividad.
+          </p>
+            <div class="d-flex justify-content-end mt-5">
+                <a href="{% url 'home' %}" class="btn btn-primary btn-lg w-45 me-3">Volver</a>
+               
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+</main>
+{% endblock %}
+

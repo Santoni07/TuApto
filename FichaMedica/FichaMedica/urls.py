@@ -9,6 +9,7 @@ from django.urls import include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name='home'),
+    path('info_prest', views.info_prest, name='info_prest'),
     path('account/', include('account.urls')),
     path('persona/', include('persona.urls')),
  

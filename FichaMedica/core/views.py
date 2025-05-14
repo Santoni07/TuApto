@@ -6,7 +6,9 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from publicidad.models import Publicidad
 
-
+def info_prest(request):
+    return render(request,'core/info_prest.html')
+    
 
 def home(request):
     publicidades = Publicidad.objects.all()

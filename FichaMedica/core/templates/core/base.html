@@ -168,12 +168,15 @@
   ];
 
   const preguntasMedico = [
-    { q: "¿Cómo apruebo un apto?", r: "Ingresá al registro médico y completá todos los estudios requeridos. Luego hacé clic en 'Aprobar'." },
-    { q: "¿Dónde veo los CUS pendientes?", r: "En tu panel, sección 'CUS' aparecen los pendientes para evaluación." },
-    { q: "¿Puedo agregar comentarios al rechazo?", r: "Sí, antes de rechazar un CUS o apto, podés dejar comentarios explicando los motivos." },
+    { q: "¿Cómo apruebo un apto?", r: "Busca el jugador, hace click en cargar y completá todos los estudios requeridos. Luego en el certificado selecciona 'Aprobar' y guarda el mismo." },
+    { q: "¿Qué hago si el jugador no tiene antecedentes cargados?", r: "podras ver al jugador en el listado pero no podras realizar ninguna accion hasta que el jugador cargue sus antecedentes" },
+     { q: "¿Cómo veo si un apto ya fue aprobado anteriormente?",r: "Desde el panel de jugadores, buscá al paciente y hacé clic en 'Ver ficha'. Si fue aprobado, verás la fecha y el estado final."},
+    { q: "¿Puedo agregar comentarios al rechazo?", r: "Sí, antes de rechazar un CUS o apto, podés dejar comentarios en el campo de observaciones explicando los motivos." },
     { q: "¿Qué pasa si faltan estudios?", r: "No podrás aprobar hasta que estén todos los formularios completos." },
     { q: "¿Qué hago si el certificado de matrícula es inválido?", r: "Verificá el QR automáticamente al subir el documento. Si no es válido, solicitá uno nuevo." },
-    { q: "¿Puedo ver la evolución del paciente?", r: "Sí, tenés acceso al historial médico completo del jugador o estudiante." }
+    { q: "¿Qué pasa si el jugador tiene dos registros activos?", r: "Podés ver ambos registros y aprobarlos individualmente. El sistema mantiene separados los torneos." },
+    { q: "¿Puedo validar estudios desde el celular?", r: "Sí, el sistema está optimizado para dispositivos móviles, aunque se recomienda el uso de escritorio para revisar documentos." },
+
   ];
 
   function esVistaMedico() {
