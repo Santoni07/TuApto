@@ -29,63 +29,51 @@
                         <div id="usuarioExistenteMensaje" class="text-success small" style="display:none;"></div>
                     </div>
 
-                    {% if not form_disabled %}
-                        <div class="card-body">
-                            {% if user_form.errors %}
-                                <div class="alert alert-danger">
-                                    <p>Ocurrió un error al registrar. Por favor, verifica los campos.</p>
-                                </div>
-                            {% endif %}
-                            <form method="post" action="{% url 'register' %}" id="registroForm" onsubmit="return validateForm()">
-                                {% csrf_token %}
+              <div class="card-body">
+                    {% if form_disabled %}
+                        <p class="text-danger text-center">Ya estás registrado con este rol. Por favor, <a href="{% url 'login' %}" style="text-decoration: none;">iniciá sesión aquí</a>.</p>
+                        <div class="text-center mt-3">
+                            <a href="{% url 'home' %}" class="btn btn-outline-primary">Volver al Inicio</a>
+                        </div>
+                    {% else %}
+                        {% if user_form.errors %}
+                            <div class="alert alert-danger">
+                                <p>Ocurrió un error al registrar. Por favor, verifica los campos.</p>
+                            </div>
+                        {% endif %}
+                        <form method="post" action="{% url 'register' %}" id="registroForm" novalidate>
+                            {% csrf_token %}
 
-                                <!-- Email -->
+                            <div class="mb-2 input-field">
+                                <label class="form-label fw-bold">{{ user_form.email.label }}</label>
+                                <div class="input-group">
+                                    {{ user_form.email|add_class:"form-control"|attr:"value:" }}
+                                    <button type="button" class="btn btn-outline-secondary" onclick="verificarEmail()">Verificar</button>
+                                </div>
+                                {% if user_form.email.errors %}
+                                    <div class="text-danger small">{{ user_form.email.errors }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div id="camposExtra" style="display:none;">
                                 <div class="mb-2 input-field">
-                                    <label class="form-label fw-bold">{{ user_form.email.label }}</label>
-                                    <div class="input-group">
-                                        {{ user_form.email|add_class:"form-control"|attr:"value:" }}
-                                        <button type="button" class="btn btn-outline-secondary" onclick="verificarEmail()">Verificar</button>
-                                    </div>
-                                    {% if user_form.email.errors %}
-                                        <div class="text-danger small">{{ user_form.email.errors }}</div>
-                                    {% endif %}
+                                    <label class="form-label fw-bold">{{ user_form.nombre.label }}</label>
+                                    {{ user_form.nombre|add_class:"form-control" }}
                                 </div>
-                                   <!-- Datos personales -->
-                                <div id="camposExtra" style="display:none;">
-                                    <div class="mb-2 input-field">
-                                        <label class="form-label fw-bold">{{ user_form.nombre.label }}</label>
-                                        {{ user_form.nombre|add_class:"form-control" }}
-                                    </div>
-                                    <div class="mb-2 input-field">
-                                        <label class="form-label fw-bold">{{ user_form.apellido.label }}</label>
-                                        {{ user_form.apellido|add_class:"form-control" }}
-                                    </div>
-                                    <div class="mb-2 input-field">
-                                        <label class="form-label fw-bold">{{ user_form.dni.label }}</label>
-                                        {{ user_form.dni|add_class:"form-control" }}
-                                        <div id="dniExistenteMensaje" class="text-danger small mt-1" style="display: none;"></div>
-                                    </div>
-                                    <div class="mb-2 input-field">
-                                        <label class="form-label fw-bold">{{ user_form.fecha_nacimiento.label }}</label>
-                                        {{ user_form.fecha_nacimiento|add_class:"form-control" }}
-                                    </div>
+                                <div class="mb-2 input-field">
+                                    <label class="form-label fw-bold">{{ user_form.apellido.label }}</label>
+                                    {{ user_form.apellido|add_class:"form-control" }}
                                 </div>
-
-                                <!-- Contraseña y Repite Contraseña -->
-                                <div class="mb-2 input-field" id="campoPassword1" style="display:none;">
-                                    <!-- Contraseña -->
-                                    <label class="form-label fw-bold">{{ user_form.password1.label }}</label>
-                                    <div class="input-group mb-2">
-                                        {{ user_form.password1|add_class:"form-control" }}
-                                        <button type="button" class="btn btn-outline-secondary" onclick="togglePassword('id_password1', 'togglePasswordIcon1')">
-                                            <i id="togglePasswordIcon1" class="fa fa-eye"></i>
-                                        </button>
-                                    </div>
-                                    {% if user_form.password1.errors %}
-                                        <div class="text-danger small">{{ user_form.password1.errors }}</div>
-                                    {% endif %}
-
-                                    <!-- Repite contraseña -->
+                                <div class="mb-2 input-field">
+                                    <label class="form-label fw-bold">{{ user_form.dni.label }}</label>
+                                    {{ user_form.dni|add_class:"form-control" }}
+                                    <div id="dniExistenteMensaje" class="text-danger small mt-1" style="display: none;"></div>
+                                </div>
+                                <div class="mb-2 input-field">
+                                    <label class="form-label fw-bold">{{ user_form.fecha_nacimiento.label }}</label>
+                                    {{ user_form.fecha_nacimiento|add_class:"form-control" }}
+                                </div>
+                                <div class="mb-2 input-field">
                                     <label class="form-label fw-bold">{{ user_form.password2.label }}</label>
                                     <div class="input-group">
                                         {{ user_form.password2|add_class:"form-control" }}
@@ -94,30 +82,38 @@
                                         </button>
                                     </div>
                                 </div>
-
-
-
-                                <!-- Términos y condiciones -->
-                                <div class="mb-2 form-check">
-                                    <input type="checkbox" id="termsCheckbox" class="form-check-input">
-                                    <label for="termsCheckbox" class="form-check-label">
-                                        Acepto los <a href="{% url 'terminos_condiciones' %}" style="text-decoration: none;">Términos y Condiciones</a>
-                                    </label>
-                                    <div id="termsError" class="text-danger small d-none">Debe aceptar los términos y condiciones</div>
-                                </div>
-
-                                <!-- Botón enviar -->
-                                <div class="d-grid mt-2">
-                                    <input type="submit" value="Crear cuenta" class="btn btn-primary w-100">
-                                </div>
-                            </form>
-
-                            <div class="mt-3 text-center">
-                                <p>¿Ya tienes una cuenta? <a href="{% url 'login' %}" style="text-decoration: none;">Iniciá sesión aquí</a></p>
-                                <a href="{% url 'home' %}" style="text-decoration: none;">Volver al Inicio</a>
                             </div>
+
+                            <div class="mb-2 input-field" id="campoPassword1" style="display:none;">
+                                <label class="form-label fw-bold">{{ user_form.password1.label }}</label>
+                                <div class="input-group">
+                                    {{ user_form.password1|add_class:"form-control" | attr:"required" }}
+                                    <button type="button" class="btn btn-outline-secondary" onclick="togglePassword('id_password1', 'togglePasswordIcon1')">
+                                        <i id="togglePasswordIcon1" class="fa fa-eye"></i>
+                                    </button>
+                                </div>
+                                {% if user_form.password1.errors %}
+                                    <div class="text-danger small">{{ user_form.password1.errors }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="mb-2 form-check">
+                                <input type="checkbox" id="termsCheckbox" class="form-check-input">
+                                <label for="termsCheckbox" class="form-check-label">Acepto los <a href="{% url 'terminos_condiciones' %}" style="text-decoration: none;">Términos y Condiciones</a></label>
+                                <div id="termsError" class="text-danger small d-none">Debe aceptar los términos y condiciones</div>
+                            </div>
+
+                            <div class="d-grid mt-2">
+                                <input type="submit" value="Crear cuenta" class="btn btn-primary w-100">
+                            </div>
+                        </form>
+
+                        <div class="mt-3 text-center">
+                            <p>¿Ya tienes una cuenta? <a href="{% url 'login' %}" style="text-decoration: none;">Iniciá sesión aquí</a></p>
+                            <a href="{% url 'home' %}" style="text-decoration: none;">Volver al Inicio</a>
                         </div>
                     {% endif %}
+                </div>
                 </div>
             </div>
         </div>

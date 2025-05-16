@@ -176,7 +176,7 @@ def menu_jugador(request):
     except Persona.DoesNotExist:
         return redirect('registrar_persona')
     except Jugador.DoesNotExist:
-        return redirect('registrar_jugador')
+        return redirect('registrar_persona')
 
     # Fichas médicas
     fichas_medicas = RegistroMedico.objects.filter(jugador=jugador).select_related('torneo')
