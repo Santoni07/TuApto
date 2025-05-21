@@ -60,9 +60,8 @@ class AntecedenteEnfermedadesForm(forms.ModelForm):
 class EstudioMedicoForm(forms.ModelForm):
     class Meta:
         model = EstudiosMedico
-        fields = ['tipo_estudio', 'observaciones', 'archivo']  # Elimina el espacio adicional en 'observaciones'
+        fields = ['tipo_estudio', 'observaciones', 'archivo']  
         
-        # Definimos los widgets para personalizar la apariencia de los campos en el formulario
         widgets = {
             'tipo_estudio': forms.Select(attrs={'class': 'form-control'}),  
             'observaciones': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),  

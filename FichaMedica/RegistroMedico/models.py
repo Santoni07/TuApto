@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, date
 import os
 from django.db import models
 from persona.models import  Torneo ,Jugador
@@ -90,7 +90,8 @@ class RegistroMedico(models.Model):
             fichas_a_eliminar.delete()
 
 def default_fecha_caducidad():
-    return datetime.now().date() + timedelta(days=365)  # ✅ Sumar 1 año desde hoy
+    today = datetime.now().date()
+    return date(today.year, 12, 31)
 
 class EstudiosMedico(models.Model):
     TIPO_ESTUDIO = [

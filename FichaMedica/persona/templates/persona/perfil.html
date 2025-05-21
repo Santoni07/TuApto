@@ -1,66 +1,76 @@
 {% extends 'core/base.html' %}
 
 {% block content %}
-    <div class="container mt-4">
-        <h2 class="mb-4">Datos de :  {{ profile.apellido }}  {{ profile.nombre }} </h2>
-        
-        <!-- Mostrar los datos de la persona como una tabla -->
-        <div class="table-responsive">
-            <table class="table table-bordered table-striped">
-                <tbody>
-                    <tr>
-                        <th>Nombre:</th>
-                        <td>{{ profile.nombre }} {{ profile.apellido }}</td>
-                    </tr>
-                    <tr>
-                        <th>DNI:</th>
-                        <td>{{ profile.dni }}</td>
-                    </tr>
-                    <tr>
-                        <th>Email:</th>
-                        <td>{{ profile.email }}</td>
-                    </tr>
-                    <tr>
-                        <th>Fecha de Nacimiento:</th>
-                        <td>{{ profile.fecha_nacimiento }}</td>
-                    </tr>
-                    <tr>
-                        <th>Dirección:</th>
-                        <td>{{ persona.direccion }}</td>
-                    </tr>
-                    <tr>
-                        <th>Teléfono:</th>
-                        <td>{{ persona.telefono }}</td>
-                    </tr>
-                    <tr>
-                        <th>Teléfono Alternativo:</th>
-                        <td>{{ persona.telefono_alternativo }}</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+<div class="container mt-5 mb-5">
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-4">
+            <!-- Título principal -->
+            <h2 class="text-center fw-bold mb-4" style="color: #00A2D3;">Datos Personales</h2>
 
-        <div class="d-flex flex-column align-items-start">
-            <p>Si deseas cambiar tu <strong>email</strong>, haz clic aquí:</p>
-            <a href="{% url 'modificar_email' %}" class="btn btn-primary btn-lg mb-3 w-50">Cambiar Email</a>
-            
-            <p>Si deseas cambiar tu <strong>contraseña</strong>, haz clic aquí:</p>
-            <a href="{% url 'modificar_contrasena' %}" class="btn btn-warning btn-lg w-50 mb-3">Cambiar Contraseña</a>
-            
-        </div>
-        
-        <!-- Botón para regresar -->
-        <div class="mt-3">
-            <p>Para volver al <strong>Menú</strong>, haz clic aquí:</p>
-            {% if profile.rol == 'jugador' %}
-                <a href="{% url 'menu_jugador' %}" class="btn btn-secondary btn-lg w-50">Volver</a>
-            {% elif profile.rol == 'medico' %}
-                <a href="{% url 'medico_home' %}" class="btn btn-secondary btn-lg w-50">Volver</a>
-            {% elif profile.rol == 'representante' %}
-                <a href="{% url 'representante_home' %}" class="btn btn-secondary btn-lg w-50">Volver</a>
-            {% else %}
-                <a href="{% url 'menu_jugador' %}" class="btn btn-secondary btn-lg w-50">Volver</a>
-            {% endif %}
+            <!-- Encabezado celeste -->
+            <div class="bg-info text-white fw-semibold text-center rounded-top py-2">
+                Información Personal
+            </div>
+
+            <!-- Tabla con tus campos originales -->
+            <div class="table-responsive">
+                <table class="table table-bordered m-0">
+                    <tbody class="align-middle">
+                        <tr>
+                            <th class="bg-light text-start" style="width: 40%;">Nombre</th>
+                            <td>{{ profile.nombre }} {{ profile.apellido }}</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light text-start">DNI</th>
+                            <td>{{ profile.dni }}</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light text-start">Email</th>
+                            <td>{{ profile.email }}</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light text-start">Fecha de Nacimiento</th>
+                            <td>{{ profile.fecha_nacimiento }}</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light text-start">Dirección</th>
+                            <td>{{ persona.direccion }}</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light text-start">Teléfono</th>
+                            <td>{{ persona.telefono }}</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light text-start">Teléfono Alternativo</th>
+                            <td>{{ persona.telefono_alternativo }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+           <div class="d-flex justify-content-center mt-4 gap-3 flex-wrap">
+                <!-- Botón Cambiar Contraseña -->
+                <button type="submit" class="btn btn-warning rounded-pill px-4 py-2 fw-bold shadow">
+                    Cambiar Contraseña
+                </button>
+
+                <!-- Botón Modificar Perfil -->
+                <a href="{% url 'modificar_perfil' %}" class="btn btn-info rounded-pill px-4 py-2 fw-bold shadow">
+                    Modificar Perfil
+                </a>
+
+                <!-- Botón Volver (según el rol del usuario) -->
+                {% if profile.rol == 'jugador' %}
+                    <a href="{% url 'menu_jugador' %}" class="btn btn-secondary rounded-pill px-4 py-2 fw-bold shadow">Volver</a>
+                {% elif profile.rol == 'medico' %}
+                    <a href="{% url 'medico_home' %}" class="btn btn-secondary rounded-pill px-4 py-2 fw-bold shadow">Volver</a>
+                {% elif profile.rol == 'representante' %}
+                    <a href="{% url 'representante_home' %}" class="btn btn-secondary rounded-pill px-4 py-2 fw-bold shadow">Volver</a>
+                {% else %}
+                    <a href="{% url 'menu_jugador' %}" class="btn btn-secondary rounded-pill px-4 py-2 fw-bold shadow">Volver</a>
+                {% endif %}
+            </div>
         </div>
     </div>
+</div>
 {% endblock %}

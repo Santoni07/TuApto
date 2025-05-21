@@ -12,7 +12,7 @@ from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from estudiante.models import Estudiante
 from account.models import Profile
-from datetime import datetime
+from datetime import datetime, date
 
 
 class RepresentanteHomeView(LoginRequiredMixin, View):
@@ -110,7 +110,10 @@ class RepresentanteHomeView(LoginRequiredMixin, View):
                             'archivo': estudio.archivo.url if estudio.archivo else None,
                             'observaciones': estudio.observaciones
                         }
-                        for estudio in estudios_medicos
+                        for estudio in EstudiosMedico.objects.filter(
+                            jugador=jugador,
+                            fecha_caducidad__gte=date.today()  
+                        )
                     ],
                 }
 

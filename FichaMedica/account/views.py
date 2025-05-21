@@ -172,7 +172,7 @@ def select_role(request):
             elif profile.rol == "estudiante":
                 return redirect("menu_estudiante")  # Redirige a home_estudiante, no a menu_estudiante directamente
             elif profile.rol == "medico":
-                return redirect("medico_home")
+                return redirect("seleccionar_apto")
             elif profile.rol == "representante":
                 return redirect("representante_home")
             else:

@@ -78,7 +78,7 @@
                 <form method="get" action="{% url 'representante_home' %}" class="row g-3 justify-content-center">
                     <div class="col-md-4">
                         <label for="filter_type" class="form-label fw-bold">Seleccione un Filtro</label>
-                        <select name="filter_type" id="filter_type" class="form-select" onchange="this.form.submit()">
+                        <select name="filter_type" id="filter_type" class="form-select" >
                             <option value="">Seleccionar...</option>
                             <option value="categoria" {% if request.GET.filter_type == 'categoria' %}selected{% endif %}>Categoría</option>
                             <option value="equipo" {% if request.GET.filter_type == 'equipo' %}selected{% endif %}>Equipo</option>
@@ -89,7 +89,7 @@
                   <!-- Filtro de Categoría -->
 <div id="filter-categoria" class="col-md-4 {% if request.GET.filter_type == 'categoria' %}d-block{% else %}d-none{% endif %}">
     <label for="filter_category" class="form-label fw-bold">Categoría</label>
-    <select name="filter_category" id="filter_category" class="form-select" onchange="this.form.submit()">
+    <select name="filter_category" id="filter_category" class="form-select" >
         <option value="">Todas</option>
         {% for categoria in categorias %}
             <option value="{{ categoria.id }}" {% if request.GET.filter_category == categoria.id|stringformat:'s' %}selected{% endif %}>{{ categoria.nombre }}</option>
@@ -100,7 +100,7 @@
 <!-- Nuevo Filtro de Equipos (Dependiente de la Categoría) -->
 <div id="filter-equipo-categoria" class="col-md-4 {% if request.GET.filter_type == 'categoria' and request.GET.filter_category %}d-block{% else %}d-none{% endif %}">
     <label for="filter_team_by_category" class="form-label fw-bold">Equipos por Categoría</label>
-    <select name="filter_team" id="filter_team_by_category" class="form-select" onchange="this.form.submit()">
+    <select name="filter_team" id="filter_team_by_category" class="form-select">
         <option value="">Todos los equipos</option>
         {% for equipo in equipos %}
             <option value="{{ equipo.id }}" {% if request.GET.filter_team == equipo.id|stringformat:'s' %}selected{% endif %}>{{ equipo.nombre }}</option>
@@ -111,7 +111,7 @@
 <!-- Filtro de Equipo Independiente -->
 <div id="filter-equipo" class="col-md-4 {% if request.GET.filter_type == 'equipo' %}d-block{% else %}d-none{% endif %}">
     <label for="filter_team" class="form-label fw-bold">Equipo</label>
-    <select name="filter_team" id="filter_team" class="form-select" onchange="this.form.submit()">
+    <select name="filter_team" id="filter_team" class="form-select">
         <option value="">Seleccionar...</option>
         {% for equipo in equipos %}
             <option value="{{ equipo.id }}" {% if request.GET.filter_team == equipo.id|stringformat:'s' %}selected{% endif %}>{{ equipo.nombre }}</option>
@@ -150,6 +150,7 @@
                             <th>Equipo</th>
                             <th>Torneo</th>
                             <th>Acciones</th>
+                            <th>Estudios Médicos</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -169,10 +170,37 @@
                                         <button class="btn btn-secondary btn-sm" disabled>No Disponible</button>
                                     {% endif %}
                                 </td>
+                                <td>
+                                    {% if jugador.estudios_medicos %}
+                                        <div class="d-flex flex-column gap-2">
+                                            {% for estudio in jugador.estudios_medicos %}
+                                                <div class="d-flex justify-content-between align-items-center flex-wrap">
+                                                    <span class="fw-bold mb-0">{{ estudio.tipo }}</span>
+                                                    <div class="d-flex gap-2">
+                                                        {% if estudio.archivo %}
+                                                            <a href="{{ estudio.archivo }}" target="_blank" class="btn btn-sm btn-outline-success">
+                                                                Ver
+                                                            </a>
+                                                            <a href="{{ estudio.archivo }}" download class="btn btn-sm btn-outline-primary">
+                                                                Descargar
+                                                            </a>
+                                                        {% else %}
+                                                            <span class="text-muted">Sin archivo</span>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        <span class="text-muted">No hay estudios</span>
+                                    {% endif %}
+                                </td>
+
+
                             </tr>
                         {% empty %}
                             <tr>
-                                <td colspan="8" class="text-center">No se encontraron resultados.</td>
+                                <td colspan="9" class="text-center">No se encontraron resultados.</td>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -182,116 +210,6 @@
     </div>
 </main>
 <script>
-   {% comment %}  document.addEventListener('DOMContentLoaded', function () {
-        const filterSections = {
-            equipo: document.getElementById('filter-equipo'),
-            categoria: document.getElementById('filter-categoria'),
-            persona: document.getElementById('filter-persona'),
-        };
-
-        const filterType = document.getElementById('filter_type');
-        const filterCategory = document.getElementById('filter_category');
-        console.log(filter_category)
-        const filterTeamByCategory = document.getElementById('filter_team_by_category');
-        const filterEquipoCategoria = document.getElementById('filter-equipo-categoria');
-        const resultsContainer = document.getElementById('results-container');
-
-        // 🔍 Mostrar la sección seleccionada al cargar la página
-        const initialFilter = filterType ? filterType.value : '';
-        if (filterSections[initialFilter]) {
-            filterSections[initialFilter].classList.remove('d-none');
-        }
-
-        // ✅ Manejar el cambio en el filtro principal
-        if (filterType) {
-            filterType.addEventListener('change', function () {
-                const selectedFilter = this.value;
-                console.log("Filtro seleccionado:", selectedFilter);
-
-                // Ocultar todas las secciones
-                Object.values(filterSections).forEach(section => section.classList.add('d-none'));
-
-                // Mostrar la sección seleccionada
-                if (filterSections[selectedFilter]) {
-                    filterSections[selectedFilter].classList.remove('d-none');
-                }
-
-                // Limpiar resultados si se cambia el filtro
-                if (resultsContainer) {
-                    resultsContainer.innerHTML = '';
-                }
-
-                // Mostrar el menú de equipos si el filtro es "categoría"
-                if (selectedFilter === 'categoria') {
-                    filterEquipoCategoria.classList.remove('d-none');
-                    filterTeamByCategory.innerHTML = '<option value="">Todos los equipos</option>';
-                } else {
-                    filterEquipoCategoria.classList.add('d-none');
-                }
-            });
-        }
-
-        // ✅ Evento: cuando cambia la categoría
-        if (filterCategory) {
-            filterCategory.addEventListener('change', function () {
-                const categoryId = this.value;
-                console.log("Categoría seleccionada:", categoryId);
-
-                // Enviar el formulario automáticamente al seleccionar una categoría
-                this.form.submit();
-
-                // Limpiar resultados anteriores
-                if (resultsContainer) {
-                    resultsContainer.innerHTML = '';
-                }
-
-                // Vaciar el select de equipos
-                filterTeamByCategory.innerHTML = '<option value="">Seleccionar equipo</option>';
-
-                if (categoryId) {
-                    // Solicitud AJAX para obtener los equipos
-                    fetch("{% url 'traer_equipos' %}", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "X-CSRFToken": "{{ csrf_token }}"
-                        },
-                        body: JSON.stringify({ categoria_id: categoryId })
-                    })
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error("Error en la respuesta del servidor");
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            if (data.equipos) {
-                                // Llenar el select de equipos con los datos recibidos
-                                data.equipos.forEach(equipo => {
-                                    const option = document.createElement("option");
-                                    option.value = equipo.id;
-                                    option.textContent = equipo.nombre;
-                                    filterTeamByCategory.appendChild(option);
-                                });
-                            }
-                        })
-                        .catch(error => {
-                            console.error("Error al cargar los equipos:", error);
-                        });
-                }
-            });
-        }
-
-        // ✅ Evento: cuando cambia el equipo seleccionado
-        if (filterTeamByCategory) {
-            filterTeamByCategory.addEventListener('change', function () {
-                const selectedOption = this.options[this.selectedIndex];
-                if (selectedOption.value) {
-                    console.log(`Equipo seleccionado: ${selectedOption.textContent}`);
-                }
-            });
-        }
-    }); {% endcomment %}
 
     document.addEventListener('DOMContentLoaded', function () {
         const filterSections = {

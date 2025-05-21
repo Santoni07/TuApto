@@ -76,19 +76,26 @@
                 </li>
                 {% endif %}  
                   <!-- Condicional para Consentimientos -->
-                  {% if ficha_medica %}
-                  {% for ficha in ficha_medica %}
-                    <li>
-                      <a href="{% url 'registroMedico:consentimiento' ficha.id %}" style="color: white; text-decoration: none; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);"> 
-                        Consentimiento - {{ ficha.torneo__nombre }}
-                      </a>
-                    </li>
-                  {% endfor %}
-                {% else %}
-                  <li>
-                    <p style="color: white;">No hay ficha médica disponible.</p>
-                  </li>
-                {% endif %}
+
+{% if ficha_medica and ficha_medica.0 %}
+  {% if not ficha_medica.0.consentimiento_persona %}
+    <li>
+      <a href="{% url 'registroMedico:consentimiento' ficha_medica.0.id %}" 
+         style="color: white; text-decoration: none; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);">
+        Consentimientos
+      </a>
+    </li>
+  {% else %}
+    <li>
+      <span style="color: white;">Consentimiento otorgado ✅</span>
+    </li>
+  {% endif %}
+{% else %}
+  <li>
+    <p style="color: white;">No hay ficha médica disponible.</p>
+  </li>
+{% endif %}
+
                 </ul>
               </li>
       
@@ -413,40 +420,87 @@
               {% endif %}
             </div>
 
-                   <!-- Mensaje de Bienvenida  -->
+                      <!-- Mensaje de Bienvenida  -->
+                    
                       <div class="container-welcome d-flex justify-content-start" id="welcome" style="margin-top: 0px;">
-                        <div class="p-4 bg-light rounded shadow" style="max-width: 600px; margin-left: 0;margin-top: 80px;">
+                      <div class="p-4 rounded shadow" style="max-width: 900px; margin-left: 0; margin-top: 80px; background-color: rgba(255, 255, 255, 0.85);">
+
                           <h1 class="text-primary mb-3">¡Bienvenido a tu espacio de gestión médica!</h1>
                           <p class="text-secondary fs-5">
                             En esta sección podrás gestionar todos tus datos médicos de manera sencilla y segura.
                             Podrás consultar el estado de tu apto médico, cargar nuevos estudios, revisar tus antecedentes
                             y dar los consentimientos necesarios para participar en los torneos.
                           </p>
+
                           <p class="text-secondary fs-5">
-                            Utiliza el menú de navegación para explorar las distintas opciones.
-                            Estamos aquí para ayudarte a mantener tu salud al día y asegurarte de que estés listo para dar lo mejor en cada competencia.
+                            <strong>Es muy importante que, como primer paso, cargues tus antecedentes de enfermedades.</strong>
+                            Para hacerlo, dirigite al menú superior en la opción <strong>“Datos Médicos”</strong> y hacé clic en 
+                            <strong>“Cargar Antecedentes”</strong>. Una vez que completes ese paso, volvé al mismo menú y hacé clic en 
+                            <strong>“Consentimientos”</strong> para aceptar la autorización correspondiente.
                           </p>
 
-                          <!-- Lógica para mostrar la alerta -->
-                          {% if not antecedentes %}
-                          
-                          <div class="mt-4 d-flex justify-content-between align-items-center alert" 
-                              style="background-color: #e3f7fc; color: #084c61; border: 1px solid #c8e6ef; padding: 20px; border-radius: 8px;">
-                            <!-- Texto a la izquierda -->
-                            <span class="fs-5" style="font-family: 'Nunito Sans', sans-serif;">
-                              
-                              <strong>Recuerda:</strong> Carga tus antecedentes de enfermedades.
-                              <a href="{% url 'registroMedico:cargar_antecedente' jugador_id %}" 
-                              class="btn btn-primary btn-lg" 
-                              style="font-family: 'Nunito Sans', sans-serif; font-weight: 600;">Cargar</a>
-                             
-                            </span>
+                          <p class="text-secondary fs-5">
+                            Recién entonces podrás continuar con la gestión completa de tu apto físico. 
+                            Utilizá el menú de navegación para explorar las distintas opciones. Estamos aquí para ayudarte a mantener tu salud al día
+                            y asegurarte de que estés listo para dar lo mejor en cada competencia.
+                          </p>
 
-                            
-                          {% endif %}
+                       <div class="mt-4">
+
+  {% if not antecedentes %}
+    <div class="alert alert-warning d-flex justify-content-between align-items-center rounded shadow-sm">
+      <div class="me-3">
+        <i class="bi bi-exclamation-triangle-fill text-warning me-2"></i>
+        <strong>Importante:</strong> Debes cargar tus antecedentes de enfermedades antes de continuar.
+      </div>
+      <a href="{% url 'registroMedico:cargar_antecedente' jugador_id %}" class="btn btn-warning fw-bold rounded-pill">
+        Cargar Antecedentes
+      </a>
+    </div>
+  {% endif %}
+
+  {% with mostrado=False %}
+    {% for ficha in ficha_medica_data %}
+      {% if not ficha.consentimiento_persona and not mostrado %}
+        <div class="alert alert-info d-flex justify-content-between align-items-center rounded shadow-sm mt-3">
+          <div class="me-3">
+            <i class="bi bi-info-circle-fill text-info me-2"></i>
+            <strong>Consentimiento pendiente:</strong> Aún no diste consentimiento en al menos uno de tus torneos.
+          </div>
+          <a href="{% url 'registroMedico:consentimiento' ficha.id %}" class="btn btn-info fw-bold rounded-pill text-white">
+            Dar Consentimiento
+          </a>
+        </div>
+        {% with mostrado=True %}{% endwith %}
+      {% endif %}
+    {% endfor %}
+  {% endwith %}
+
+  {% if antecedentes %}
+    {% with consentimiento_completo=True %}
+      {% for ficha in ficha_medica_data %}
+        {% if not ficha.consentimiento_persona %}
+          {% with consentimiento_completo=False %}{% endwith %}
+        {% endif %}
+      {% endfor %}
+      {% if consentimiento_completo %}
+        <div class="alert alert-success d-flex justify-content-between align-items-center rounded shadow-sm">
+          <div class="me-3">
+            <i class="bi bi-check-circle-fill text-success me-2"></i>
+            ¡Todo está en orden! Ya cargaste tus antecedentes y diste los consentimientos necesarios.
+          </div>
+        </div>
+      {% endif %}
+    {% endwith %}
+  {% endif %}
+
+</div>
+
+
 
                         </div>
                       </div> 
+ 
 
                   
                     

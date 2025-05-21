@@ -70,6 +70,7 @@
                         <tr class="text-center">
                             <th scope="col">Tipo de Estudio</th>
                             <th scope="col">Observaciones</th>
+                            <th scope="col">Año</th>
                             <th scope="col">Archivo</th>
                             <th scope="col">Acciones</th>
                         </tr>
@@ -79,6 +80,7 @@
                         <tr class="text-center">
                             <td data-label="Tipo de Estudio" class="fw-bold">{{ estudio.get_tipo_estudio_display }}</td>
                             <td data-label="Observaciones">{{ estudio.observaciones|default_if_none:"S/D" }}</td>
+                            <td data-label="Año">{{ estudio.fecha_creacion|date:"Y" }}</td>
                             <td data-label="Archivo">
                                 {% if estudio.archivo %}
                                     <a href="{{ estudio.archivo.url }}" target="_blank" class="btn btn-primary btn-sm">
@@ -89,9 +91,13 @@
                                 {% endif %}
                             </td>
                             <td data-label="Acciones">
-                                <a href="{% url 'registroMedico:eliminar_estudio' estudio.pk %}" class="btn btn-danger btn-sm">
-                                    <i class="bi bi-trash"></i> Eliminar
-                                </a>
+                                {% if registro_estado != 'APROBADA' %}
+                                    <a href="{% url 'registroMedico:eliminar_estudio' estudio.pk %}" class="btn btn-danger btn-sm">
+                                        <i class="bi bi-trash"></i> Eliminar
+                                    </a>
+                                {% else %}
+                                    <span class="text-muted">No disponible</span>
+                                {% endif %}
                             </td>
                         </tr>
                         {% empty %}

@@ -218,23 +218,28 @@ def oftalmologico_view(request, jugador_id, registro_id):
 def registro_medico_update_view(request, registro_id):
     registro_medico = get_object_or_404(RegistroMedico, id=registro_id)
     jugador = registro_medico.jugador
+    profile_id = request.session.get("user_profile_id")
+    profile = Profile.objects.filter(id=profile_id).first()
 
     if request.method == 'POST':
         print(request.POST)
 
         estado_anterior = registro_medico.estado
         registro_medico_form = RegistroMedicoUpdateForm(request.POST, instance=registro_medico)
-        estudio_medico_form = EstudioMedicoForm(request.POST, request.FILES)
+        if request.method == 'POST' and 'cargar_estudio' in request.POST:
+            estudio_medico_form = EstudioMedicoForm(request.POST, request.FILES)
+        else:
+            estudio_medico_form = EstudioMedicoForm()
 
         # CARGA DE ESTUDIO
-        if 'cargar_estudio' in request.POST and estudio_medico_form.is_valid():
+        if 'cargar_estudio' in request.POST :
             estudio = estudio_medico_form.save(commit=False)
             estudio.jugador = jugador
             estudio.ficha_medica = registro_medico
             estudio.save()
             print(f"✅ Estudio guardado: {estudio.tipo_estudio} - ID: {estudio.idestudio}")
             messages.success(request, "✅ Estudio médico cargado exitosamente.")
-            return redirect('registro_medico_update', registro_id=registro_medico.id)
+            return redirect('registro_medico_update_view', registro_id=registro_medico.id)
 
         # GUARDAR SOLO REGISTRO
         elif 'guardar_registro' in request.POST and registro_medico_form.is_valid():
@@ -327,6 +332,8 @@ def registro_medico_update_view(request, registro_id):
 
             print("🛑 Errores en EstudioMedicoForm:")
             print(estudio_medico_form.errors)
+            print("🧨 RegistroMedicoForm errors:", registro_medico_form.errors)
+            print("🧨 EstudioMedicoForm errors:", estudio_medico_form.errors)
             messages.error(request, "❌ Error al procesar el formulario.")
 
     else:
@@ -340,6 +347,7 @@ def registro_medico_update_view(request, registro_id):
 
     context = {
         'jugador': jugador,
+        'profile': profile,
         'registro_medico': registro_medico,
         'registro_medico_form': registro_medico_form,
         'estudio_medico_form': estudio_medico_form,
@@ -398,7 +406,10 @@ def registro_medico_update_view(request, registro_id):
                 'archivo': estudio.archivo.url if estudio.archivo else None,
                 'observaciones': estudio.observaciones,
             }
-            for estudio in EstudiosMedico.objects.filter(jugador=jugador)
+              for estudio in EstudiosMedico.objects.filter(
+        jugador=jugador,
+        fecha_caducidad__gte=date.today()  # ✅ sólo los vigentes
+    )
         ],
         'electro_basal_form': ElectroBasalForm(instance=ElectroBasal.objects.filter(ficha_medica=registro_medico).first() or ElectroBasal(ficha_medica=registro_medico)),
         'electro_esfuerzo_form': ElectroEsfuerzoForm(instance=ElectroEsfuerzo.objects.filter(ficha_medica=registro_medico).first() or ElectroEsfuerzo(ficha_medica=registro_medico)),

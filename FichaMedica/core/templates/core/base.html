@@ -59,9 +59,12 @@
                             <ul class="navbar-nav ms-auto align-items-center">
                                 {% if request.path != '/account/login/' %}
                                     {% if user.is_authenticated %}
+
+                                        {% if request.path != '/account/select_role/' %}
                                         <li class="nav-item me-3">
                                             <a href="{% url 'perfil' %}" class="nav-link active">Perfil</a>
                                         </li>
+                                        {% endif %}
                                         <li class="nav-item me-3">
                                             <button type="button" class="btn btn-link nav-link" data-bs-toggle="modal" data-bs-target="#logoutModal">
                                                 Salir

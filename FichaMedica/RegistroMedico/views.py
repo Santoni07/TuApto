@@ -219,6 +219,7 @@ class CargarEstudioView(LoginRequiredMixin, CreateView):
         return reverse_lazy('medico_home')  # Fallback en caso de problemas
 
 # ✅ Listar estudios médicos filtrados por JUGADOR
+
 class EstudiosMedicoListView(ListView):
     model = EstudiosMedico
     template_name = 'registro_medico/estudios_list.html'
@@ -226,7 +227,17 @@ class EstudiosMedicoListView(ListView):
 
     def get_queryset(self):
         jugador_id = self.kwargs.get('jugador_id')
+        self.jugador_id = jugador_id  # guardamos para usar en el contexto
         return EstudiosMedico.objects.filter(jugador__id=jugador_id)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Obtener el registro médico actual para el jugador
+        registro = RegistroMedico.objects.filter(jugador_id=self.jugador_id).order_by('-fecha_de_llenado').first()
+
+        context['registro_estado'] = registro.estado if registro else 'SIN_REGISTRO'
+        return context
 
 # ✅ Eliminar un estudio médico
 class EliminarEstudioView(DeleteView):

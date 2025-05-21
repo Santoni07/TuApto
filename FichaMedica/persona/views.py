@@ -181,10 +181,11 @@ def menu_jugador(request):
     # Fichas médicas
     fichas_medicas = RegistroMedico.objects.filter(jugador=jugador).select_related('torneo')
     fichas_medicas_data = list(fichas_medicas)
+    ficha_medica_primera = fichas_medicas.first()
 
     # Antecedentes
     antecedentes = AntecedenteEnfermedades.objects.filter(jugador=jugador).first()  # uno solo porque es OneToOneField
-
+    faltan_consentimientos = any(not ficha.consentimiento_persona for ficha in fichas_medicas_data)
     # Categorías y Equipos
     jugador_categoria_equipos = JugadorCategoriaEquipo.objects.select_related(
         'categoria_equipo__categoria__torneo',
@@ -233,6 +234,8 @@ def menu_jugador(request):
         'antecedentes': antecedentes,
         'ficha_medica': fichas_medicas,
         'ficha_medica_data': fichas_medicas_data,
+        'faltan_consentimientos': faltan_consentimientos,
+        'ficha_medica_primera': ficha_medica_primera,
     }
 
     return render(request, 'persona/menu_jugador.html', context)
@@ -241,14 +244,16 @@ def menu_jugador(request):
 
 
 
+@login_required
 def modificar_perfil(request):
-    profile = request.user.profile
+    profile_id = request.session.get("user_profile_id")
+    profile = Profile.objects.filter(id=profile_id).first()
+
+    if not profile:
+        return HttpResponse("No se pudo cargar el perfil.", status=404)
+
     persona = getattr(profile, 'persona', None)
-    
-    # Obtener el jugador asociado a la persona
-    jugador = None
-    if persona:
-        jugador = getattr(persona, 'jugador', None)
+    jugador = getattr(persona, 'jugador', None) if persona else None
 
     if request.method == 'POST':
         form_persona = PersonaForm(request.POST, instance=persona)
@@ -264,8 +269,9 @@ def modificar_perfil(request):
 
     return render(request, 'persona/modificar_perfil.html', {
         'form_persona': form_persona,
-        'form_jugador': form_jugador,  # Pasar el formulario del jugador al contexto
-        'jugador': jugador  # Pasa el objeto jugador al contexto
+        'form_jugador': form_jugador,
+        'jugador': jugador,
+        'profile': profile,  # lo agregamos por si lo usás en el template
     })
 
 
@@ -329,12 +335,17 @@ def cambiar_contraseña(request):
     if request.method == 'POST':
         form = CustomPasswordChangeForm(request.user, request.POST)
         if form.is_valid():
-            user = form.save()  # Guarda el nuevo password
-            update_session_auth_hash(request, user)  # Mantener la sesión activa después de cambiar la contraseña
-            messages.success(request, '¡Contraseña cambiada con éxito!')  # Agregar mensaje de éxito
-            return redirect('perfil')  # Redirigir al perfil o donde desees
+            user = form.save()
+            update_session_auth_hash(request, user)
+            request.session['password_changed'] = True  # ⚠️ Marca en la sesión
+            return redirect('modificar_contrasena')  # Redirigimos a sí misma para mostrar modal
     else:
         form = CustomPasswordChangeForm(request.user)
+
+    # Verificamos si debe mostrarse el modal
+    if request.session.get('password_changed'):
+        messages.success(request, '¡Contraseña cambiada con éxito!')
+        del request.session['password_changed']
 
     return render(request, 'persona/modificar_contrasena.html', {'form': form})
 

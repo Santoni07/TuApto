@@ -247,9 +247,9 @@
                         <div id="estudios-medicos-{{ jugador.id }}" class="card-body"
                         style="{% if jugador.id|stringformat:"s" == jugador_id %}display: block;{% else %}display: none;{% endif %}">
                             <!-- Mostrar Estudios Existentes -->
-                            {% for estudio in jugador.estudios_medicos.all %}
+                            {% for estudio in estudios_medicos %}
                             <div class="mb-2">
-                                <strong>Tipo: </strong>{{  estudio.get_tipo_estudio_display }}
+                                <strong>Tipo: </strong> {{ estudio.tipo }}
                                 {% if estudio.archivo %}
                                 <a href="{{ estudio.archivo }}" target="_blank" class="btn btn-link">Ver archivo</a>
                                 <!-- Botón Eliminar -->
@@ -737,7 +737,7 @@
                             <p>Firma y sello del Médico:</p>
                             <div class="form-group">
                                 <label for="firma">Firma:</label>
-                                <input type="text" class="form-control" id="firma" name="firma" value="{{ user.profile.nombre }} {{ user.profile.apellido }}" readonly>
+                                <input type="text" class="form-control" id="firma" name="firma" value="{{ profile.nombre }} {{ profile.apellido }}" readonly>
                             </div>
 
                             <p>Esta certificación tiene validez por el año en curso a partir de la fecha de emisión y es válida sin enmiendas solo en original.</p>
@@ -749,7 +749,7 @@
                                     {% if electrocardiograma_cargado and ergonometria_cargado %}
                                         <!-- Habilitar botón Guardar -->
                                         <div class="d-flex justify-content-center mt-3">
-                                            <button type="submit" id="guardarFichaBtn" class="btn btn-primary w-50">Guardar</button>
+                                            <button type="submit" id="guardarFichaBtn"  name="guardar_ficha_completa" class="btn btn-primary w-50">Guardar</button>
                                         </div>
                                     {% else %}
                                         <!-- Mostrar mensajes de faltantes -->

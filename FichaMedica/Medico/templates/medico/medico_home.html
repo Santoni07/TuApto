@@ -207,13 +207,13 @@
                                                         <a href="{% url 'registro_medico_update_view' jugador.registro_id %}" 
                                                         class="btn btn-warning btn-seleccionar"
                                                         onclick="window.location.href=this.href; return false;">
-                                                        Cargar Ficha {{ jugador.registro_id }}
+                                                        Cargar Ficha 
                                                         </a>
                                                      
                                                         {% elif jugador.estado == "APROBADA" %}
                                                             <a href="{% url 'ficha_medica' jugador.registro_id %}" 
                                                             class="btn btn-success">
-                                                            Ver Ficha {{ jugador.registro_id }}
+                                                            Ver Ficha
                                                             </a>
                                                         {% endif %}
                                                     {% else %}
