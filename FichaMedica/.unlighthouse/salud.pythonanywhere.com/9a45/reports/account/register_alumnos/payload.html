@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Registro</title>
+    
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+
+    <!-- Favicons -->
+
+    <link href="/static/core/img/milogo.jpg" rel="icon" >
+
+<!-- Fuente Poppins -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+    <script src="/static/core/js/main.js"></script>
+    
+    <script src="/static/core/js/form_medico.js"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect">
+    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&family=Poppins:wght@100;200;300;400;500;600;700;800;900&family=Raleway:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Vendor CSS Files -->
+    <link href="/static/core/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/core/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="/static/core/vendor/aos/aos.css" rel="stylesheet">
+    <link href="/static/core/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+    <link href="/static/core/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Main CSS File -->
+    <link href="/static/core/css/main.css" rel="stylesheet">
+</head>
+
+<body class="index-page">
+  
+    
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<div class="container-fluid vh-100 d-flex align-items-center justify-content-center m-0 p-0">
+    <div class="row w-100 h-100 g-0">
+        <div class="col-md-7 d-none d-md-flex align-items-center justify-content-center bg-light h-100">
+            <img src="/static/core/img/login.jpeg" alt="Aptos médicos" class="img-fluid w-100 h-100 object-fit-cover opacity-75">
+        </div>
+
+        <div class="col-12 col-md-5 d-flex flex-column align-items-center justify-content-center border-start bg-white h-100 p-3 p-md-4">
+            <div class="card p-3 p-md-4 shadow-lg w-100" style="max-height: 80vh; border-radius: 10px; border: none; max-width: 80%; overflow-y: auto;">
+                <div class="text-center">
+                    <img src="/static/core/img/milogo3.png" alt="Logo" style="width: 90px;">
+                    <h1 class="mt-2">CHECKEATE</h1>
+                </div>
+                <div class="card-header text-center bg-white border-0">
+                    <h4 class="fw-bold">¡Regístrate ahora!</h4>
+                    <p class="text-muted small">Completa los datos para crear tu cuenta y gestionar tus <strong>CUS ONLINE</strong>.</p>
+                    <p class="text-muted small">Vamos a verificar tu Email.</p>
+                    <div id="usuarioExistenteMensaje" class="text-success small" style="display:none;"></div>
+                </div>
+
+                <div class="card-body">
+                    
+                        
+                        <form method="post" action="/account/register_alumnos/" id="registroForm" novalidate>
+                            <input type="hidden" name="csrfmiddlewaretoken" value="y38V7LGifoZahXk9PecmHOA6lfPSBpxpG64MTrMERbLfWd74ImreqUcdDdPv55ji">
+
+                            <div class="mb-2 input-field">
+                                <label class="form-label fw-bold">Email</label>
+                                <div class="input-group">
+                                    <input type="email" name="email" maxlength="254" value="" class="form-control" required id="id_email">
+                                    <button type="button" class="btn btn-outline-secondary" onclick="verificarEmail()">Verificar</button>
+                                </div>
+                                
+                            </div>
+
+                            <div id="camposExtra" style="display:none;">
+                                <div class="mb-2 input-field">
+                                    <label class="form-label fw-bold">Nombre</label>
+                                    <input type="text" name="nombre" maxlength="30" class="form-control" id="id_nombre">
+                                </div>
+                                <div class="mb-2 input-field">
+                                    <label class="form-label fw-bold">Apellido</label>
+                                    <input type="text" name="apellido" maxlength="30" class="form-control" id="id_apellido">
+                                </div>
+                                <div class="mb-2 input-field">
+                                    <label class="form-label fw-bold">Dni</label>
+                                    <input type="text" name="dni" maxlength="15" class="form-control" id="id_dni">
+                                    <div id="dniExistenteMensaje" class="text-danger small mt-1" style="display: none;"></div>
+                                </div>
+                                <div class="mb-2 input-field">
+                                    <label class="form-label fw-bold">Fecha de Nacimiento</label>
+                                    <input type="date" name="fecha_nacimiento" class="form-control form-control" required id="id_fecha_nacimiento">
+                                </div>
+                                <div class="mb-2 input-field">
+                                    <label class="form-label fw-bold">Repite Contraseña</label>
+                                    <div class="input-group">
+                                        <input type="password" name="password2" class="form-control" required id="id_password2">
+                                        <button type="button" class="btn btn-outline-secondary" onclick="togglePassword('id_password2', 'togglePasswordIcon2')">
+                                            <i id="togglePasswordIcon2" class="fa fa-eye"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-2 input-field" id="campoPassword1" style="display:none;">
+                                <label class="form-label fw-bold">Contraseña</label>
+                                <div class="input-group">
+                                    <input type="password" name="password1" required class="form-control" id="id_password1">
+                                    <button type="button" class="btn btn-outline-secondary" onclick="togglePassword('id_password1', 'togglePasswordIcon1')">
+                                        <i id="togglePasswordIcon1" class="fa fa-eye"></i>
+                                    </button>
+                                </div>
+                                
+                            </div>
+
+                            <div class="mb-2 form-check">
+                                <input type="checkbox" id="termsCheckbox" class="form-check-input">
+                                <label for="termsCheckbox" class="form-check-label">Acepto los <a href="/account/terminos_condiciones/" style="text-decoration: none;">Términos y Condiciones</a></label>
+                                <div id="termsError" class="text-danger small d-none">Debe aceptar los términos y condiciones</div>
+                            </div>
+
+                            <div class="d-grid mt-2">
+                                <input type="submit" value="Crear cuenta" class="btn btn-primary w-100">
+                            </div>
+                        </form>
+
+                        <div class="mt-3 text-center">
+                            <p>¿Ya tienes una cuenta? <a href="/account/login/" style="text-decoration: none;">Iniciá sesión aquí</a></p>
+                            <a href="/" style="text-decoration: none;">Volver al Inicio</a>
+                        </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function verificarEmail() {
+    const emailInput = document.querySelector('input[name="email"]');
+    const email = emailInput.value;
+    const camposExtra = document.getElementById("camposExtra");
+    const password1 = document.getElementById("campoPassword1");
+    const mensaje = document.getElementById("usuarioExistenteMensaje");
+
+    if (!email) return;
+
+    fetch(`/account/verificar-email/?email=${email}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.existe) {
+                camposExtra.style.display = "none";
+                password1.style.display = "block";
+                mensaje.style.display = "block";
+                mensaje.textContent = "Este correo ya está registrado. Ingresá tu contraseña para gestionar tu cuenta.";
+            } else {
+                camposExtra.style.display = "block";
+                password1.style.display = "block";
+                mensaje.style.display = "none";
+            }
+        });
+}
+
+function togglePassword(fieldId, iconId) {
+    const passwordField = document.getElementById(fieldId);
+    const icon = document.getElementById(iconId);
+
+    if (passwordField.type === 'password') {
+        passwordField.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+    } else {
+        passwordField.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+    }
+}
+
+
+    document.addEventListener("DOMContentLoaded", function () {
+        console.log("✅ DOM completamente cargado");
+
+        const form = document.getElementById("registroForm");
+        const checkbox = document.getElementById("termsCheckbox");
+        const error = document.getElementById("termsError");
+
+        if (form) {
+            form.addEventListener("submit", function (e) {
+                console.log("🧪 Validando checkbox...");
+                console.log("➡️ Checkbox marcado:", checkbox.checked);
+
+                if (!checkbox.checked) {
+                    error.classList.remove("d-none");
+                    e.preventDefault();
+                } else {
+                    error.classList.add("d-none");
+                }
+            });
+        }
+    });
+
+</script>
+    <script>
+function verificarDni() {
+    const dniInput = document.querySelector('input[name="dni"]');
+    const dni = dniInput.value;
+    const dniMensaje = document.getElementById("dniExistenteMensaje");
+
+    if (!dni) return;
+
+    fetch(`/account/verificar-dni/?dni=${dni}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.existe) {
+                dniMensaje.style.display = "block";
+                dniMensaje.textContent = "Este DNI ya está registrado.";
+            } else {
+                dniMensaje.style.display = "none";
+                dniMensaje.textContent = "";
+            }
+        });
+}
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const dniInput = document.querySelector('input[name="dni"]');
+    dniInput.addEventListener("blur", verificarDni);
+});
+</script>
+
+<style>
+@media (min-width: 768px) {
+    .input-field {
+        margin-bottom: 0.5rem;
+    }
+}
+
+@media (max-width: 767px) {
+    .input-field {
+        margin-bottom: 1.5rem;
+    }
+    .card {
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+}
+</style>
+
+<!-- ✅ Chatbot Flotante estilo WhatsApp con flujo secuencial -->
+
+<!-- Botón flotante -->
+<div id="chatbot-boton" onclick="abrirChat()" class="btn btn-success rounded-circle d-flex justify-content-center align-items-center" style="position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; z-index: 1050;">
+    <i class="bi bi-chat-dots" style="font-size: 1.5rem;"></i>
+  </div>
+
+  <!-- Contenedor del Chatbot -->
+  <div id="chatbot-contenedor" class="card shadow-sm" style="position: fixed; bottom: 90px; right: 20px; width: 320px; display: none; z-index: 1050;">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+      <span>¿Necesitás ayuda?</span>
+      <button class="btn-close btn-close-white" onclick="cerrarChat()"></button>
+    </div>
+    <div class="card-body">
+      <!-- Paso 1: Pregunta inicial -->
+      <div id="paso1">
+        <p>¿Necesitás ayuda?</p>
+        <div class="d-flex gap-2">
+          <button class="btn btn-outline-primary btn-sm w-100" onclick="siguientePaso(2)">Sí</button>
+          <button class="btn btn-outline-secondary btn-sm w-100" onclick="cerrarChat()">No</button>
+        </div>
+      </div>
+
+      <!-- Paso 2: Selección de tipo de usuario -->
+      <div id="paso2" style="display: none;">
+        <p>¿Sos Tutor o Jugador?</p>
+        <div class="d-flex gap-2">
+          <button class="btn btn-outline-info btn-sm w-100" onclick="mostrarPreguntas('tutor')">Tutor</button>
+          <button class="btn btn-outline-success btn-sm w-100" onclick="mostrarPreguntas('jugador')">Jugador</button>
+        </div>
+      </div>
+
+      <!-- Paso 3: Lista de preguntas -->
+      <div id="preguntas-container" style="display: none;">
+        <p class="fw-bold" id="titulo-preguntas"></p>
+        <ul class="list-group list-group-flush" id="lista-preguntas"></ul>
+        <div id="respuesta" class="alert alert-info mt-3 d-none"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+<script>
+  const preguntasTutor = [
+    { q: "¿Cómo creo un nuevo CUS?", r: "Desde el panel de tutor, seleccioná al estudiante y hacé clic en 'Nuevo CUS'." },
+    { q: "¿Qué pasa si el CUS está vencido?", r: "Podés cargar uno nuevo, y el sistema traerá los datos anteriores." },
+    { q: "¿Dónde veo los antecedentes cargados?", r: "En la ficha del estudiante, sección 'Antecedentes Médicos'." },
+    { q: "¿Puedo actualizar antecedentes?", r: "Sí, solo si el CUS está vencido. Se habilita automáticamente." },
+    { q: "¿Qué estudios puedo cargar?", r: "Laboratorio, oftalmológico, torax, entre otros." },
+    { q: "¿Cuántas actualizaciones tiene el CUS?", r: "Hasta 5 actualizaciones. Luego se marca como vencido." },
+    { q: "¿Puedo ver el PDF del CUS?", r: "Sí, una vez aprobado podés descargarlo." },
+    { q: "¿Qué pasa si falta un formulario?", r: "No se puede guardar el CUS hasta completar todos los formularios." },
+    { q: "¿Puedo contactar al médico?", r: "Sí, desde el panel del estudiante verás los datos del médico asignado." },
+    { q: "¿Qué hago si el CUS fue rechazado?", r: "Revisá los comentarios del rechazo y corregilo para reenviarlo." }
+  ];
+
+  const preguntasJugador = [
+    { q: "¿Cómo subo mis estudios médicos?", r: "Desde tu panel, clic en 'Cargar estudios' y adjuntá los archivos." },
+    { q: "¿Qué pasa si me rechazan un estudio?", r: "El médico dejará un comentario. Subí una nueva versión." },
+    { q: "¿Cuánto dura un apto físico?", r: "Hasta el 31 de diciembre del año en curso." },
+    { q: "¿Dónde veo si mi apto fue aprobado?", r: "En tu panel, el estado se muestra junto al nombre del torneo." },
+    { q: "¿Puedo descargar mi apto físico?", r: "Sí, una vez aprobado podés descargarlo como PDF." },
+    { q: "¿Qué estudios son obligatorios?", r: "Depende del torneo, usualmente laboratorio y cardiovascular." },
+    { q: "¿Puedo usar el mismo apto para varios torneos?", r: "Sí, si está vigente y es aceptado por cada organización." },
+    { q: "¿Quién ve mis estudios?", r: "Solo médicos autorizados y organizadores del torneo." },
+    { q: "¿Puedo subir estudios desde el celular?", r: "Sí, la plataforma es compatible con dispositivos móviles." },
+    { q: "¿Qué pasa si tengo varias fichas en curso?", r: "Podés gestionarlas por separado, cada una vinculada a su torneo." }
+  ];
+
+  const preguntasMedico = [
+    { q: "¿Cómo apruebo un apto?", r: "Busca el jugador, hace click en cargar y completá todos los estudios requeridos. Luego en el certificado selecciona 'Aprobar' y guarda el mismo." },
+    { q: "¿Cómo veo si un apto ya fue aprobado anteriormente?",r: "Desde el panel de jugadores, buscá al paciente y hacé clic en 'Ver ficha'. Si fue aprobado, verás la fecha y el estado final."},
+    { q: "¿Qué debo revisar antes de aprobar un CUS?",r: "Verificá que todos los formularios estén completos, firmados y sin observaciones pendientes."},
+    { q: "¿Qué hago si el jugador no tiene antecedentes cargados?", r: "podras ver al jugador en el listado pero no podras realizar ninguna accion hasta que el jugador cargue los antecedentes" },
+    { q: "¿Puedo agregar comentarios al rechazo?", r: "Sí, antes de rechazar un CUS o apto, podés dejar comentarios en el campo de observaciones explicando los motivos." },
+    { q: "¿Qué pasa si faltan estudios?", r: "No podrás aprobar hasta que estén todos los formularios completos." },
+    { q: "¿Qué hago si el certificado de matrícula es inválido?", r: "Verificá el QR automáticamente al subir el documento. Si no es válido, solicitá uno nuevo." },
+    { q: "¿Qué pasa si el jugador tiene dos registros activos?", r: "Podés ver ambos registros y aprobarlos individualmente. El sistema mantiene separados los torneos." },
+    { q: "¿Puedo validar estudios desde el celular?", r: "Sí, el sistema está optimizado para dispositivos móviles, aunque se recomienda el uso de escritorio para revisar documentos." },
+
+  ];
+
+  function esVistaMedico() {
+    const path = window.location.pathname;
+    const rutasMedico = [
+      "/medico/medico_home/",
+      "/medico/cus_home/",
+      "/medico/seleccionar_apto/",
+      "/medico/documentacion/cargar/",
+      "/medico/contrato/",
+    ];
+    return (
+      rutasMedico.some(r => path.startsWith(r)) ||
+      path.includes("registro_medico_update") ||
+      path.includes("/cus/")
+    );
+  }
+
+  function abrirChat() {
+    document.getElementById("chatbot-contenedor").style.display = "block";
+    document.getElementById("chatbot-boton").style.display = "none";
+
+    if (esVistaMedico()) {
+      mostrarPreguntas("medico");
+      const paso1 = document.getElementById("paso1");
+      const paso2 = document.getElementById("paso2");
+      if (paso1) paso1.style.display = "none";
+      if (paso2) paso2.style.display = "none";
+    }
+  }
+
+  function cerrarChat() {
+    document.getElementById("chatbot-contenedor").style.display = "none";
+    document.getElementById("chatbot-boton").style.display = "flex";
+    const paso1 = document.getElementById("paso1");
+    const paso2 = document.getElementById("paso2");
+    if (paso1) paso1.style.display = "block";
+    if (paso2) paso2.style.display = "none";
+    document.getElementById("preguntas-container").style.display = "none";
+    document.getElementById("respuesta").classList.add("d-none");
+  }
+
+  function siguientePaso(paso) {
+    if (esVistaMedico()) {
+      mostrarPreguntas("medico");
+      return;
+    }
+    document.getElementById("paso1").style.display = paso === 1 ? "block" : "none";
+    document.getElementById("paso2").style.display = paso === 2 ? "block" : "none";
+    document.getElementById("preguntas-container").style.display = "none";
+    document.getElementById("respuesta").classList.add("d-none");
+  }
+
+  function mostrarPreguntas(tipo) {
+    let preguntas;
+    if (tipo === 'tutor') {
+      preguntas = preguntasTutor;
+    } else if (tipo === 'jugador') {
+      preguntas = preguntasJugador;
+    } else if (tipo === 'medico') {
+      preguntas = preguntasMedico;
+    } else {
+      console.warn("Tipo de usuario no reconocido:", tipo);
+      return;
+    }
+
+    const lista = document.getElementById("lista-preguntas");
+    const titulo = document.getElementById("titulo-preguntas");
+    const paso1 = document.getElementById("paso1");
+    const paso2 = document.getElementById("paso2");
+    const preguntasContainer = document.getElementById("preguntas-container");
+
+    if (!lista || !titulo || !paso1 || !preguntasContainer) {
+      console.error("Elementos del DOM no encontrados.");
+      return;
+    }
+
+    lista.innerHTML = "";
+    preguntas.forEach((item) => {
+      const li = document.createElement("li");
+      li.className = "list-group-item list-group-item-action";
+      li.style.cursor = "pointer";
+      li.textContent = item.q;
+      li.onclick = () => mostrarRespuesta(item.r);
+      lista.appendChild(li);
+    });
+
+    titulo.textContent =
+      tipo === 'tutor' ? "Preguntas frecuentes para Tutores" :
+      tipo === 'jugador' ? "Preguntas frecuentes para Jugadores" :
+      "Preguntas frecuentes para Médicos";
+
+    if (paso1) paso1.style.display = "none";
+    if (paso2) paso2.style.display = "none";
+    preguntasContainer.style.display = "block";
+  }
+
+  function mostrarRespuesta(texto) {
+    const div = document.getElementById("respuesta");
+    if (div) {
+      div.textContent = texto;
+      div.classList.remove("d-none");
+    }
+  }
+  document.addEventListener("click", function (event) {
+  const chatContenedor = document.getElementById("chatbot-contenedor");
+  const chatBoton = document.getElementById("chatbot-boton");
+
+  if (!chatContenedor || !chatBoton) return;
+
+  // Si el clic fue fuera del chatbot y del botón flotante, cerrarlo
+  if (!chatContenedor.contains(event.target) && !chatBoton.contains(event.target)) {
+    if (chatContenedor.style.display === "block") {
+      cerrarChat();
+    }
+  }
+});
+</script>
+
+
+    
+     
+
+    
+
+
+    <!-- Modal de confirmación de cierre de sesión -->
+    <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="logoutModalLabel">Cerrar Sesión</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    ¿Estás seguro de que deseas cerrar sesión?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <form method="POST" action="/account/logout/" class="d-inline" id="logout-form">
+                        <input type="hidden" name="csrfmiddlewaretoken" value="y38V7LGifoZahXk9PecmHOA6lfPSBpxpG64MTrMERbLfWd74ImreqUcdDdPv55ji">
+                        <button type="submit" class="btn btn-danger">Cerrar Sesión</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vendor JS Files -->
+    <script src="/static/core/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/core/vendor/aos/aos.js"></script>
+    <script src="/static/core/vendor/glightbox/js/glightbox.min.js"></script>
+    <script src="/static/core/vendor/swiper/swiper-bundle.min.js"></script>
+
+    <!-- Main JS File -->
+
+</body>
+
+</html>

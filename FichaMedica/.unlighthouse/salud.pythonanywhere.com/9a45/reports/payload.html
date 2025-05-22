@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Salud - Aptos
+Físicos</title>
+    
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+
+    <!-- Favicons -->
+
+    <link href="/static/core/img/milogo.jpg" rel="icon" >
+
+<!-- Fuente Poppins -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+    <script src="/static/core/js/main.js"></script>
+    
+    <script src="/static/core/js/cierreSesion.js"></script>
+  
+    <script src="/static/core/js/form_medico.js"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect">
+    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&family=Poppins:wght@100;200;300;400;500;600;700;800;900&family=Raleway:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Vendor CSS Files -->
+    <link href="/static/core/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/core/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="/static/core/vendor/aos/aos.css" rel="stylesheet">
+    <link href="/static/core/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+    <link href="/static/core/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Main CSS File -->
+    <link href="/static/core/css/main.css" rel="stylesheet">
+</head>
+
+<body class="index-page">
+  
+    <header id="header" class="header d-flex align-items-center sticky-top">
+        <div class="container-fluid position-relative d-flex align-items-center justify-content-between">
+
+                <a href="/" class="logo d-flex align-items-center me-auto me-xl-0">
+                    <img src="/static/core/img/milogo3.png" alt="Logo"  >
+                    <h1 class="sitename" >CHECKEATE</h1>
+                </a>
+
+                <nav id="navmenu" class="navbar navbar-expand-lg navbar-light bg-white">
+                    <div class="container-fluid">
+                        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
+                        <div class="collapse navbar-collapse" id="navbarNav">
+                            <ul class="navbar-nav ms-auto align-items-center">
+                                
+                                    
+                                        <li class="nav-item me-3">
+                                            <a href="/account/login/" class="nav-link">Iniciar Sesión</a>
+                                        </li>
+
+                                    
+                                
+                            </ul>
+                        </div>
+                    </div>
+                </nav>
+
+
+        </div>
+    </header>
+    
+    
+
+<style>
+  /* Estilos para los botones del carrusel */
+  .black-controls {
+    background-color: white !important; /* Fondo negro */
+    border: none; /* Sin bordes */
+    opacity: 0.4; /* Transparencia opcional */
+  }
+  .carousel-indicators button {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: #009fe3; /* Color azul, ajústalo a tu necesidad */
+    border: none;
+    margin: 0 5px;
+  }
+
+  .carousel-indicators .active {
+    background-color: #0056b3; /* Color más oscuro para la bolita activa */
+  }
+
+  .carousel-indicators {
+    bottom: 50px; /* Ajusta la posición de las bolitas si es necesario */
+    position: absolute;
+    bottom: 20px; /* Ajusta la posición vertical */
+    left: 50%;
+    transform: translateX(100%);
+    transform: translateY(-200%);
+    z-index: 10; /* Asegura que estén por encima de las imágenes */
+  }
+  .black-controls:hover {
+    opacity: 1; /* Sin transparencia */
+  }
+
+  /* Iconos dentro de los botones */
+  .black-controls .carousel-control-prev-icon,
+  .black-controls .carousel-control-next-icon {
+    filter: invert(1); /* Cambia el color del ícono a blanco */
+  }
+  /* Contenedor principal */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  /* Hace que el carrusel ocupe todo el ancho y alto */
+
+
+
+  /* Sección Hero */
+  .hero-section {
+    background-color: #0288d1; /* Color de fondo del Hero */
+    color: white;
+    padding: 40px 0;
+    text-align: center;
+  }
+
+  /* Contenedor principal */
+  .options-section {
+    background-color: #f4f4f4;
+    padding: 0px;
+  }
+
+  .options-container {
+    display: flex; /* Flexbox para alinear los bloques horizontalmente */
+    max-width: 100%; /* Ocupa todo el ancho */
+  }
+
+  /* Estilo de los bloques */
+  .option {
+    font-family: Nunito !important;
+    flex: 1; /* Todos los bloques tienen el mismo tamaño */
+    text-align: center; /* Centrar texto */
+    padding: 60px 20px; /* Espaciado interno */
+    color: rgb(248, 249, 249); /* Texto oscuro para contraste */
+    font-size: 1.5rem; /* Tamaño del texto más grande */
+    font-weight: bold;
+    transition: transform 0.5s ease, box-shadow 0.5s ease; /* Animación suave */
+    cursor: pointer; /* Cambiar cursor al pasar por encima */
+  }
+
+  /* Efecto de zoom al pasar el ratón */
+  .option:hover {
+    transform: scale(1.3); /* Efecto de zoom */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Sombra visible */
+  }
+
+  /* Quitar espacio entre bloques */
+  .options-container .option + .option {
+    margin-left: 0;
+  }
+
+  /* Diseño responsivo */
+  @media (max-width: 768px) {
+    .options-container {
+      flex-direction: column; /* Los bloques se apilan uno debajo del otro */
+    }
+
+    .option {
+      flex: 1 1 100%; /* Cada bloque ocupa el 100% del ancho */
+      padding: 40px 10px; /* Reducir el padding en pantallas medianas */
+    }
+  }
+
+  @media (max-width: 480px) {
+    .option {
+      padding: 20px 10px; /* Padding aún más reducido en pantallas pequeñas */
+    }
+  }
+</style>
+<!-- Carrusel de Hero -->
+<section id="heroCarousel" class="carousel slide" data-bs-ride="carousel">
+
+  <!-- Indicadores (Opcional) -->
+  <div class="carousel-indicators">
+    <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active"></button>
+    <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1"></button>
+    <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2"></button>
+  </div>
+
+  <!-- Contenido del Carrusel -->
+  <div class="carousel-inner">
+
+    <!-- Diapositiva 1 -->
+    <div class="carousel-item active">
+      <section class="hero section dark-background">
+        <img
+          src="/static/core/img/medico_home.jpg"
+          alt="Medico Home"
+          class="hero-img"
+        />
+        <div class="container text-center">
+          <div class="row justify-content-start">
+            <div class="col-lg-8 col-md-8 col-sm-10 text-lg-start text-md-center">
+              <h2>Aptos Físicos Online</h2>
+              <p>
+                Gestiona de manera sencilla y rápida tus exámenes médicos para torneos
+                de fútbol. Los jugadores pueden cargar sus datos y antecedentes, y los
+                médicos realizarán la aprobación del apto físico de forma online.
+              </p>
+              <a href="/account/register/" class="btn-get-started">Regístrate</a>
+              <a href="/account/login/" class="btn-get-started">Inicia Sesión</a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Diapositiva 2 -->
+    <div class="carousel-item">
+      <section class="hero section dark-background">
+        <img
+          src="/static/core/img/alumnos.jpg"
+          alt="alumnos"
+          class="hero-img"
+        />
+        <div class="container text-center">
+          <div class="row justify-content-start">
+            <div class="col-lg-8 col-md-8 col-sm-10 text-lg-start text-md-center">
+              <h2>¿Sos Estudiante? Realiza el Certificado Unico de Salud</h2>
+              <p>
+                Ingresa y llena el certificado con tus datos personales y antecedentes
+              </p>
+              <a href="/account/register_alumnos/" class="btn-get-started">Regístrate</a>
+              <a href="/account/login/" class="btn-get-started">Inicia Sesión</a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Diapositiva 3 -->
+    <div class="carousel-item">
+      <section class="hero section dark-background">
+        <img
+          src="/static/core/img/representante.jpg"
+          alt="Representante del Torneo"
+          class="hero-img"
+        />
+        <div class="container text-center">
+          <div class="row justify-content-start">
+            <div class="col-lg-8 col-md-8 col-sm-10 text-lg-start text-md-center">
+              <h2>Control Total para Representantes</h2>
+              <p>
+                Organiza y supervisa los exámenes médicos de los jugadores y alumnos  sin complicaciones y a un solo click de distancia.
+              </p>
+
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+  </div>
+
+
+
+</section>
+
+
+<!-- End Hero Section -->
+<section id="options" class="options-section">
+  <div class="options-container">
+    <div class="option" style="background-color: #006994">
+        <a href="#quienes-somos" style="color: white; text-decoration: none; display: block;">Quienes Somos</a>
+    </div>
+    <div class="option" style="background-color: #0093c4">
+        <a href="#quiero-ser-prestador" style="color: white; text-decoration: none; display: block;">Quiero ser Prestador</a>
+    </div>
+    <div class="option" style="background-color: #00c4f6">
+      <a href="/InfoNovedades/SaludBienestar/" style="color: white; text-decoration: none; display: block;">Salud y Bienestar</a>
+    </div>
+    <div class="option" style="background-color: #00d7f6">
+      <a href="/InfoNovedades/InfoNovedades/" style="color: white; text-decoration: none; display: block;">Novedades</a>
+    </div>
+    <div class="option" style="background-color:rgb(126, 219, 243)">
+      <a href="#footer" style="color: white; text-decoration: none; display: block;">Contacto</a>
+    </div>
+  </div>
+
+</section>
+
+<!-- ✅ Chatbot Flotante estilo WhatsApp con flujo secuencial -->
+
+<!-- Botón flotante -->
+<div id="chatbot-boton" onclick="abrirChat()" class="btn btn-success rounded-circle d-flex justify-content-center align-items-center" style="position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; z-index: 1050;">
+    <i class="bi bi-chat-dots" style="font-size: 1.5rem;"></i>
+  </div>
+
+  <!-- Contenedor del Chatbot -->
+  <div id="chatbot-contenedor" class="card shadow-sm" style="position: fixed; bottom: 90px; right: 20px; width: 320px; display: none; z-index: 1050;">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+      <span>¿Necesitás ayuda?</span>
+      <button class="btn-close btn-close-white" onclick="cerrarChat()"></button>
+    </div>
+    <div class="card-body">
+      <!-- Paso 1: Pregunta inicial -->
+      <div id="paso1">
+        <p>¿Necesitás ayuda?</p>
+        <div class="d-flex gap-2">
+          <button class="btn btn-outline-primary btn-sm w-100" onclick="siguientePaso(2)">Sí</button>
+          <button class="btn btn-outline-secondary btn-sm w-100" onclick="cerrarChat()">No</button>
+        </div>
+      </div>
+
+      <!-- Paso 2: Selección de tipo de usuario -->
+      <div id="paso2" style="display: none;">
+        <p>¿Sos Tutor o Jugador?</p>
+        <div class="d-flex gap-2">
+          <button class="btn btn-outline-info btn-sm w-100" onclick="mostrarPreguntas('tutor')">Tutor</button>
+          <button class="btn btn-outline-success btn-sm w-100" onclick="mostrarPreguntas('jugador')">Jugador</button>
+        </div>
+      </div>
+
+      <!-- Paso 3: Lista de preguntas -->
+      <div id="preguntas-container" style="display: none;">
+        <p class="fw-bold" id="titulo-preguntas"></p>
+        <ul class="list-group list-group-flush" id="lista-preguntas"></ul>
+        <div id="respuesta" class="alert alert-info mt-3 d-none"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+<script>
+  const preguntasTutor = [
+    { q: "¿Cómo creo un nuevo CUS?", r: "Desde el panel de tutor, seleccioná al estudiante y hacé clic en 'Nuevo CUS'." },
+    { q: "¿Qué pasa si el CUS está vencido?", r: "Podés cargar uno nuevo, y el sistema traerá los datos anteriores." },
+    { q: "¿Dónde veo los antecedentes cargados?", r: "En la ficha del estudiante, sección 'Antecedentes Médicos'." },
+    { q: "¿Puedo actualizar antecedentes?", r: "Sí, solo si el CUS está vencido. Se habilita automáticamente." },
+    { q: "¿Qué estudios puedo cargar?", r: "Laboratorio, oftalmológico, torax, entre otros." },
+    { q: "¿Cuántas actualizaciones tiene el CUS?", r: "Hasta 5 actualizaciones. Luego se marca como vencido." },
+    { q: "¿Puedo ver el PDF del CUS?", r: "Sí, una vez aprobado podés descargarlo." },
+    { q: "¿Qué pasa si falta un formulario?", r: "No se puede guardar el CUS hasta completar todos los formularios." },
+    { q: "¿Puedo contactar al médico?", r: "Sí, desde el panel del estudiante verás los datos del médico asignado." },
+    { q: "¿Qué hago si el CUS fue rechazado?", r: "Revisá los comentarios del rechazo y corregilo para reenviarlo." }
+  ];
+
+  const preguntasJugador = [
+    { q: "¿Cómo subo mis estudios médicos?", r: "Desde tu panel, clic en 'Cargar estudios' y adjuntá los archivos." },
+    { q: "¿Qué pasa si me rechazan un estudio?", r: "El médico dejará un comentario. Subí una nueva versión." },
+    { q: "¿Cuánto dura un apto físico?", r: "Hasta el 31 de diciembre del año en curso." },
+    { q: "¿Dónde veo si mi apto fue aprobado?", r: "En tu panel, el estado se muestra junto al nombre del torneo." },
+    { q: "¿Puedo descargar mi apto físico?", r: "Sí, una vez aprobado podés descargarlo como PDF." },
+    { q: "¿Qué estudios son obligatorios?", r: "Depende del torneo, usualmente laboratorio y cardiovascular." },
+    { q: "¿Puedo usar el mismo apto para varios torneos?", r: "Sí, si está vigente y es aceptado por cada organización." },
+    { q: "¿Quién ve mis estudios?", r: "Solo médicos autorizados y organizadores del torneo." },
+    { q: "¿Puedo subir estudios desde el celular?", r: "Sí, la plataforma es compatible con dispositivos móviles." },
+    { q: "¿Qué pasa si tengo varias fichas en curso?", r: "Podés gestionarlas por separado, cada una vinculada a su torneo." }
+  ];
+
+  const preguntasMedico = [
+    { q: "¿Cómo apruebo un apto?", r: "Busca el jugador, hace click en cargar y completá todos los estudios requeridos. Luego en el certificado selecciona 'Aprobar' y guarda el mismo." },
+    { q: "¿Cómo veo si un apto ya fue aprobado anteriormente?",r: "Desde el panel de jugadores, buscá al paciente y hacé clic en 'Ver ficha'. Si fue aprobado, verás la fecha y el estado final."},
+    { q: "¿Qué debo revisar antes de aprobar un CUS?",r: "Verificá que todos los formularios estén completos, firmados y sin observaciones pendientes."},
+    { q: "¿Qué hago si el jugador no tiene antecedentes cargados?", r: "podras ver al jugador en el listado pero no podras realizar ninguna accion hasta que el jugador cargue los antecedentes" },
+    { q: "¿Puedo agregar comentarios al rechazo?", r: "Sí, antes de rechazar un CUS o apto, podés dejar comentarios en el campo de observaciones explicando los motivos." },
+    { q: "¿Qué pasa si faltan estudios?", r: "No podrás aprobar hasta que estén todos los formularios completos." },
+    { q: "¿Qué hago si el certificado de matrícula es inválido?", r: "Verificá el QR automáticamente al subir el documento. Si no es válido, solicitá uno nuevo." },
+    { q: "¿Qué pasa si el jugador tiene dos registros activos?", r: "Podés ver ambos registros y aprobarlos individualmente. El sistema mantiene separados los torneos." },
+    { q: "¿Puedo validar estudios desde el celular?", r: "Sí, el sistema está optimizado para dispositivos móviles, aunque se recomienda el uso de escritorio para revisar documentos." },
+
+  ];
+
+  function esVistaMedico() {
+    const path = window.location.pathname;
+    const rutasMedico = [
+      "/medico/medico_home/",
+      "/medico/cus_home/",
+      "/medico/seleccionar_apto/",
+      "/medico/documentacion/cargar/",
+      "/medico/contrato/",
+    ];
+    return (
+      rutasMedico.some(r => path.startsWith(r)) ||
+      path.includes("registro_medico_update") ||
+      path.includes("/cus/")
+    );
+  }
+
+  function abrirChat() {
+    document.getElementById("chatbot-contenedor").style.display = "block";
+    document.getElementById("chatbot-boton").style.display = "none";
+
+    if (esVistaMedico()) {
+      mostrarPreguntas("medico");
+      const paso1 = document.getElementById("paso1");
+      const paso2 = document.getElementById("paso2");
+      if (paso1) paso1.style.display = "none";
+      if (paso2) paso2.style.display = "none";
+    }
+  }
+
+  function cerrarChat() {
+    document.getElementById("chatbot-contenedor").style.display = "none";
+    document.getElementById("chatbot-boton").style.display = "flex";
+    const paso1 = document.getElementById("paso1");
+    const paso2 = document.getElementById("paso2");
+    if (paso1) paso1.style.display = "block";
+    if (paso2) paso2.style.display = "none";
+    document.getElementById("preguntas-container").style.display = "none";
+    document.getElementById("respuesta").classList.add("d-none");
+  }
+
+  function siguientePaso(paso) {
+    if (esVistaMedico()) {
+      mostrarPreguntas("medico");
+      return;
+    }
+    document.getElementById("paso1").style.display = paso === 1 ? "block" : "none";
+    document.getElementById("paso2").style.display = paso === 2 ? "block" : "none";
+    document.getElementById("preguntas-container").style.display = "none";
+    document.getElementById("respuesta").classList.add("d-none");
+  }
+
+  function mostrarPreguntas(tipo) {
+    let preguntas;
+    if (tipo === 'tutor') {
+      preguntas = preguntasTutor;
+    } else if (tipo === 'jugador') {
+      preguntas = preguntasJugador;
+    } else if (tipo === 'medico') {
+      preguntas = preguntasMedico;
+    } else {
+      console.warn("Tipo de usuario no reconocido:", tipo);
+      return;
+    }
+
+    const lista = document.getElementById("lista-preguntas");
+    const titulo = document.getElementById("titulo-preguntas");
+    const paso1 = document.getElementById("paso1");
+    const paso2 = document.getElementById("paso2");
+    const preguntasContainer = document.getElementById("preguntas-container");
+
+    if (!lista || !titulo || !paso1 || !preguntasContainer) {
+      console.error("Elementos del DOM no encontrados.");
+      return;
+    }
+
+    lista.innerHTML = "";
+    preguntas.forEach((item) => {
+      const li = document.createElement("li");
+      li.className = "list-group-item list-group-item-action";
+      li.style.cursor = "pointer";
+      li.textContent = item.q;
+      li.onclick = () => mostrarRespuesta(item.r);
+      lista.appendChild(li);
+    });
+
+    titulo.textContent =
+      tipo === 'tutor' ? "Preguntas frecuentes para Tutores" :
+      tipo === 'jugador' ? "Preguntas frecuentes para Jugadores" :
+      "Preguntas frecuentes para Médicos";
+
+    if (paso1) paso1.style.display = "none";
+    if (paso2) paso2.style.display = "none";
+    preguntasContainer.style.display = "block";
+  }
+
+  function mostrarRespuesta(texto) {
+    const div = document.getElementById("respuesta");
+    if (div) {
+      div.textContent = texto;
+      div.classList.remove("d-none");
+    }
+  }
+  document.addEventListener("click", function (event) {
+  const chatContenedor = document.getElementById("chatbot-contenedor");
+  const chatBoton = document.getElementById("chatbot-boton");
+
+  if (!chatContenedor || !chatBoton) return;
+
+  // Si el clic fue fuera del chatbot y del botón flotante, cerrarlo
+  if (!chatContenedor.contains(event.target) && !chatBoton.contains(event.target)) {
+    if (chatContenedor.style.display === "block") {
+      cerrarChat();
+    }
+  }
+});
+</script>
+
+
+    
+        <!-- Publicidades Section -->
+        <section
+          id="publicidades"
+          class="publicidades section light-background"
+          style="padding:40px; margin: 0"
+        >
+          <div class="container-fluid" style="padding: 0">
+            <div class="row g-0">
+              <!-- Columna izquierda: Imagen con leyenda -->
+              <div class="col-md-6 position-relative">
+                <div class="content-container" style="padding-top: 20px">
+                  <!-- Título -->
+                  <h2 style=" font-family: 'Poppins', sans-serif; color: #0D6EFD;background-color: #f9f9f9;text-align: center; margin-bottom: 40px;">
+                    "Plataforma Integral de Evaluación de Salud Escolar y Deportiva"
+                  </h2>
+
+                  <!-- Descripción -->
+                  <p
+                    style="font-family: Nunito Sans; font-size: 1.2rem; line-height: 1.8; text-align: center; color: #333; padding: 0 20px;"
+                  >
+
+                  </p>
+
+                  <!-- Imagen -->
+                  <div
+                    class="image-container"
+                    style="margin-top: 20px; text-align: center"
+                  >
+                    <img
+                      src="/static/core/img/medicina-del-deporte.jpg"
+                      alt="imagen de deporte"
+                      class="img-fluid"
+                      style="
+                        max-width: 100%;
+                        height: 30%;
+                        border-radius: 8px;
+                        margin-top: 0px;
+                      "
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Columna derecha: Carrusel -->
+              <div class="col-md-6">
+                <!-- Ajuste del margen superior -->
+                <div
+                  id="publicidadesCarousel"
+                  class="carousel slide h-100 rounded"
+                  data-bs-ride="carousel"
+                  style="padding: 20px; background-color: white"
+                >
+                  <!-- Contenido del carrusel -->
+                  <div class="carousel-inner" style="margin-top: 50px">
+                    
+                    <div class="carousel-item active">
+                      <div class="text-center">
+                        <img
+                          src="/media/media/publicidades/about.jpg"
+                          alt="Centro Medico San Martin"
+                          class="publicidad-img rounded img-fluid"
+                          style="max-width: 30%; height: auto; margin: 0 auto"
+                        />
+                        <h3 style="margin-top: 15px; font-size: 1.5rem; color: #007bff">
+                          Centro Medico San Martin
+                        </h3>
+                        <p style="color: #555">&quot;Centro Médico San Martín – Atención integral con profesionales de excelencia. Consultas, estudios y especialidades en un solo lugar. Tecnología, calidez y compromiso con tu salud.&quot;</p>
+                        
+                      </div>
+                    </div>
+                    
+                  </div>
+
+                  <!-- Controles de navegación -->
+                  <button
+                    class="carousel-control-prev"
+                    type="button"
+                    data-bs-target="#publicidadesCarousel"
+                    data-bs-slide="prev"
+                  >
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Anterior</span>
+                  </button>
+                  <button
+                    class="carousel-control-next"
+                    type="button"
+                    data-bs-target="#publicidadesCarousel"
+                    data-bs-slide="next"
+                  >
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Siguiente</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+    
+
+
+<!-- Sección Quiénes Somos -->
+<section id="quienes-somos" class="container-fluid py-5" style="background-color: #f9f9f9; font-family: 'Poppins', sans-serif;">
+  <div class="row align-items-center">
+
+    <!-- Columna de Texto -->
+    <div class="col-lg-6 text-center text-lg-start mb-4 mb-lg-0 px-4">
+      <h2 class="text-primary fw-bold mb-4" style="color: #00a2d3; text-align: center;">
+        ¿Quiénes Somos?
+      </h2>
+
+      <p class="text-dark" style="font-size: 1.1rem; line-height: 1.8; text-align: justify;">
+        <strong>Checkeate</strong> es una plataforma digital integral diseñada para gestionar, evaluar y centralizar la información médica de niños, niñas, adolescentes y deportistas.
+      </p>
+
+      <p class="text-dark" style="font-size: 1.1rem; line-height: 1.8; text-align: justify;">
+        Nacimos con el objetivo de modernizar y simplificar el acceso a los <strong>aptos físicos deportivos</strong> y los <strong>certificados escolares de salud (CUS)</strong>, garantizando trazabilidad, seguridad y acompañamiento médico en cada etapa.
+      </p>
+
+      <p class="text-dark" style="font-size: 1.1rem; line-height: 1.8; text-align: justify;">
+        Trabajamos junto a profesionales de la salud, instituciones educativas, clubes y familias para facilitar los procesos de control médico preventivo, mejorar la toma de decisiones y asegurar la aptitud física y escolar de cada estudiante, jugador o deportista.
+      </p>
+
+      <p class="text-dark" style="font-size: 1.1rem; line-height: 1.8; text-align: justify;">
+        Con un enfoque inclusivo, digital y seguro, buscamos contribuir al bienestar de las personas desde una mirada médica integral, respetando los tiempos de cada institución y fomentando hábitos de salud desde la infancia.
+      </p>
+    </div>
+
+    <!-- Columna de Imagen -->
+    <div class="col-lg-6">
+      <img src="/static/core/img/quienes_somos.jpg" alt="Quiénes Somos" class="img-fluid rounded" style="width: 100%; height: auto; object-fit: cover;">
+    </div>
+
+  </div>
+</section>
+
+<!-- Sección Quiero Ser Prestador -->
+<section id="quiero-ser-prestador" class="container-fluid py-5" style="background-color: #f9f9f9; font-family: 'Poppins', sans-serif;">
+  <div class="row align-items-center px-4">
+
+    <!-- Columna de Texto -->
+    <div class="col-lg-6 text-center text-lg-start mb-4 mb-lg-0">
+      <h2 class="text-primary fw-bold mb-4" style="color: #00a2d3; text-align: center;">Quiero ser Prestador</h2>
+
+      <p class="text-dark" style="font-size: 1.1rem; line-height: 1.8; text-align: justify;">
+        Únete a nuestra red de prestadores médicos y forma parte de un proyecto innovador que está transformando la forma en que se gestionan los aptos médicos deportivos.
+      </p>
+      <p class="text-dark" style="font-size: 1.1rem; line-height: 1.8; text-align: justify;">
+        Como prestador, tendrás acceso a herramientas digitales diseñadas para simplificar y optimizar tu trabajo. Podrás realizar evaluaciones médicas de manera eficiente y almacenar toda la información en un sistema centralizado, accesible desde cualquier dispositivo.
+      </p>
+      <p class="text-dark" style="font-size: 1.1rem; line-height: 1.8; text-align: justify;">
+        Además, te ofrecemos la posibilidad de ampliar tu red de pacientes al trabajar directamente con clubes deportivos, torneos y jugadores. Nuestra plataforma conecta a prestadores médicos con organizaciones deportivas, facilitando la coordinación y asegurando que los jugadores cumplan con los requisitos médicos necesarios.
+      </p>
+   <p class="text-dark" style="font-size: 1.1rem; line-height: 1.8; text-align: justify;">
+        <strong>¡Sé parte del cambio y ayúdanos a revolucionar el mundo de los aptos médicos deportivos!</strong>
+        <br>
+        Para más información, <a href="/info_prest" class="text-primary fw-bold">hacé clic aquí</a>.
+      </p>
+    </div>
+
+    <!-- Columna de Formulario -->
+    <div class="col-lg-6">
+      <form action="/" method="POST" class="bg-white p-4 rounded shadow-sm">
+        <input type="hidden" name="csrfmiddlewaretoken" value="5wjDeL2dfCJGje2ArtEEDpv6l973kAJEyuQ4emSGkUHwkQuC9TzHrXGVZTHUP6Ku">
+        <input type="hidden" name="tipo_formulario" value="quiero_prestador">
+
+        <h3 class="text-primary text-center mb-3" style="color: #00a2d3;">¿Quieres ser Prestador?</h3>
+        <p class="text-center mb-4" style="font-size: 1rem; color: #333;">
+          Rellena el siguiente formulario para contactarnos y formar parte de nuestra red de prestadores médicos. Nos pondremos en contacto contigo lo antes posible.
+        </p>
+
+        <!-- Nombre -->
+        <div class="mb-3">
+          <label for="name" class="form-label fw-semibold" style="color: #333;">Nombre completo:</label>
+          <input type="text" id="name" name="name" class="form-control" required>
+        </div>
+
+        <!-- Correo electrónico -->
+        <div class="mb-3">
+          <label for="email" class="form-label fw-semibold" style="color: #333;">Correo electrónico:</label>
+          <input type="email" id="email" name="email" class="form-control" required>
+        </div>
+
+        <!-- Mensaje -->
+        <div class="mb-3">
+          <label for="message" class="form-label fw-semibold" style="color: #333;">Mensaje:</label>
+          <textarea id="message" name="message" rows="4" class="form-control" required></textarea>
+        </div>
+
+        <!-- Botón de envío -->
+        <div class="text-center">
+          <button type="submit" class="btn btn-primary w-100" style="background-color: #00a2d3; border: none; padding: 10px 20px; font-size: 1rem; border-radius: 4px;">Enviar Consulta</button>
+        </div>
+      </form>
+    </div>
+
+  </div>
+</section>
+
+
+
+
+
+
+    
+<footer id="footer" style="display: flex; flex-wrap: wrap; justify-content: space-between; padding: 20px; background-color: #d9e6f2; color:#2c3e50;">
+    <!-- Sección Izquierda: Logo -->
+    <div style="flex: 1; display: flex; align-items: center; justify-content: center; margin-right: 20px;">
+        <img src="/static/core/img/milogo4.png" alt="Logo Checkeate" style="height: 150px; margin-right: 10px;">
+
+    </div>
+
+    <!-- Sección Central: Información -->
+    <div style="flex: 1; border-left: 2px solid #fff; padding-left: 20px; display: flex; flex-direction: column; justify-content: center;">
+        <p style="margin: 5px 0;"> CHECKEATE 2025 - Todos los derechos reservados</p>
+        <p style="margin: 5px 0;">Av. Cornelio Savedra 343 - CP5008 - Córdoba</p>
+        <p style="margin: 5px 0;">Email: CentroMedicoDR.GR@gmail.com / Tel: 3513817760</p>
+    </div>
+
+    <!-- Sección Derecha: Formulario -->
+    <div style="flex: 1; padding: 8px; background-color: #fff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); max-width: 400px; margin: 0 auto;">
+      <h4 style="color: #00a2d3; text-align: center; margin-bottom: 6px; font-size: 1rem;">Contáctanos</h4>
+      <form action="/" method="POST" style="display: flex; flex-direction: column; gap: 4px;">
+        <input type="hidden" name="csrfmiddlewaretoken" value="5wjDeL2dfCJGje2ArtEEDpv6l973kAJEyuQ4emSGkUHwkQuC9TzHrXGVZTHUP6Ku">
+        <input type="hidden" name="tipo_formulario" value="footer_contacto">
+
+        <input type="text" name="nombre" placeholder="Tu nombre" required
+              style="padding: 6px; font-size: 0.9rem; border: 1px solid #ddd; border-radius: 4px;">
+          <input type="email" name="email" placeholder="Tu correo" required
+              style="padding: 6px; font-size: 0.9rem; border: 1px solid #ddd; border-radius: 4px;">
+          <textarea name="mensaje" placeholder="Tu mensaje" rows="2" required
+              style="padding: 6px; font-size: 0.9rem; border: 1px solid #ddd; border-radius: 4px; resize: none;"></textarea>
+          <button type="submit"
+              style="background-color: #00a2d3; color: white; border: none; padding: 6px; border-radius: 4px; font-size: 0.9rem; cursor: pointer;">
+              Enviar
+          </button>
+      </form>
+  </div>
+
+
+</footer>
+<script>
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+
+        document.querySelector(this.getAttribute('href')).scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'  // Asegura que la sección inicie desde la parte superior de la ventana
+        });
+    });
+});
+</script>
+
+
+
+    <!-- Modal de confirmación de cierre de sesión -->
+    <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="logoutModalLabel">Cerrar Sesión</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    ¿Estás seguro de que deseas cerrar sesión?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <form method="POST" action="/account/logout/" class="d-inline" id="logout-form">
+                        <input type="hidden" name="csrfmiddlewaretoken" value="5wjDeL2dfCJGje2ArtEEDpv6l973kAJEyuQ4emSGkUHwkQuC9TzHrXGVZTHUP6Ku">
+                        <button type="submit" class="btn btn-danger">Cerrar Sesión</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vendor JS Files -->
+    <script src="/static/core/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/core/vendor/aos/aos.js"></script>
+    <script src="/static/core/vendor/glightbox/js/glightbox.min.js"></script>
+    <script src="/static/core/vendor/swiper/swiper-bundle.min.js"></script>
+
+    <!-- Main JS File -->
+
+</body>
+
+</html>
