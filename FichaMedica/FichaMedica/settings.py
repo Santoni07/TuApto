@@ -133,14 +133,18 @@ WSGI_APPLICATION = 'FichaMedica.wsgi.application'
 }
  """
 
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'checkeate_db',
+        'USER': 'super',
+        'PASSWORD': 'asantoni_888',
+        'HOST': 'Salud-4592.postgres.pythonanywhere-services.com',
+        'PORT': '14592',
+    }
+}
 
 """ DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-} """
-DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'checkeate_db',         
@@ -149,7 +153,7 @@ DATABASES = {
         'HOST': 'localhost',
         'PORT': '5433',
     }
-}
+} """
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
